@@ -87,14 +87,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { name: "theme-color", content: "#0a0a1a" },
-      { title: "Bible Habit" },
-      { name: "description", content: "Acompanhe sua leitura bíblica diária, ofensiva e progresso." },
-      { property: "og:title", content: "Bible Habit" },
-      { property: "og:description", content: "Acompanhe sua leitura bíblica diária, ofensiva e progresso." },
+      { title: "Bible Habit — Rastreador de Leitura Bíblica" },
+      { name: "description", content: "Bible Habit é o app para criar o hábito da leitura bíblica: registre capítulos, mantenha sua ofensiva e leia em grupo com ranking semanal." },
+      { property: "og:site_name", content: "Bible Habit" },
+      { property: "og:title", content: "Bible Habit — Rastreador de Leitura Bíblica" },
+      { property: "og:description", content: "Crie o hábito da leitura bíblica: ofensiva diária, planos personalizados, grupos com ranking semanal e conquistas para manter você firme na Palavra." },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://biblehabit.lovable.app" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Bible Habit" },
-      { name: "twitter:description", content: "Acompanhe sua leitura bíblica diária, ofensiva e progresso." },
+      { name: "twitter:title", content: "Bible Habit — Rastreador de Leitura Bíblica" },
+      { name: "twitter:description", content: "Crie o hábito da leitura bíblica: ofensiva diária, planos personalizados, grupos com ranking semanal e conquistas." },
       { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/e43ca74d-8381-4cd6-9aa4-d643178f57fe" },
       { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/e43ca74d-8381-4cd6-9aa4-d643178f57fe" },
     ],
@@ -103,6 +105,27 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         // Default to dark unless the user explicitly picked light.
         children:
           "(function(){try{var s=localStorage.getItem('theme');var d=s?s!=='light':true;if(d)document.documentElement.classList.add('dark');}catch(e){document.documentElement.classList.add('dark');}})();",
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization",
+              name: "Bible Habit",
+              url: "https://biblehabit.lovable.app",
+              logo: "https://biblehabit.lovable.app/favicon.ico",
+            },
+            {
+              "@type": "WebSite",
+              name: "Bible Habit",
+              url: "https://biblehabit.lovable.app",
+              description: "Rastreador de leitura bíblica com ofensiva diária, planos, grupos e conquistas.",
+              inLanguage: "pt-BR",
+            },
+          ],
+        }),
       },
     ],
     links: [
@@ -115,6 +138,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
     ],
   }),
+
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
