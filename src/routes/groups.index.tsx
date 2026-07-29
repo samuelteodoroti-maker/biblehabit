@@ -17,13 +17,16 @@ export const Route = createFileRoute("/groups/")({
   head: () => ({
     meta: [
       { title: "Grupos — Bible Habit" },
-      { name: "description", content: "Leia junto com seus grupos e acompanhe o ranking semanal." },
+      { name: "description", content: "Leia a Bíblia junto com seus amigos: crie grupos, entre com código de convite e acompanhe o ranking semanal de capítulos lidos." },
       { property: "og:title", content: "Grupos — Bible Habit" },
-      { property: "og:description", content: "Leia junto com seus grupos e acompanhe o ranking semanal." },
+      { property: "og:description", content: "Leia a Bíblia junto com seus amigos: crie grupos, entre com código de convite e acompanhe o ranking semanal de capítulos lidos." },
+      { property: "og:url", content: "https://biblehabit.lovable.app/groups" },
     ],
+    links: [{ rel: "canonical", href: "https://biblehabit.lovable.app/groups" }],
   }),
   component: GroupsPage,
 });
+
 
 type Group = {
   id: string;
@@ -160,7 +163,7 @@ function GroupsPage() {
                   {g.avatar ?? "📖"}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="truncate font-display font-semibold">{g.name}</h3>
+                  <h2 className="truncate font-display font-semibold">{g.name}</h2>
                   <p className="text-xs text-muted-foreground">
                     {g.member_count} {g.member_count === 1 ? "membro" : "membros"}
                   </p>

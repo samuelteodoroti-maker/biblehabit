@@ -14,14 +14,17 @@ import { useAuth } from "@/hooks/useAuth";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Bible Habit" },
-      { name: "description", content: "Acompanhe sua leitura bíblica diária, ofensiva e progresso." },
-      { property: "og:title", content: "Bible Habit" },
-      { property: "og:description", content: "Acompanhe sua leitura bíblica diária, ofensiva e progresso." },
+      { title: "Início — Bible Habit" },
+      { name: "description", content: "Acompanhe sua ofensiva diária, registre capítulos lidos e visualize seu calendário de leitura bíblica no Bible Habit." },
+      { property: "og:title", content: "Início — Bible Habit" },
+      { property: "og:description", content: "Acompanhe sua ofensiva diária, registre capítulos lidos e visualize seu calendário de leitura bíblica no Bible Habit." },
+      { property: "og:url", content: "https://biblehabit.lovable.app/" },
     ],
+    links: [{ rel: "canonical", href: "https://biblehabit.lovable.app/" }],
   }),
   component: HomePage,
 });
+
 
 const pad = (n: number) => String(n).padStart(2, "0");
 function todayKey() {
@@ -209,12 +212,14 @@ function HomePage() {
       {/* Greeting */}
       <div className="mb-6">
         <p className="text-xs font-medium uppercase tracking-[0.15em] text-muted-foreground">
-          {greeting()}
+          {greeting()}, {displayName} 👋
         </p>
         <h1 className="mt-1 font-display text-3xl font-bold tracking-tight">
-          {displayName} <span className="inline-block">👋</span>
+          Seu hábito bíblico — Bible Habit
         </h1>
       </div>
+
+
 
       {/* Streak hero */}
       <Card className="relative mb-4 overflow-hidden border-border/60 bg-card/70 p-6 shadow-card backdrop-blur-sm">

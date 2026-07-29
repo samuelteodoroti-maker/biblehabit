@@ -21,14 +21,17 @@ import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recha
 export const Route = createFileRoute("/progress")({
   head: () => ({
     meta: [
-      { title: "Planos — Bible Habit" },
-      { name: "description", content: "Gerencie seus planos de leitura personalizados." },
-      { property: "og:title", content: "Planos — Bible Habit" },
-      { property: "og:description", content: "Gerencie seus planos de leitura personalizados." },
+      { title: "Planos de leitura — Bible Habit" },
+      { name: "description", content: "Crie e acompanhe planos de leitura bíblica personalizados, visualize seus insights e o gráfico de capítulos lidos nos últimos 7 dias." },
+      { property: "og:title", content: "Planos de leitura — Bible Habit" },
+      { property: "og:description", content: "Crie e acompanhe planos de leitura bíblica personalizados, visualize seus insights e o gráfico de capítulos lidos nos últimos 7 dias." },
+      { property: "og:url", content: "https://biblehabit.lovable.app/progress" },
     ],
+    links: [{ rel: "canonical", href: "https://biblehabit.lovable.app/progress" }],
   }),
   component: ProgressPage,
 });
+
 
 type Plan = {
   id: string;
@@ -297,9 +300,10 @@ function ProgressPage() {
     <AppShell title="Planos de leitura" subtitle="Crie e acompanhe suas jornadas">
       {insights.hasData && (
         <div className="mb-6 space-y-3">
-          <p className="px-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+          <h2 className="px-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
             Insights pessoais
-          </p>
+          </h2>
+
           <div className="grid grid-cols-2 gap-3">
             <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
               <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
@@ -380,7 +384,7 @@ function ProgressPage() {
               <div className="flex items-start gap-4">
                 <CircularProgress value={pct} />
                 <div className="min-w-0 flex-1">
-                  <h3 className="truncate font-display text-base font-semibold">{p.title}</h3>
+                  <h2 className="truncate font-display text-base font-semibold">{p.title}</h2>
                   <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
                     {p.description ?? "—"}
                   </p>

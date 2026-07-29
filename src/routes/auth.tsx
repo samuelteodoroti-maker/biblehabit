@@ -73,11 +73,12 @@ function AuthPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-5 py-10">
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-5 py-10">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[420px] hero-glow" aria-hidden />
       <div className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full gradient-primary opacity-20 blur-3xl" aria-hidden />
 
       <div className="relative w-full max-w-sm">
+
         {/* Brand */}
         <div className="mb-10 flex flex-col items-center text-center">
           <div className="relative flex h-20 w-20 items-center justify-center rounded-3xl gradient-primary shadow-glow">
@@ -180,6 +181,7 @@ function AuthPage() {
           </button>
         </p>
       </div>
-    </div>
+    </main>
   );
+
 }
