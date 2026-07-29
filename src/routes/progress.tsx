@@ -56,28 +56,54 @@ function ProgressPage() {
   const [plans, setPlans] = useState<Plan[]>(readingPlans);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Plan | null>(null);
-  const [form, setForm] = useState({ title: "", description: "", totalDays: 30 });
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    totalDays: 30,
+    fromIdx: 0,
+    toIdx: 0,
+    daysTouched: false,
+  });
+
+  const totalChapters = useMemo(
+    () => chaptersBetween(form.fromIdx, form.toIdx),
+    [form.fromIdx, form.toIdx],
+  );
+  const suggestedDays = Math.max(1, totalChapters);
+
+  useEffect(() => {
+    if (!open || editing) return;
+    if (totalChapters <= 0) return;
+    if (form.daysTouched) return;
+    setForm((f) => ({ ...f, totalDays: suggestedDays }));
+  }, [open, editing, totalChapters, suggestedDays, form.daysTouched]);
 
   const openNew = () => {
     setEditing(null);
-    setForm({ title: "", description: "", totalDays: 30 });
+    setForm({ title: "", description: "", totalDays: 30, fromIdx: 0, toIdx: 0, daysTouched: false });
     setOpen(true);
   };
   const openEdit = (p: Plan) => {
     setEditing(p);
-    setForm({ title: p.title, description: p.description, totalDays: p.totalDays });
+    setForm({ title: p.title, description: p.description, totalDays: p.totalDays, fromIdx: 0, toIdx: 0, daysTouched: true });
     setOpen(true);
   };
   const save = () => {
     if (!form.title.trim()) return toast.error("Título obrigatório");
+    const description = editing
+      ? form.description
+      : totalChapters > 0
+        ? `${bibleBooks[form.fromIdx].name} — ${bibleBooks[form.toIdx].name} (${totalChapters} capítulos)`
+        : form.description;
+    const payload = { title: form.title, description, totalDays: form.totalDays };
     if (editing) {
-      setPlans((prev) => prev.map((p) => (p.id === editing.id ? { ...p, ...form } : p)));
+      setPlans((prev) => prev.map((p) => (p.id === editing.id ? { ...p, ...payload } : p)));
       toast.success("Plano atualizado");
     } else {
       const id = "p" + Date.now();
       setPlans((prev) => [
         ...prev,
-        { id, ...form, completedDays: 0, booksToday: "—", shareLink: `https://biblereader.app/join/${id}` },
+        { id, ...payload, completedDays: 0, booksToday: "—", shareLink: `https://biblereader.app/join/${id}` },
       ]);
       toast.success("Plano criado");
     }
