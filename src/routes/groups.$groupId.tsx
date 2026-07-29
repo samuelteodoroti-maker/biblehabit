@@ -63,8 +63,10 @@ type Message = {
 function weekStart() {
   const d = new Date();
   d.setHours(0, 0, 0, 0);
-  d.setDate(d.getDate() - d.getDay()); // Sunday
-  return d.toISOString().slice(0, 10);
+  d.setDate(d.getDate() - d.getDay()); // Sunday, local time
+  // Format in LOCAL time — reading_logs.read_date is stored as a local calendar date.
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
 function timeAgo(iso: string) {
@@ -274,15 +276,34 @@ function GroupDetail() {
     setSending(true);
     const text = draft.trim();
     setDraft("");
-    const { error } = await supabase.from("group_messages").insert({
-      group_id: groupId,
+    // Optimistic insert so the sender sees the message immediately even if realtime lags.
+    const tempId = `tmp-${Date.now()}`;
+    const optimistic: Message = {
+      id: tempId,
       user_id: user.id,
       message: text,
-    });
+      created_at: new Date().toISOString(),
+    };
+    setMessages((prev) => [...prev, optimistic]);
+    const { data, error } = await supabase
+      .from("group_messages")
+      .insert({ group_id: groupId, user_id: user.id, message: text })
+      .select("id, user_id, message, created_at")
+      .maybeSingle();
     setSending(false);
     if (error) {
       toast.error(error.message);
+      setMessages((prev) => prev.filter((m) => m.id !== tempId));
       setDraft(text);
+      return;
+    }
+    // Replace optimistic with the persisted row; realtime insert will dedupe by id.
+    if (data) {
+      setMessages((prev) => {
+        const withoutTemp = prev.filter((m) => m.id !== tempId);
+        if (withoutTemp.some((m) => m.id === (data as Message).id)) return withoutTemp;
+        return [...withoutTemp, data as Message];
+      });
     }
   };
 

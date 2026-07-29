@@ -89,13 +89,19 @@ function CircularProgress({ value }: { value: number }) {
   );
 }
 
+const pad2 = (n: number) => String(n).padStart(2, "0");
+function localDateKey(d: Date) {
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+}
+
 function buildLast7(dayMap: Map<string, number>) {
   const out: { day: string; chapters: number }[] = [];
   const labels = ["D", "S", "T", "Q", "Q", "S", "S"];
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
-    const key = d.toISOString().slice(0, 10);
+    // Use local date to match how reading_logs.read_date is stored (local day).
+    const key = localDateKey(d);
     out.push({ day: labels[d.getDay()], chapters: dayMap.get(key) ?? 0 });
   }
   return out;
