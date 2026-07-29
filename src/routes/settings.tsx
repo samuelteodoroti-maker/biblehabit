@@ -117,7 +117,7 @@ function SettingsPage() {
       <Section title="Minha conta">
         <Row>
           <Avatar className="h-14 w-14 ring-2 ring-primary/30">
-            {avatarUrl && <AvatarImage src={avatarUrl} />}
+            {effectiveAvatar && <AvatarImage src={effectiveAvatar} />}
             <AvatarFallback className="gradient-primary text-primary-foreground">
               {initial}
             </AvatarFallback>
