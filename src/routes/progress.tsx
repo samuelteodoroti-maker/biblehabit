@@ -11,11 +11,12 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Plus, Share2, Pencil, Trash2, Loader2, BookOpen } from "lucide-react";
+import { Plus, Share2, Pencil, Trash2, Loader2, BookOpen, CalendarHeart, TrendingUp } from "lucide-react";
 import { bibleBooks, chaptersBetween } from "@/lib/bibleBooks";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
 
 export const Route = createFileRoute("/progress")({
   head: () => ({
