@@ -163,7 +163,7 @@ function GroupsPage() {
                   {g.avatar ?? "📖"}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="truncate font-display font-semibold">{g.name}</h3>
+                  <h2 className="truncate font-display font-semibold">{g.name}</h2>
                   <p className="text-xs text-muted-foreground">
                     {g.member_count} {g.member_count === 1 ? "membro" : "membros"}
                   </p>
