@@ -60,10 +60,8 @@ type Message = {
 
 function weekStart() {
   const d = new Date();
-  const day = d.getDay();
-  const diff = (day + 6) % 7;
-  d.setDate(d.getDate() - diff);
   d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() - d.getDay()); // Sunday
   return d.toISOString().slice(0, 10);
 }
 
