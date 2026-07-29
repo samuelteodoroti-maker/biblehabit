@@ -76,28 +76,14 @@ function HomePage() {
         {registered ? "Leitura registrada ✓" : "Registrar leitura de hoje"}
       </Button>
 
-      <Card className="p-4">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-semibold">Calendário de leitura</h2>
-          <span className="text-xs text-muted-foreground">Últimos 90 dias</span>
-        </div>
-        <div className="grid grid-flow-col grid-rows-7 gap-1">
-          {readingHeatmap.map((d) => (
-            <div
-              key={d.date}
-              title={`${d.date}: ${d.value > 0 ? "leu" : "sem leitura"}`}
-              className={`h-3 w-3 rounded-sm ${intensityClass(d.value)}`}
-            />
-          ))}
-        </div>
-        <div className="mt-3 flex items-center justify-end gap-1 text-xs text-muted-foreground">
-          <span>menos</span>
-          {[0, 1, 2, 3, 4].map((v) => (
-            <div key={v} className={`h-3 w-3 rounded-sm ${intensityClass(v)}`} />
-          ))}
-          <span>mais</span>
-        </div>
-      </Card>
+      <ReadingCalendar
+        year={CURRENT_YEAR}
+        month={CURRENT_MONTH}
+        today={TODAY}
+        readDates={readDates}
+        className="mb-6"
+      />
     </AppShell>
   );
 }
+
