@@ -103,15 +103,21 @@ function SettingsPage() {
     navigate({ to: "/auth" });
   };
 
-  const displayName = name || email.split("@")[0] || "Você";
-  const initial = (name || email || "?")[0]?.toUpperCase();
+  const metaName =
+    (user?.user_metadata?.full_name as string | undefined) ??
+    (user?.user_metadata?.name as string | undefined) ??
+    "";
+  const metaAvatar = (user?.user_metadata?.avatar_url as string | undefined) ?? null;
+  const effectiveAvatar = avatarUrl || metaAvatar;
+  const displayName = name || metaName || email.split("@")[0] || "Você";
+  const initial = (displayName || email || "?")[0]?.toUpperCase();
 
   return (
     <AppShell title="Ajustes" subtitle="Conta, integrações e preferências">
       <Section title="Minha conta">
         <Row>
           <Avatar className="h-14 w-14 ring-2 ring-primary/30">
-            {avatarUrl && <AvatarImage src={avatarUrl} />}
+            {effectiveAvatar && <AvatarImage src={effectiveAvatar} />}
             <AvatarFallback className="gradient-primary text-primary-foreground">
               {initial}
             </AvatarFallback>
@@ -176,7 +182,7 @@ function SettingsPage() {
       <Section title="Minha atividade">
         {logs.length === 0 ? (
           <div className="p-6 text-center text-sm text-muted-foreground">
-            Você ainda não registrou nenhuma leitura.
+            Nenhuma atividade recente. Registre sua primeira leitura para começar!
           </div>
         ) : (
           logs.map((l) => (
