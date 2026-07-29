@@ -384,7 +384,7 @@ function ProgressPage() {
               <div className="flex items-start gap-4">
                 <CircularProgress value={pct} />
                 <div className="min-w-0 flex-1">
-                  <h3 className="truncate font-display text-base font-semibold">{p.title}</h3>
+                  <h2 className="truncate font-display text-base font-semibold">{p.title}</h2>
                   <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
                     {p.description ?? "—"}
                   </p>
