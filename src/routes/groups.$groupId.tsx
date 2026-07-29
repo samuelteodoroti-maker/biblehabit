@@ -201,6 +201,29 @@ function GroupDetail() {
       if (cancelled) return;
       setActivities(feed);
       setLoadingActivities(false);
+
+      // Load reactions for these activities
+      const logIds = feed.map((f) => f.id);
+      if (logIds.length > 0) {
+        const { data: rx } = await supabase
+          .from("reactions")
+          .select("log_id, type, user_id")
+          .in("log_id", logIds);
+        if (cancelled) return;
+        const map = new Map<string, { fire: number; amen: number; myFire: boolean; myAmen: boolean }>();
+        (rx ?? []).forEach((r: { log_id: string; type: string; user_id: string }) => {
+          const cur = map.get(r.log_id) ?? { fire: 0, amen: 0, myFire: false, myAmen: false };
+          if (r.type === "fire") {
+            cur.fire++;
+            if (r.user_id === user.id) cur.myFire = true;
+          } else if (r.type === "amen") {
+            cur.amen++;
+            if (r.user_id === user.id) cur.myAmen = true;
+          }
+          map.set(r.log_id, cur);
+        });
+        setReactions(map);
+      }
     })();
     return () => { cancelled = true; };
   }, [members, user]);
