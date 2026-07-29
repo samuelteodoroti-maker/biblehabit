@@ -224,6 +224,10 @@ export type Database = {
       }
     }
     Functions: {
+      is_group_member: {
+        Args: { _group_id: string; _user_id: string }
+        Returns: boolean
+      }
       join_group_by_code: { Args: { _code: string }; Returns: string }
     }
     Enums: {
