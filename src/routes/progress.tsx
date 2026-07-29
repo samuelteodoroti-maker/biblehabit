@@ -1,16 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
-  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
+  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 import { Plus, Share2, Pencil, Trash2 } from "lucide-react";
 import { readingPlans } from "@/lib/mockData";
+import { bibleBooks, chaptersBetween } from "@/lib/bibleBooks";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/progress")({
@@ -53,28 +56,54 @@ function ProgressPage() {
   const [plans, setPlans] = useState<Plan[]>(readingPlans);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Plan | null>(null);
-  const [form, setForm] = useState({ title: "", description: "", totalDays: 30 });
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    totalDays: 30,
+    fromIdx: 0,
+    toIdx: 0,
+    daysTouched: false,
+  });
+
+  const totalChapters = useMemo(
+    () => chaptersBetween(form.fromIdx, form.toIdx),
+    [form.fromIdx, form.toIdx],
+  );
+  const suggestedDays = Math.max(1, totalChapters);
+
+  useEffect(() => {
+    if (!open || editing) return;
+    if (totalChapters <= 0) return;
+    if (form.daysTouched) return;
+    setForm((f) => ({ ...f, totalDays: suggestedDays }));
+  }, [open, editing, totalChapters, suggestedDays, form.daysTouched]);
 
   const openNew = () => {
     setEditing(null);
-    setForm({ title: "", description: "", totalDays: 30 });
+    setForm({ title: "", description: "", totalDays: 30, fromIdx: 0, toIdx: 0, daysTouched: false });
     setOpen(true);
   };
   const openEdit = (p: Plan) => {
     setEditing(p);
-    setForm({ title: p.title, description: p.description, totalDays: p.totalDays });
+    setForm({ title: p.title, description: p.description, totalDays: p.totalDays, fromIdx: 0, toIdx: 0, daysTouched: true });
     setOpen(true);
   };
   const save = () => {
     if (!form.title.trim()) return toast.error("Título obrigatório");
+    const description = editing
+      ? form.description
+      : totalChapters > 0
+        ? `${bibleBooks[form.fromIdx].name} — ${bibleBooks[form.toIdx].name} (${totalChapters} capítulos)`
+        : form.description;
+    const payload = { title: form.title, description, totalDays: form.totalDays };
     if (editing) {
-      setPlans((prev) => prev.map((p) => (p.id === editing.id ? { ...p, ...form } : p)));
+      setPlans((prev) => prev.map((p) => (p.id === editing.id ? { ...p, ...payload } : p)));
       toast.success("Plano atualizado");
     } else {
       const id = "p" + Date.now();
       setPlans((prev) => [
         ...prev,
-        { id, ...form, completedDays: 0, booksToday: "—", shareLink: `https://biblereader.app/join/${id}` },
+        { id, ...payload, completedDays: 0, booksToday: "—", shareLink: `https://biblereader.app/join/${id}` },
       ]);
       toast.success("Plano criado");
     }
@@ -136,16 +165,55 @@ function ProgressPage() {
               <Label>Título</Label>
               <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
             </div>
-            <div>
-              <Label>Descrição / livros e capítulos</Label>
-              <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Livro Inicial (De)</Label>
+                <Select
+                  value={String(form.fromIdx)}
+                  onValueChange={(v) => {
+                    const from = Number(v);
+                    setForm((f) => ({ ...f, fromIdx: from, toIdx: Math.max(from, f.toIdx) }));
+                  }}
+                >
+                  <SelectTrigger><SelectValue placeholder="Selecionar" /></SelectTrigger>
+                  <SelectContent>
+                    {bibleBooks.map((b, i) => (
+                      <SelectItem key={b.name} value={String(i)}>{b.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Livro Final (Até)</Label>
+                <Select
+                  value={String(form.toIdx)}
+                  onValueChange={(v) => setForm((f) => ({ ...f, toIdx: Number(v) }))}
+                >
+                  <SelectTrigger><SelectValue placeholder="Selecionar" /></SelectTrigger>
+                  <SelectContent>
+                    {bibleBooks.map((b, i) => (
+                      <SelectItem key={b.name} value={String(i)} disabled={i < form.fromIdx}>
+                        {b.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+            {totalChapters > 0 && (
+              <p className="text-xs text-muted-foreground">
+                Total: {totalChapters} capítulos. Sugestão: {suggestedDays} dias (1 capítulo/dia).
+              </p>
+            )}
             <div>
               <Label>Dias</Label>
               <Input
                 type="number"
+                min={1}
                 value={form.totalDays}
-                onChange={(e) => setForm({ ...form, totalDays: Number(e.target.value) })}
+                onChange={(e) =>
+                  setForm({ ...form, totalDays: Number(e.target.value), daysTouched: true })
+                }
               />
             </div>
           </div>
