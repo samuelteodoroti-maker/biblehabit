@@ -1,6 +1,6 @@
 ---
 name: ui-design
-description: Sistema completo de design de interfaces: grid de 12 colunas, espaçamento em múltiplos de 8px, hierarquia visual em 3 níveis, design tokens e guias de estilo. Define componentes, whitespace como ferramenta de design e padrões de consistência para que a interface inteira siga a mesma linguagem visual do início ao fim do projeto.
+description: "Sistema completo de design de interfaces: grid de 12 colunas, espaçamento em múltiplos de 8px, hierarquia visual em 3 níveis, design tokens e guias de estilo. Define componentes, whitespace como ferramenta de design e padrões de consistência para que a interface inteira siga a mesma linguagem visual do início ao fim do projeto."
 ---
 
 Apply professional UI design principles to this project.
