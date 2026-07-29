@@ -155,6 +155,47 @@ function ProgressPage() {
     return () => { cancelled = true; };
   }, [user]);
 
+  // Insights
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const since = new Date();
+      since.setDate(since.getDate() - 89);
+      const sinceStr = since.toISOString().slice(0, 10);
+      const { data } = await supabase
+        .from("reading_logs")
+        .select("read_date, chapters_count")
+        .eq("user_id", user.id)
+        .gte("read_date", sinceStr);
+      if (cancelled) return;
+      const logs = (data ?? []) as { read_date: string; chapters_count: number }[];
+      if (logs.length === 0) {
+        setInsights({ favoriteDay: null, avgChapters: 0, last7: buildLast7(new Map()), hasData: false });
+        return;
+      }
+      const dayNames = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+      const dayCounts = new Array(7).fill(0);
+      let totalChapters = 0;
+      const dayMap = new Map<string, number>();
+      for (const l of logs) {
+        const d = new Date(l.read_date + "T00:00:00");
+        dayCounts[d.getDay()]++;
+        totalChapters += l.chapters_count ?? 0;
+        dayMap.set(l.read_date, (dayMap.get(l.read_date) ?? 0) + (l.chapters_count ?? 0));
+      }
+      let favIdx = 0;
+      for (let i = 1; i < 7; i++) if (dayCounts[i] > dayCounts[favIdx]) favIdx = i;
+      setInsights({
+        favoriteDay: dayCounts[favIdx] > 0 ? dayNames[favIdx] : null,
+        avgChapters: totalChapters / logs.length,
+        last7: buildLast7(dayMap),
+        hasData: true,
+      });
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
+
   const openNew = () => {
     setEditing(null);
     setForm({ title: "", totalDays: 30, fromIdx: 0, toIdx: 0, daysTouched: false });
