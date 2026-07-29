@@ -45,8 +45,6 @@ function GroupDetail() {
       </AppShell>
     );
   }
-  const [messages, setMessages] = useState(groupMessages);
-  const [draft, setDraft] = useState("");
 
   const send = () => {
     if (!draft.trim()) return;
