@@ -536,7 +536,7 @@ function GroupDetail() {
             members.map((m, i) => {
               const rank = i + 1;
               const displayName = m.name ?? "Sem nome";
-              const podiumStyles: Record<number, { bg: string; ring: string; icon: JSX.Element }> = {
+              const podiumStyles: Record<number, { bg: string; ring: string; icon: ReactNode }> = {
                 1: {
                   bg: "bg-gradient-to-br from-yellow-400 to-amber-600 text-white shadow-glow",
                   ring: "ring-1 ring-yellow-400/40",
