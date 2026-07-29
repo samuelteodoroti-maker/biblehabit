@@ -165,16 +165,55 @@ function ProgressPage() {
               <Label>Título</Label>
               <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
             </div>
-            <div>
-              <Label>Descrição / livros e capítulos</Label>
-              <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Livro Inicial (De)</Label>
+                <Select
+                  value={String(form.fromIdx)}
+                  onValueChange={(v) => {
+                    const from = Number(v);
+                    setForm((f) => ({ ...f, fromIdx: from, toIdx: Math.max(from, f.toIdx) }));
+                  }}
+                >
+                  <SelectTrigger><SelectValue placeholder="Selecionar" /></SelectTrigger>
+                  <SelectContent>
+                    {bibleBooks.map((b, i) => (
+                      <SelectItem key={b.name} value={String(i)}>{b.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Livro Final (Até)</Label>
+                <Select
+                  value={String(form.toIdx)}
+                  onValueChange={(v) => setForm((f) => ({ ...f, toIdx: Number(v) }))}
+                >
+                  <SelectTrigger><SelectValue placeholder="Selecionar" /></SelectTrigger>
+                  <SelectContent>
+                    {bibleBooks.map((b, i) => (
+                      <SelectItem key={b.name} value={String(i)} disabled={i < form.fromIdx}>
+                        {b.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+            {totalChapters > 0 && (
+              <p className="text-xs text-muted-foreground">
+                Total: {totalChapters} capítulos. Sugestão: {suggestedDays} dias (1 capítulo/dia).
+              </p>
+            )}
             <div>
               <Label>Dias</Label>
               <Input
                 type="number"
+                min={1}
                 value={form.totalDays}
-                onChange={(e) => setForm({ ...form, totalDays: Number(e.target.value) })}
+                onChange={(e) =>
+                  setForm({ ...form, totalDays: Number(e.target.value), daysTouched: true })
+                }
               />
             </div>
           </div>
