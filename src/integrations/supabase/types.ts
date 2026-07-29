@@ -14,7 +14,176 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      group_members: {
+        Row: {
+          group_id: string
+          joined_at: string
+          user_id: string
+        }
+        Insert: {
+          group_id: string
+          joined_at?: string
+          user_id: string
+        }
+        Update: {
+          group_id?: string
+          joined_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      groups: {
+        Row: {
+          avatar: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          invite_code: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          avatar?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          invite_code?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          avatar?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          invite_code?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          current_streak: number
+          email: string | null
+          id: string
+          last_read_date: string | null
+          longest_streak: number
+          name: string | null
+          total_chapters_read: number
+          updated_at: string
+          youversion_link: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          current_streak?: number
+          email?: string | null
+          id: string
+          last_read_date?: string | null
+          longest_streak?: number
+          name?: string | null
+          total_chapters_read?: number
+          updated_at?: string
+          youversion_link?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          current_streak?: number
+          email?: string | null
+          id?: string
+          last_read_date?: string | null
+          longest_streak?: number
+          name?: string | null
+          total_chapters_read?: number
+          updated_at?: string
+          youversion_link?: string | null
+        }
+        Relationships: []
+      }
+      reading_logs: {
+        Row: {
+          chapters_count: number
+          chapters_text: string | null
+          created_at: string
+          id: string
+          plan_id: string | null
+          read_date: string
+          user_id: string
+        }
+        Insert: {
+          chapters_count?: number
+          chapters_text?: string | null
+          created_at?: string
+          id?: string
+          plan_id?: string | null
+          read_date?: string
+          user_id: string
+        }
+        Update: {
+          chapters_count?: number
+          chapters_text?: string | null
+          created_at?: string
+          id?: string
+          plan_id?: string | null
+          read_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      reading_plans: {
+        Row: {
+          books_today: string | null
+          completed_days: number
+          created_at: string
+          description: string | null
+          goal_days: number
+          id: string
+          share_code: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          books_today?: string | null
+          completed_days?: number
+          created_at?: string
+          description?: string | null
+          goal_days?: number
+          id?: string
+          share_code?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          books_today?: string | null
+          completed_days?: number
+          created_at?: string
+          description?: string | null
+          goal_days?: number
+          id?: string
+          share_code?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
