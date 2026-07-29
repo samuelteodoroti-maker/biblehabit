@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -11,10 +11,11 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Plus, Share2, Pencil, Trash2 } from "lucide-react";
-import { readingPlans } from "@/lib/mockData";
+import { Plus, Share2, Pencil, Trash2, Loader2 } from "lucide-react";
 import { bibleBooks, chaptersBetween } from "@/lib/bibleBooks";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/progress")({
   head: () => ({
@@ -28,7 +29,17 @@ export const Route = createFileRoute("/progress")({
   component: ProgressPage,
 });
 
-type Plan = (typeof readingPlans)[number];
+type Plan = {
+  id: string;
+  title: string;
+  description: string | null;
+  start_book: string | null;
+  end_book: string | null;
+  total_days: number;
+  completed_days: number;
+  books_today: string | null;
+  share_code: string | null;
+};
 
 function CircularProgress({ value }: { value: number }) {
   const safe = Number.isFinite(value) ? Math.max(0, Math.min(100, value)) : 0;
@@ -53,12 +64,15 @@ function CircularProgress({ value }: { value: number }) {
 }
 
 function ProgressPage() {
-  const [plans, setPlans] = useState<Plan[]>(readingPlans);
+  const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
+  const [plans, setPlans] = useState<Plan[]>([]);
+  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState<Plan | null>(null);
   const [form, setForm] = useState({
     title: "",
-    description: "",
     totalDays: 30,
     fromIdx: 0,
     toIdx: 0,
@@ -72,70 +86,163 @@ function ProgressPage() {
   const suggestedDays = Math.max(1, totalChapters);
 
   useEffect(() => {
+    if (!authLoading && !user) navigate({ to: "/auth" });
+  }, [user, authLoading, navigate]);
+
+  useEffect(() => {
     if (!open || editing) return;
     if (totalChapters <= 0) return;
     if (form.daysTouched) return;
     setForm((f) => ({ ...f, totalDays: suggestedDays }));
   }, [open, editing, totalChapters, suggestedDays, form.daysTouched]);
 
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    setLoading(true);
+    (async () => {
+      const { data, error } = await supabase
+        .from("reading_plans")
+        .select("id, title, description, start_book, end_book, total_days, goal_days, completed_days, books_today, share_code")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+      if (cancelled) return;
+      if (error) toast.error(error.message);
+      setPlans(
+        (data ?? []).map((p) => ({
+          id: p.id,
+          title: p.title,
+          description: p.description,
+          start_book: p.start_book,
+          end_book: p.end_book,
+          total_days: p.total_days ?? p.goal_days ?? 30,
+          completed_days: p.completed_days ?? 0,
+          books_today: p.books_today,
+          share_code: p.share_code,
+        })),
+      );
+      setLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
+
   const openNew = () => {
     setEditing(null);
-    setForm({ title: "", description: "", totalDays: 30, fromIdx: 0, toIdx: 0, daysTouched: false });
+    setForm({ title: "", totalDays: 30, fromIdx: 0, toIdx: 0, daysTouched: false });
     setOpen(true);
   };
+
   const openEdit = (p: Plan) => {
+    const fromIdx = Math.max(0, bibleBooks.findIndex((b) => b.name === p.start_book));
+    const toIdx = Math.max(fromIdx, bibleBooks.findIndex((b) => b.name === p.end_book));
     setEditing(p);
-    setForm({ title: p.title, description: p.description, totalDays: p.totalDays, fromIdx: 0, toIdx: 0, daysTouched: true });
+    setForm({
+      title: p.title,
+      totalDays: p.total_days,
+      fromIdx: fromIdx < 0 ? 0 : fromIdx,
+      toIdx: toIdx < 0 ? 0 : toIdx,
+      daysTouched: true,
+    });
     setOpen(true);
   };
-  const save = () => {
+
+  const save = async () => {
+    if (!user) return;
     if (!form.title.trim()) return toast.error("Título obrigatório");
-    const description = editing
-      ? form.description
-      : totalChapters > 0
-        ? `${bibleBooks[form.fromIdx].name} — ${bibleBooks[form.toIdx].name} (${totalChapters} capítulos)`
-        : form.description;
-    const payload = { title: form.title, description, totalDays: form.totalDays };
+    setSaving(true);
+    const startBook = bibleBooks[form.fromIdx]?.name ?? null;
+    const endBook = bibleBooks[form.toIdx]?.name ?? null;
+    const description =
+      totalChapters > 0 ? `${startBook} — ${endBook} (${totalChapters} capítulos)` : null;
+
     if (editing) {
-      setPlans((prev) => prev.map((p) => (p.id === editing.id ? { ...p, ...payload } : p)));
+      const { data, error } = await supabase
+        .from("reading_plans")
+        .update({
+          title: form.title,
+          description,
+          start_book: startBook,
+          end_book: endBook,
+          total_days: form.totalDays,
+          goal_days: form.totalDays,
+        })
+        .eq("id", editing.id)
+        .select("id, title, description, start_book, end_book, total_days, completed_days, books_today, share_code")
+        .maybeSingle();
+      setSaving(false);
+      if (error) return toast.error(error.message);
+      if (data) setPlans((prev) => prev.map((p) => (p.id === editing.id ? { ...p, ...data } as Plan : p)));
       toast.success("Plano atualizado");
     } else {
-      const id = "p" + Date.now();
-      setPlans((prev) => [
-        ...prev,
-        { id, ...payload, completedDays: 0, booksToday: "—", shareLink: `https://biblereader.app/join/${id}` },
-      ]);
+      const { data, error } = await supabase
+        .from("reading_plans")
+        .insert({
+          user_id: user.id,
+          title: form.title,
+          description,
+          start_book: startBook,
+          end_book: endBook,
+          total_days: form.totalDays,
+          goal_days: form.totalDays,
+        })
+        .select("id, title, description, start_book, end_book, total_days, completed_days, books_today, share_code")
+        .maybeSingle();
+      setSaving(false);
+      if (error) return toast.error(error.message);
+      if (data) setPlans((prev) => [{ ...(data as Plan) }, ...prev]);
       toast.success("Plano criado");
     }
     setOpen(false);
   };
-  const remove = (id: string) => {
+
+  const remove = async (id: string) => {
+    const { error } = await supabase.from("reading_plans").delete().eq("id", id);
+    if (error) return toast.error(error.message);
     setPlans((prev) => prev.filter((p) => p.id !== id));
     toast.success("Plano removido");
   };
+
   const share = (p: Plan) => {
-    navigator.clipboard?.writeText(p.shareLink).catch(() => {});
+    const link = p.share_code
+      ? `${window.location.origin}/join/${p.share_code}`
+      : `${window.location.origin}/plan/${p.id}`;
+    navigator.clipboard?.writeText(link).catch(() => {});
     toast.success("Link de convite copiado");
   };
 
   return (
     <AppShell title="Planos de leitura">
-      <Button onClick={openNew} className="mb-5 w-full gap-2">
+      <Button onClick={openNew} className="mb-5 w-full gap-2" disabled={!user}>
         <Plus className="h-4 w-4" /> Novo plano
       </Button>
 
+      {loading && (
+        <div className="flex justify-center py-10 text-muted-foreground">
+          <Loader2 className="h-5 w-5 animate-spin" />
+        </div>
+      )}
+
+      {!loading && plans.length === 0 && user && (
+        <Card className="p-6 text-center text-sm text-muted-foreground">
+          Você ainda não tem planos de leitura. Crie o primeiro para começar.
+        </Card>
+      )}
+
       <div className="space-y-3">
         {plans.map((p) => {
-          const pct = p.totalDays > 0 ? (p.completedDays / p.totalDays) * 100 : 0;
+          const pct = p.total_days > 0 ? (p.completed_days / p.total_days) * 100 : 0;
           return (
             <Card key={p.id} className="p-4">
               <div className="flex items-start gap-4">
                 <CircularProgress value={pct} />
                 <div className="min-w-0 flex-1">
                   <h3 className="truncate font-semibold">{p.title}</h3>
-                  <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{p.description}</p>
+                  <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
+                    {p.description ?? "—"}
+                  </p>
                   <p className="mt-2 text-xs text-muted-foreground">
-                    {p.completedDays}/{p.totalDays} dias · Hoje: {p.booksToday}
+                    {p.completed_days}/{p.total_days} dias
+                    {p.books_today ? ` · Hoje: ${p.books_today}` : ""}
                   </p>
                 </div>
               </div>
@@ -218,8 +325,11 @@ function ProgressPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
-            <Button onClick={save}>Salvar</Button>
+            <Button variant="outline" onClick={() => setOpen(false)} disabled={saving}>Cancelar</Button>
+            <Button onClick={save} disabled={saving}>
+              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Salvar
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
