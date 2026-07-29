@@ -11,7 +11,7 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Plus, Share2, Pencil, Trash2, Loader2 } from "lucide-react";
+import { Plus, Share2, Pencil, Trash2, Loader2, BookOpen } from "lucide-react";
 import { bibleBooks, chaptersBetween } from "@/lib/bibleBooks";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,9 +20,9 @@ import { useAuth } from "@/hooks/useAuth";
 export const Route = createFileRoute("/progress")({
   head: () => ({
     meta: [
-      { title: "Progresso — Bible Habit" },
+      { title: "Planos — Bible Habit" },
       { name: "description", content: "Gerencie seus planos de leitura personalizados." },
-      { property: "og:title", content: "Progresso — Bible Habit" },
+      { property: "og:title", content: "Planos — Bible Habit" },
       { property: "og:description", content: "Gerencie seus planos de leitura personalizados." },
     ],
   }),
@@ -47,16 +47,38 @@ function CircularProgress({ value }: { value: number }) {
   const c = 2 * Math.PI * r;
   const offset = c - (safe / 100) * c;
   return (
-    <svg width="80" height="80" viewBox="0 0 80 80" className="shrink-0" aria-label={`Progresso ${Math.round(safe)}%`}>
-      <circle cx="40" cy="40" r={r} className="fill-none stroke-muted" strokeWidth="8" />
+    <svg
+      width="80"
+      height="80"
+      viewBox="0 0 80 80"
+      className="shrink-0"
+      aria-label={`Progresso ${Math.round(safe)}%`}
+    >
+      <defs>
+        <linearGradient id="progGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="oklch(0.55 0.22 275)" />
+          <stop offset="100%" stopColor="oklch(0.75 0.19 275)" />
+        </linearGradient>
+      </defs>
+      <circle cx="40" cy="40" r={r} className="fill-none stroke-muted/60" strokeWidth="7" />
       <circle
-        cx="40" cy="40" r={r}
-        className="fill-none stroke-primary transition-all"
-        strokeWidth="8" strokeLinecap="round"
-        strokeDasharray={c} strokeDashoffset={offset}
+        cx="40"
+        cy="40"
+        r={r}
+        stroke="url(#progGrad)"
+        className="fill-none transition-all"
+        strokeWidth="7"
+        strokeLinecap="round"
+        strokeDasharray={c}
+        strokeDashoffset={offset}
         transform="rotate(-90 40 40)"
       />
-      <text x="40" y="45" textAnchor="middle" className="fill-foreground text-sm font-bold">
+      <text
+        x="40"
+        y="46"
+        textAnchor="middle"
+        className="fill-foreground font-display text-base font-bold"
+      >
         {Math.round(safe)}%
       </text>
     </svg>
@@ -211,8 +233,12 @@ function ProgressPage() {
   };
 
   return (
-    <AppShell title="Planos de leitura">
-      <Button onClick={openNew} className="mb-5 w-full gap-2" disabled={!user}>
+    <AppShell title="Planos de leitura" subtitle="Crie e acompanhe suas jornadas">
+      <Button
+        onClick={openNew}
+        className="mb-6 h-12 w-full gap-2 rounded-2xl gradient-primary font-semibold text-primary-foreground shadow-glow hover:brightness-110"
+        disabled={!user}
+      >
         <Plus className="h-4 w-4" /> Novo plano
       </Button>
 
@@ -223,8 +249,12 @@ function ProgressPage() {
       )}
 
       {!loading && plans.length === 0 && user && (
-        <Card className="p-6 text-center text-sm text-muted-foreground">
-          Você ainda não tem planos de leitura. Crie o primeiro para começar.
+        <Card className="border-dashed border-border/70 bg-card/40 p-8 text-center">
+          <BookOpen className="mx-auto h-8 w-8 text-muted-foreground" />
+          <p className="mt-3 font-display text-base font-semibold">Sem planos ainda</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Crie o primeiro para começar sua jornada.
+          </p>
         </Card>
       )}
 
@@ -232,28 +262,54 @@ function ProgressPage() {
         {plans.map((p) => {
           const pct = p.total_days > 0 ? (p.completed_days / p.total_days) * 100 : 0;
           return (
-            <Card key={p.id} className="p-4">
+            <Card
+              key={p.id}
+              className="border-border/60 bg-card/70 p-5 backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:shadow-card"
+            >
               <div className="flex items-start gap-4">
                 <CircularProgress value={pct} />
                 <div className="min-w-0 flex-1">
-                  <h3 className="truncate font-semibold">{p.title}</h3>
-                  <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
+                  <h3 className="truncate font-display text-base font-semibold">{p.title}</h3>
+                  <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
                     {p.description ?? "—"}
                   </p>
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    {p.completed_days}/{p.total_days} dias
-                    {p.books_today ? ` · Hoje: ${p.books_today}` : ""}
-                  </p>
+                  <div className="mt-2.5 flex flex-wrap gap-1.5 text-[11px]">
+                    <span className="rounded-full border border-border/60 bg-background/50 px-2 py-0.5 font-medium text-muted-foreground">
+                      {p.completed_days}/{p.total_days} dias
+                    </span>
+                    {p.books_today ? (
+                      <span className="rounded-full bg-primary/15 px-2 py-0.5 font-medium text-primary">
+                        Hoje: {p.books_today}
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
               </div>
-              <div className="mt-3 flex gap-2">
-                <Button size="sm" variant="secondary" className="flex-1 gap-1.5" onClick={() => share(p)}>
+              <div className="mt-4 flex gap-2">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="flex-1 gap-1.5 rounded-xl"
+                  onClick={() => share(p)}
+                >
                   <Share2 className="h-3.5 w-3.5" /> Compartilhar
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => openEdit(p)}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="rounded-xl"
+                  onClick={() => openEdit(p)}
+                  aria-label="Editar"
+                >
                   <Pencil className="h-3.5 w-3.5" />
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => remove(p.id)}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="rounded-xl text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  onClick={() => remove(p.id)}
+                  aria-label="Remover"
+                >
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
               </div>
@@ -263,18 +319,25 @@ function ProgressPage() {
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
+        <DialogContent className="rounded-2xl border-border/60 bg-card/95 backdrop-blur-xl">
           <DialogHeader>
-            <DialogTitle>{editing ? "Editar plano" : "Novo plano"}</DialogTitle>
+            <DialogTitle className="font-display text-xl">
+              {editing ? "Editar plano" : "Novo plano"}
+            </DialogTitle>
           </DialogHeader>
-          <div className="space-y-3">
-            <div>
-              <Label>Título</Label>
-              <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <Label className="text-xs">Título</Label>
+              <Input
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                placeholder="Ex.: Novo Testamento em 90 dias"
+                className="h-10 rounded-xl"
+              />
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label>Livro Inicial (De)</Label>
+              <div className="space-y-1.5">
+                <Label className="text-xs">De</Label>
                 <Select
                   value={String(form.fromIdx)}
                   onValueChange={(v) => {
@@ -282,7 +345,9 @@ function ProgressPage() {
                     setForm((f) => ({ ...f, fromIdx: from, toIdx: Math.max(from, f.toIdx) }));
                   }}
                 >
-                  <SelectTrigger><SelectValue placeholder="Selecionar" /></SelectTrigger>
+                  <SelectTrigger className="h-10 rounded-xl">
+                    <SelectValue placeholder="Selecionar" />
+                  </SelectTrigger>
                   <SelectContent>
                     {bibleBooks.map((b, i) => (
                       <SelectItem key={b.name} value={String(i)}>{b.name}</SelectItem>
@@ -290,13 +355,15 @@ function ProgressPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <Label>Livro Final (Até)</Label>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Até</Label>
                 <Select
                   value={String(form.toIdx)}
                   onValueChange={(v) => setForm((f) => ({ ...f, toIdx: Number(v) }))}
                 >
-                  <SelectTrigger><SelectValue placeholder="Selecionar" /></SelectTrigger>
+                  <SelectTrigger className="h-10 rounded-xl">
+                    <SelectValue placeholder="Selecionar" />
+                  </SelectTrigger>
                   <SelectContent>
                     {bibleBooks.map((b, i) => (
                       <SelectItem key={b.name} value={String(i)} disabled={i < form.fromIdx}>
@@ -308,12 +375,15 @@ function ProgressPage() {
               </div>
             </div>
             {totalChapters > 0 && (
-              <p className="text-xs text-muted-foreground">
-                Total: {totalChapters} capítulos. Sugestão: {suggestedDays} dias (1 capítulo/dia).
-              </p>
+              <div className="rounded-xl border border-border/60 bg-background/50 px-3 py-2.5 text-xs text-muted-foreground">
+                Total: <span className="font-semibold text-foreground">{totalChapters}</span>{" "}
+                capítulos · Sugestão:{" "}
+                <span className="font-semibold text-foreground">{suggestedDays}</span> dias (1
+                capítulo/dia).
+              </div>
             )}
-            <div>
-              <Label>Dias</Label>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Dias</Label>
               <Input
                 type="number"
                 min={1}
@@ -321,12 +391,24 @@ function ProgressPage() {
                 onChange={(e) =>
                   setForm({ ...form, totalDays: Number(e.target.value), daysTouched: true })
                 }
+                className="h-10 rounded-xl"
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)} disabled={saving}>Cancelar</Button>
-            <Button onClick={save} disabled={saving}>
+            <Button
+              variant="outline"
+              className="rounded-xl"
+              onClick={() => setOpen(false)}
+              disabled={saving}
+            >
+              Cancelar
+            </Button>
+            <Button
+              className="rounded-xl gradient-primary font-semibold text-primary-foreground shadow-glow hover:brightness-110"
+              onClick={save}
+              disabled={saving}
+            >
               {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Salvar
             </Button>
