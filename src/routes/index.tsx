@@ -111,7 +111,7 @@ function HomePage() {
           last_read_date: null,
         };
       } else if ((!p.name && metaName) || (!p.avatar_url && metaAvatar)) {
-        const patch: Record<string, string> = {};
+        const patch: { name?: string; avatar_url?: string } = {};
         if (!p.name && metaName) patch.name = metaName;
         if (!p.avatar_url && metaAvatar) patch.avatar_url = metaAvatar;
         const { data: updated } = await supabase
