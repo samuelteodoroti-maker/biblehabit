@@ -14,14 +14,16 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/groups/$groupId")({
   head: () => ({
     meta: [
-      { title: "Grupo — Bible Habit" },
-      { name: "description", content: "Atividades, ranking e chat do grupo." },
-      { property: "og:title", content: "Grupo — Bible Habit" },
-      { property: "og:description", content: "Atividades, ranking e chat do grupo." },
+      { title: "Detalhes do grupo — Bible Habit" },
+      { name: "description", content: "Veja as atividades recentes do grupo, o ranking semanal de capítulos lidos e converse com os membros no chat do Bible Habit." },
+      { property: "og:title", content: "Detalhes do grupo — Bible Habit" },
+      { property: "og:description", content: "Veja as atividades recentes do grupo, o ranking semanal de capítulos lidos e converse com os membros no chat do Bible Habit." },
+      { property: "og:type", content: "article" },
     ],
   }),
   component: GroupDetail,
 });
+
 
 type Group = {
   id: string;
