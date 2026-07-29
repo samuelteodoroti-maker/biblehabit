@@ -13,9 +13,9 @@ import { useAuth } from "@/hooks/useAuth";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Início — Bible Habit" },
+      { title: "Bible Habit" },
       { name: "description", content: "Acompanhe sua leitura bíblica diária, ofensiva e progresso." },
-      { property: "og:title", content: "Início — Bible Habit" },
+      { property: "og:title", content: "Bible Habit" },
       { property: "og:description", content: "Acompanhe sua leitura bíblica diária, ofensiva e progresso." },
     ],
   }),
