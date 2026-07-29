@@ -239,3 +239,7 @@
 @utility safe-bottom {
   padding-bottom: max(env(safe-area-inset-bottom), 0.5rem);
 }
+
+#lovable-badge {
+  display: none !important;
+}
