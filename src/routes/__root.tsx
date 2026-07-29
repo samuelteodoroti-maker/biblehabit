@@ -4,11 +4,14 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
+  useNavigate,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 
 import appCss from "../styles.css?url";
@@ -127,9 +130,35 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <AuthGate>
+        <Outlet />
+      </AuthGate>
       <Toaster position="top-center" richColors />
     </QueryClientProvider>
   );
+}
+
+const PUBLIC_PATHS = new Set(["/auth"]);
+
+function AuthGate({ children }: { children: ReactNode }) {
+  const { session, loading } = useAuth();
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isPublic = PUBLIC_PATHS.has(pathname);
+
+  useEffect(() => {
+    if (loading) return;
+    if (!session && !isPublic) {
+      navigate({ to: "/auth", replace: true });
+    }
+  }, [loading, session, isPublic, navigate]);
+
+  if (loading) {
+    return <div className="min-h-screen bg-background" />;
+  }
+  if (!session && !isPublic) {
+    return <div className="min-h-screen bg-background" />;
+  }
+  return <>{children}</>;
 }
 
