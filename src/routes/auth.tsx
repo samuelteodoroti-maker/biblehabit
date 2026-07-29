@@ -12,9 +12,9 @@ import { useAuth } from "@/hooks/useAuth";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Entrar — Bible Tracker" },
+      { title: "Entrar — Bible Habit" },
       { name: "description", content: "Mantenha sua chama acesa. Leia a Bíblia todos os dias." },
-      { property: "og:title", content: "Entrar — Bible Tracker" },
+      { property: "og:title", content: "Entrar — Bible Habit" },
       { property: "og:description", content: "Mantenha sua chama acesa. Leia a Bíblia todos os dias." },
     ],
   }),
@@ -81,7 +81,7 @@ function AuthPage() {
             <BookOpen className="h-8 w-8 text-primary" />
             <Flame className="absolute -bottom-1 -right-1 h-5 w-5 fill-orange-500 text-orange-500 drop-shadow" />
           </div>
-          <h1 className="mt-4 text-3xl font-bold tracking-tight">Bible Tracker</h1>
+          <h1 className="mt-4 text-3xl font-bold tracking-tight">Bible Habit</h1>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
             Mantenha sua chama acesa. Construa o hábito de ler a Bíblia todos os dias.
           </p>

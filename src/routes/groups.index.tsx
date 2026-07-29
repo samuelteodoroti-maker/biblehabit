@@ -9,9 +9,9 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/groups/")({
   head: () => ({
     meta: [
-      { title: "Grupos — Bible Tracker" },
+      { title: "Grupos — Bible Habit" },
       { name: "description", content: "Leia junto com seus grupos e acompanhe o ranking semanal." },
-      { property: "og:title", content: "Grupos — Bible Tracker" },
+      { property: "og:title", content: "Grupos — Bible Habit" },
       { property: "og:description", content: "Leia junto com seus grupos e acompanhe o ranking semanal." },
     ],
   }),

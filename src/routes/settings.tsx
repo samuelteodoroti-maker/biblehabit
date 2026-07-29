@@ -15,9 +15,9 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/settings")({
   head: () => ({
     meta: [
-      { title: "Ajustes — Bible Tracker" },
+      { title: "Ajustes — Bible Habit" },
       { name: "description", content: "Conta, integrações, atividade e tema do aplicativo." },
-      { property: "og:title", content: "Ajustes — Bible Tracker" },
+      { property: "og:title", content: "Ajustes — Bible Habit" },
       { property: "og:description", content: "Conta, integrações, atividade e tema do aplicativo." },
     ],
   }),

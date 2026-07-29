@@ -20,9 +20,9 @@ import { useAuth } from "@/hooks/useAuth";
 export const Route = createFileRoute("/progress")({
   head: () => ({
     meta: [
-      { title: "Progresso — Bible Tracker" },
+      { title: "Progresso — Bible Habit" },
       { name: "description", content: "Gerencie seus planos de leitura personalizados." },
-      { property: "og:title", content: "Progresso — Bible Tracker" },
+      { property: "og:title", content: "Progresso — Bible Habit" },
       { property: "og:description", content: "Gerencie seus planos de leitura personalizados." },
     ],
   }),
