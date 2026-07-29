@@ -92,6 +92,9 @@ function GroupDetail() {
   const [notFound, setNotFound] = useState(false);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
+  const [reactions, setReactions] = useState<
+    Map<string, { fire: number; amen: number; myFire: boolean; myAmen: boolean }>
+  >(new Map());
   const chatEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
