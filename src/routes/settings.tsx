@@ -54,7 +54,46 @@ function SettingsPage() {
   const [youVersion, setYouVersion] = useState("");
   const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [saving, setSaving] = useState(false);
+  const [reminderEnabled, setReminderEnabled] = useState(false);
+  const [reminderTime, setReminderTime] = useState("20:00");
   const email = user?.email ?? "";
+
+  useEffect(() => {
+    try {
+      const en = localStorage.getItem("bh_reminder_enabled") === "1";
+      const t = localStorage.getItem("bh_reminder_time") || "20:00";
+      setReminderEnabled(en);
+      setReminderTime(t);
+    } catch {}
+  }, []);
+
+  const toggleReminder = async (checked: boolean) => {
+    if (checked) {
+      if (!("Notification" in window)) {
+        toast.error("Este navegador não suporta notificações");
+        return;
+      }
+      let perm = Notification.permission;
+      if (perm === "default") perm = await Notification.requestPermission();
+      if (perm !== "granted") {
+        toast.error("Permissão de notificação negada");
+        return;
+      }
+      localStorage.setItem("bh_reminder_enabled", "1");
+      localStorage.setItem("bh_reminder_time", reminderTime);
+      setReminderEnabled(true);
+      toast.success("Lembretes ativados");
+    } else {
+      localStorage.setItem("bh_reminder_enabled", "0");
+      setReminderEnabled(false);
+      toast.success("Lembretes desativados");
+    }
+  };
+
+  const updateReminderTime = (v: string) => {
+    setReminderTime(v);
+    localStorage.setItem("bh_reminder_time", v);
+  };
 
   useEffect(() => {
     if (!user) return;
