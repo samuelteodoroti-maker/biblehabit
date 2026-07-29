@@ -28,11 +28,12 @@ export const Route = createFileRoute("/progress")({
 type Plan = (typeof readingPlans)[number];
 
 function CircularProgress({ value }: { value: number }) {
+  const safe = Number.isFinite(value) ? Math.max(0, Math.min(100, value)) : 0;
   const r = 32;
   const c = 2 * Math.PI * r;
-  const offset = c - (value / 100) * c;
+  const offset = c - (safe / 100) * c;
   return (
-    <svg width="80" height="80" viewBox="0 0 80 80" className="shrink-0">
+    <svg width="80" height="80" viewBox="0 0 80 80" className="shrink-0" aria-label={`Progresso ${Math.round(safe)}%`}>
       <circle cx="40" cy="40" r={r} className="fill-none stroke-muted" strokeWidth="8" />
       <circle
         cx="40" cy="40" r={r}
@@ -42,7 +43,7 @@ function CircularProgress({ value }: { value: number }) {
         transform="rotate(-90 40 40)"
       />
       <text x="40" y="45" textAnchor="middle" className="fill-foreground text-sm font-bold">
-        {Math.round(value)}%
+        {Math.round(safe)}%
       </text>
     </svg>
   );
@@ -96,7 +97,7 @@ function ProgressPage() {
 
       <div className="space-y-3">
         {plans.map((p) => {
-          const pct = (p.completedDays / p.totalDays) * 100;
+          const pct = p.totalDays > 0 ? (p.completedDays / p.totalDays) * 100 : 0;
           return (
             <Card key={p.id} className="p-4">
               <div className="flex items-start gap-4">
