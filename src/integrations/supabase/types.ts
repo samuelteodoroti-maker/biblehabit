@@ -186,10 +186,36 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_profiles: {
+        Row: {
+          avatar_url: string | null
+          current_streak: number | null
+          id: string | null
+          longest_streak: number | null
+          name: string | null
+          total_chapters_read: number | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          current_streak?: number | null
+          id?: string | null
+          longest_streak?: number | null
+          name?: string | null
+          total_chapters_read?: number | null
+        }
+        Update: {
+          avatar_url?: string | null
+          current_streak?: number | null
+          id?: string | null
+          longest_streak?: number | null
+          name?: string | null
+          total_chapters_read?: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      [_ in never]: never
+      join_group_by_code: { Args: { _code: string }; Returns: string }
     }
     Enums: {
       [_ in never]: never
