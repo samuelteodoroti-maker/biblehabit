@@ -98,7 +98,6 @@ function buildLast7(dayMap: Map<string, number>) {
   return out;
 }
 
-function ProgressPage_UNUSED() {}
 
 function ProgressPage() {
   const navigate = useNavigate();
