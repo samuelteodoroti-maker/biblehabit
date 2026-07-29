@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Flame, BookOpenCheck, CalendarDays } from "lucide-react";
 import { currentUser, readingHeatmap, readingPlans } from "@/lib/mockData";
+import { ReadingCalendar } from "@/components/ReadingCalendar";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
@@ -19,15 +20,17 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-function intensityClass(v: number) {
-  return [
-    "bg-muted",
-    "bg-primary/20",
-    "bg-primary/40",
-    "bg-primary/70",
-    "bg-primary",
-  ][v];
-}
+// Dados fixos para garantir consistência entre SSR e CSR.
+const CURRENT_YEAR = 2026;
+const CURRENT_MONTH = 6; // July (0-indexed)
+const TODAY = "2026-07-29";
+const readDates = new Set(
+  readingHeatmap
+    .filter((d) => d.value > 0)
+    .map((d) => d.date)
+    .filter((d) => d.startsWith("2026-07"))
+);
+
 
 function HomePage() {
   const [registered, setRegistered] = useState(false);
@@ -73,28 +76,14 @@ function HomePage() {
         {registered ? "Leitura registrada ✓" : "Registrar leitura de hoje"}
       </Button>
 
-      <Card className="p-4">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-semibold">Calendário de leitura</h2>
-          <span className="text-xs text-muted-foreground">Últimos 90 dias</span>
-        </div>
-        <div className="grid grid-flow-col grid-rows-7 gap-1">
-          {readingHeatmap.map((d) => (
-            <div
-              key={d.date}
-              title={`${d.date}: ${d.value > 0 ? "leu" : "sem leitura"}`}
-              className={`h-3 w-3 rounded-sm ${intensityClass(d.value)}`}
-            />
-          ))}
-        </div>
-        <div className="mt-3 flex items-center justify-end gap-1 text-xs text-muted-foreground">
-          <span>menos</span>
-          {[0, 1, 2, 3, 4].map((v) => (
-            <div key={v} className={`h-3 w-3 rounded-sm ${intensityClass(v)}`} />
-          ))}
-          <span>mais</span>
-        </div>
-      </Card>
+      <ReadingCalendar
+        year={CURRENT_YEAR}
+        month={CURRENT_MONTH}
+        today={TODAY}
+        readDates={readDates}
+        className="mb-6"
+      />
     </AppShell>
   );
 }
+
