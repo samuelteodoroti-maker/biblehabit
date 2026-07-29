@@ -94,6 +94,12 @@ function ProgressPage() {
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState<Plan | null>(null);
+  const [insights, setInsights] = useState<{
+    favoriteDay: string | null;
+    avgChapters: number;
+    last7: { day: string; chapters: number }[];
+    hasData: boolean;
+  }>({ favoriteDay: null, avgChapters: 0, last7: [], hasData: false });
   const [form, setForm] = useState({
     title: "",
     totalDays: 30,
