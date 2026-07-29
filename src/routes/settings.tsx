@@ -182,7 +182,7 @@ function SettingsPage() {
       <Section title="Minha atividade">
         {logs.length === 0 ? (
           <div className="p-6 text-center text-sm text-muted-foreground">
-            Você ainda não registrou nenhuma leitura.
+            Nenhuma atividade recente. Registre sua primeira leitura para começar!
           </div>
         ) : (
           logs.map((l) => (
