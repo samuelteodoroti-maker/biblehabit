@@ -103,8 +103,14 @@ function SettingsPage() {
     navigate({ to: "/auth" });
   };
 
-  const displayName = name || email.split("@")[0] || "Você";
-  const initial = (name || email || "?")[0]?.toUpperCase();
+  const metaName =
+    (user?.user_metadata?.full_name as string | undefined) ??
+    (user?.user_metadata?.name as string | undefined) ??
+    "";
+  const metaAvatar = (user?.user_metadata?.avatar_url as string | undefined) ?? null;
+  const effectiveAvatar = avatarUrl || metaAvatar;
+  const displayName = name || metaName || email.split("@")[0] || "Você";
+  const initial = (displayName || email || "?")[0]?.toUpperCase();
 
   return (
     <AppShell title="Ajustes" subtitle="Conta, integrações e preferências">
