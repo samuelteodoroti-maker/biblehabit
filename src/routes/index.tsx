@@ -4,7 +4,6 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Flame, BookOpenCheck, CalendarDays, Loader2, Sparkles, Check } from "lucide-react";
-import { currentUser, readingHeatmap, readingPlans } from "@/lib/mockData";
 import { ReadingCalendar } from "@/components/ReadingCalendar";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,9 +20,6 @@ export const Route = createFileRoute("/")({
   }),
   component: HomePage,
 });
-
-const CURRENT_YEAR = 2026;
-const CURRENT_MONTH = 6;
 
 const pad = (n: number) => String(n).padStart(2, "0");
 function todayKey() {
@@ -46,43 +42,106 @@ type Profile = {
   last_read_date: string | null;
 };
 
+type ActivePlan = {
+  id: string;
+  title: string;
+  books_today: string | null;
+};
+
 function HomePage() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [activePlan, setActivePlan] = useState<ActivePlan | null>(null);
   const [logDates, setLogDates] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState(false);
   const [dataLoading, setDataLoading] = useState(false);
-  const activePlan = readingPlans[0];
 
   const today = useMemo(() => todayKey(), []);
+  const now = useMemo(() => new Date(), []);
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
   const registeredToday = logDates.has(today);
 
   useEffect(() => {
     if (!user) {
       setProfile(null);
+      setActivePlan(null);
       setLogDates(new Set());
       return;
     }
     let cancelled = false;
     setDataLoading(true);
     (async () => {
-      const [{ data: p }, { data: logs }] = await Promise.all([
-        supabase
+      // Ensure profile enrichment from OAuth metadata (name / avatar) if missing.
+      const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
+      const metaName =
+        (meta.full_name as string | undefined) ??
+        (meta.name as string | undefined) ??
+        null;
+      const metaAvatar =
+        (meta.avatar_url as string | undefined) ??
+        (meta.picture as string | undefined) ??
+        null;
+
+      const { data: existing } = await supabase
+        .from("profiles")
+        .select("name, avatar_url, current_streak, total_chapters_read, last_read_date")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      let p = existing as Profile | null;
+
+      if (!p) {
+        const { data: inserted } = await supabase
           .from("profiles")
+          .insert({
+            id: user.id,
+            email: user.email ?? null,
+            name: metaName,
+            avatar_url: metaAvatar,
+          })
           .select("name, avatar_url, current_streak, total_chapters_read, last_read_date")
+          .maybeSingle();
+        p = (inserted as Profile | null) ?? {
+          name: metaName,
+          avatar_url: metaAvatar,
+          current_streak: 0,
+          total_chapters_read: 0,
+          last_read_date: null,
+        };
+      } else if ((!p.name && metaName) || (!p.avatar_url && metaAvatar)) {
+        const patch: { name?: string; avatar_url?: string } = {};
+        if (!p.name && metaName) patch.name = metaName;
+        if (!p.avatar_url && metaAvatar) patch.avatar_url = metaAvatar;
+        const { data: updated } = await supabase
+          .from("profiles")
+          .update(patch)
           .eq("id", user.id)
-          .maybeSingle(),
+          .select("name, avatar_url, current_streak, total_chapters_read, last_read_date")
+          .maybeSingle();
+        if (updated) p = updated as Profile;
+      }
+
+      const [{ data: logs }, { data: plans }] = await Promise.all([
         supabase
           .from("reading_logs")
           .select("read_date")
           .eq("user_id", user.id)
           .order("read_date", { ascending: false })
           .limit(365),
+        supabase
+          .from("reading_plans")
+          .select("id, title, books_today")
+          .eq("user_id", user.id)
+          .order("updated_at", { ascending: false })
+          .limit(1),
       ]);
+
       if (cancelled) return;
-      setProfile(p as Profile | null);
+      setProfile(p);
       setLogDates(new Set((logs ?? []).map((l: { read_date: string }) => l.read_date)));
+      setActivePlan((plans?.[0] as ActivePlan | undefined) ?? null);
       setDataLoading(false);
     })();
     return () => {
@@ -90,21 +149,11 @@ function HomePage() {
     };
   }, [user]);
 
-  const mockReadDates = useMemo(
-    () =>
-      new Set(
-        readingHeatmap
-          .filter((d) => d.value > 0)
-          .map((d) => d.date)
-          .filter((d) => d.startsWith("2026-07")),
-      ),
-    [],
-  );
-
-  const displayName = profile?.name ?? user?.email?.split("@")[0] ?? currentUser.name.split(" ")[0];
-  const streak = profile?.current_streak ?? (user ? 0 : currentUser.streak);
-  const total = profile?.total_chapters_read ?? (user ? 0 : currentUser.totalDays);
-  const readDates = user ? logDates : mockReadDates;
+  const displayName =
+    profile?.name?.split(" ")[0] ??
+    (user?.email ? user.email.split("@")[0] : "amigo");
+  const streak = profile?.current_streak ?? 0;
+  const total = profile?.total_chapters_read ?? 0;
 
   const handleRegister = async () => {
     if (!user) {
@@ -166,7 +215,9 @@ function HomePage() {
           <p className="mt-2 text-sm text-muted-foreground">
             {registeredToday
               ? "Você já leu hoje. Continue firme amanhã."
-              : "Registre a leitura de hoje para manter a chama acesa."}
+              : streak === 0
+                ? "Comece hoje sua primeira leitura para acender a chama."
+                : "Registre a leitura de hoje para manter a chama acesa."}
           </p>
         </div>
       </Card>
@@ -186,7 +237,7 @@ function HomePage() {
             Hoje
           </div>
           <p className="mt-2 truncate font-display text-base font-semibold">
-            {activePlan.booksToday}
+            {activePlan?.books_today ?? "Sem plano ativo"}
           </p>
         </Card>
       </div>
@@ -217,10 +268,10 @@ function HomePage() {
       </Button>
 
       <ReadingCalendar
-        year={CURRENT_YEAR}
-        month={CURRENT_MONTH}
+        year={currentYear}
+        month={currentMonth}
         today={today}
-        readDates={readDates}
+        readDates={logDates}
       />
     </AppShell>
   );
