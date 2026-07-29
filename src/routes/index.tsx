@@ -152,6 +152,30 @@ function HomePage() {
     };
   }, [user]);
 
+  // Daily reminder: if enabled and past reminder time with no reading today, notify once/day.
+  useEffect(() => {
+    if (!user || dataLoading) return;
+    try {
+      const enabled = localStorage.getItem("bh_reminder_enabled") === "1";
+      if (!enabled) return;
+      const time = localStorage.getItem("bh_reminder_time") || "20:00";
+      const [hh, mm] = time.split(":").map(Number);
+      const now = new Date();
+      const trigger = new Date();
+      trigger.setHours(hh || 20, mm || 0, 0, 0);
+      if (now < trigger) return;
+      if (registeredToday) return;
+      const key = `bh_reminded_${today}`;
+      if (localStorage.getItem(key) === "1") return;
+      localStorage.setItem(key, "1");
+      const msg = "Que tal registrar sua leitura de hoje? 📖";
+      if ("Notification" in window && Notification.permission === "granted") {
+        try { new Notification("Bible Habit", { body: msg }); } catch {}
+      }
+      toast(msg, { duration: 6000 });
+    } catch {}
+  }, [user, dataLoading, registeredToday, today]);
+
   const displayName =
     profile?.name?.split(" ")[0] ??
     (user?.email ? user.email.split("@")[0] : "amigo");
