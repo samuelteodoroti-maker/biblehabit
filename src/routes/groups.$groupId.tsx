@@ -284,6 +284,41 @@ function GroupDetail() {
     }
   };
 
+  const toggleReaction = async (logId: string, type: "fire" | "amen") => {
+    if (!user) return;
+    const cur = reactions.get(logId) ?? { fire: 0, amen: 0, myFire: false, myAmen: false };
+    const mine = type === "fire" ? cur.myFire : cur.myAmen;
+    const next = { ...cur };
+    if (mine) {
+      if (type === "fire") { next.myFire = false; next.fire = Math.max(0, cur.fire - 1); }
+      else { next.myAmen = false; next.amen = Math.max(0, cur.amen - 1); }
+    } else {
+      if (type === "fire") { next.myFire = true; next.fire = cur.fire + 1; }
+      else { next.myAmen = true; next.amen = cur.amen + 1; }
+    }
+    setReactions((prev) => new Map(prev).set(logId, next));
+    if (mine) {
+      const { error } = await supabase
+        .from("reactions")
+        .delete()
+        .eq("log_id", logId)
+        .eq("user_id", user.id)
+        .eq("type", type);
+      if (error) {
+        toast.error(error.message);
+        setReactions((prev) => new Map(prev).set(logId, cur));
+      }
+    } else {
+      const { error } = await supabase
+        .from("reactions")
+        .insert({ log_id: logId, user_id: user.id, type });
+      if (error) {
+        toast.error(error.message);
+        setReactions((prev) => new Map(prev).set(logId, cur));
+      }
+    }
+  };
+
   if (notFound) {
     return (
       <AppShell title="Grupo não encontrado">
