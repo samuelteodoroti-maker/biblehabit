@@ -1,6 +1,6 @@
 ---
 name: "Audit: Secrets & Data Leaks"
-description: Detecta segredos e credenciais expostos no código frontend: API keys e tokens hardcoded, tabelas Supabase sem Row Level Security (RLS), políticas de Storage públicas sem restrição, e APIs retornando campos sensíveis desnecessários (CPF, senha, cartão). Gera relatório com cada vazamento, o arquivo e linha responsável, e o código de correção recomendado.
+description: "Detecta segredos e credenciais expostos no código frontend: API keys e tokens hardcoded, tabelas Supabase sem Row Level Security (RLS), políticas de Storage públicas sem restrição, e APIs retornando campos sensíveis desnecessários (CPF, senha, cartão). Gera relatório com cada vazamento, o arquivo e linha responsável, e o código de correção recomendado."
 ---
 
 Audit this project for data leaks. Check the following in order of severity.
