@@ -63,8 +63,10 @@ type Message = {
 function weekStart() {
   const d = new Date();
   d.setHours(0, 0, 0, 0);
-  d.setDate(d.getDate() - d.getDay()); // Sunday
-  return d.toISOString().slice(0, 10);
+  d.setDate(d.getDate() - d.getDay()); // Sunday, local time
+  // Format in LOCAL time — reading_logs.read_date is stored as a local calendar date.
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
 function timeAgo(iso: string) {
