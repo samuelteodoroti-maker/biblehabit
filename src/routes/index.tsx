@@ -3,11 +3,13 @@ import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Flame, BookOpenCheck, CalendarDays, Loader2, Sparkles, Check } from "lucide-react";
+import { Flame, BookOpenCheck, CalendarDays, Sparkles, Check } from "lucide-react";
 import { ReadingCalendar } from "@/components/ReadingCalendar";
+import { LogReadingModal } from "@/components/LogReadingModal";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -54,8 +56,9 @@ function HomePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [activePlan, setActivePlan] = useState<ActivePlan | null>(null);
   const [logDates, setLogDates] = useState<Set<string>>(new Set());
-  const [busy, setBusy] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const [dataLoading, setDataLoading] = useState(false);
+
 
   const today = useMemo(() => todayKey(), []);
   const now = useMemo(() => new Date(), []);
@@ -155,24 +158,18 @@ function HomePage() {
   const streak = profile?.current_streak ?? 0;
   const total = profile?.total_chapters_read ?? 0;
 
-  const handleRegister = async () => {
+  const openRegister = () => {
     if (!user) {
       toast.info("Entre para registrar sua leitura");
       navigate({ to: "/auth" });
       return;
     }
     if (registeredToday) return;
-    setBusy(true);
-    const { error } = await supabase.from("reading_logs").insert({
-      user_id: user.id,
-      read_date: today,
-      chapters_count: 1,
-    });
-    if (error) {
-      setBusy(false);
-      toast.error(error.message);
-      return;
-    }
+    setModalOpen(true);
+  };
+
+  const refreshAfterLog = async () => {
+    if (!user) return;
     const { data: p } = await supabase
       .from("profiles")
       .select("name, avatar_url, current_streak, total_chapters_read, last_read_date")
@@ -180,9 +177,8 @@ function HomePage() {
       .maybeSingle();
     setProfile(p as Profile | null);
     setLogDates((prev) => new Set(prev).add(today));
-    setBusy(false);
-    toast.success("Leitura registrada! 🔥");
   };
+
 
   return (
     <AppShell>
@@ -250,12 +246,10 @@ function HomePage() {
             ? "bg-success/15 text-success hover:bg-success/20"
             : "gradient-primary text-primary-foreground shadow-glow hover:brightness-110"
         }`}
-        disabled={busy || registeredToday || authLoading || dataLoading}
-        onClick={handleRegister}
+        disabled={registeredToday || authLoading || dataLoading}
+        onClick={openRegister}
       >
-        {busy ? (
-          <Loader2 className="h-5 w-5 animate-spin" />
-        ) : registeredToday ? (
+        {registeredToday ? (
           <Check className="h-5 w-5" />
         ) : (
           <BookOpenCheck className="h-5 w-5" />
@@ -273,6 +267,17 @@ function HomePage() {
         today={today}
         readDates={logDates}
       />
+
+      {user && (
+        <LogReadingModal
+          open={modalOpen}
+          onOpenChange={setModalOpen}
+          userId={user.id}
+          today={today}
+          onSaved={refreshAfterLog}
+        />
+      )}
+
     </AppShell>
   );
 }

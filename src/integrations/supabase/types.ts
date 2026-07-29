@@ -40,6 +40,38 @@ export type Database = {
           },
         ]
       }
+      group_messages: {
+        Row: {
+          created_at: string
+          group_id: string
+          id: string
+          message: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          group_id: string
+          id?: string
+          message: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          group_id?: string
+          id?: string
+          message?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_messages_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       groups: {
         Row: {
           avatar: string | null
@@ -121,6 +153,7 @@ export type Database = {
           chapters_text: string | null
           created_at: string
           id: string
+          notes: string | null
           plan_id: string | null
           read_date: string
           user_id: string
@@ -130,6 +163,7 @@ export type Database = {
           chapters_text?: string | null
           created_at?: string
           id?: string
+          notes?: string | null
           plan_id?: string | null
           read_date?: string
           user_id: string
@@ -139,6 +173,7 @@ export type Database = {
           chapters_text?: string | null
           created_at?: string
           id?: string
+          notes?: string | null
           plan_id?: string | null
           read_date?: string
           user_id?: string
