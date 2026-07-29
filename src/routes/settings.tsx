@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { Sun, Moon, LogOut, ChevronRight, Loader2 } from "lucide-react";
+import { Sun, Moon, LogOut, ChevronRight, Loader2, Bell } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -53,7 +54,46 @@ function SettingsPage() {
   const [youVersion, setYouVersion] = useState("");
   const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [saving, setSaving] = useState(false);
+  const [reminderEnabled, setReminderEnabled] = useState(false);
+  const [reminderTime, setReminderTime] = useState("20:00");
   const email = user?.email ?? "";
+
+  useEffect(() => {
+    try {
+      const en = localStorage.getItem("bh_reminder_enabled") === "1";
+      const t = localStorage.getItem("bh_reminder_time") || "20:00";
+      setReminderEnabled(en);
+      setReminderTime(t);
+    } catch {}
+  }, []);
+
+  const toggleReminder = async (checked: boolean) => {
+    if (checked) {
+      if (!("Notification" in window)) {
+        toast.error("Este navegador não suporta notificações");
+        return;
+      }
+      let perm = Notification.permission;
+      if (perm === "default") perm = await Notification.requestPermission();
+      if (perm !== "granted") {
+        toast.error("Permissão de notificação negada");
+        return;
+      }
+      localStorage.setItem("bh_reminder_enabled", "1");
+      localStorage.setItem("bh_reminder_time", reminderTime);
+      setReminderEnabled(true);
+      toast.success("Lembretes ativados");
+    } else {
+      localStorage.setItem("bh_reminder_enabled", "0");
+      setReminderEnabled(false);
+      toast.success("Lembretes desativados");
+    }
+  };
+
+  const updateReminderTime = (v: string) => {
+    setReminderTime(v);
+    localStorage.setItem("bh_reminder_time", v);
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -195,6 +235,38 @@ function SettingsPage() {
               </div>
             </div>
           ))
+        )}
+      </Section>
+
+      <Section title="Preferências">
+        <Row>
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent/60">
+            <Bell className="h-4 w-4" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold">Lembretes diários</p>
+            <p className="text-xs text-muted-foreground">
+              Avisamos se você ainda não leu hoje
+            </p>
+          </div>
+          <Switch checked={reminderEnabled} onCheckedChange={toggleReminder} />
+        </Row>
+        {reminderEnabled && (
+          <Row>
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent/60 text-xs font-semibold">
+              🕗
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold">Hora do lembrete</p>
+              <p className="text-xs text-muted-foreground">Escolha quando ser avisado</p>
+            </div>
+            <Input
+              type="time"
+              value={reminderTime}
+              onChange={(e) => updateReminderTime(e.target.value)}
+              className="h-10 w-28 rounded-xl"
+            />
+          </Row>
         )}
       </Section>
 

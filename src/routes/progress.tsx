@@ -11,11 +11,12 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Plus, Share2, Pencil, Trash2, Loader2, BookOpen } from "lucide-react";
+import { Plus, Share2, Pencil, Trash2, Loader2, BookOpen, CalendarHeart, TrendingUp } from "lucide-react";
 import { bibleBooks, chaptersBetween } from "@/lib/bibleBooks";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
 
 export const Route = createFileRoute("/progress")({
   head: () => ({
@@ -85,6 +86,19 @@ function CircularProgress({ value }: { value: number }) {
   );
 }
 
+function buildLast7(dayMap: Map<string, number>) {
+  const out: { day: string; chapters: number }[] = [];
+  const labels = ["D", "S", "T", "Q", "Q", "S", "S"];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    out.push({ day: labels[d.getDay()], chapters: dayMap.get(key) ?? 0 });
+  }
+  return out;
+}
+
+
 function ProgressPage() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
@@ -93,6 +107,12 @@ function ProgressPage() {
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState<Plan | null>(null);
+  const [insights, setInsights] = useState<{
+    favoriteDay: string | null;
+    avgChapters: number;
+    last7: { day: string; chapters: number }[];
+    hasData: boolean;
+  }>({ favoriteDay: null, avgChapters: 0, last7: [], hasData: false });
   const [form, setForm] = useState({
     title: "",
     totalDays: 30,
@@ -144,6 +164,47 @@ function ProgressPage() {
         })),
       );
       setLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
+
+  // Insights
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const since = new Date();
+      since.setDate(since.getDate() - 89);
+      const sinceStr = since.toISOString().slice(0, 10);
+      const { data } = await supabase
+        .from("reading_logs")
+        .select("read_date, chapters_count")
+        .eq("user_id", user.id)
+        .gte("read_date", sinceStr);
+      if (cancelled) return;
+      const logs = (data ?? []) as { read_date: string; chapters_count: number }[];
+      if (logs.length === 0) {
+        setInsights({ favoriteDay: null, avgChapters: 0, last7: buildLast7(new Map()), hasData: false });
+        return;
+      }
+      const dayNames = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+      const dayCounts = new Array(7).fill(0);
+      let totalChapters = 0;
+      const dayMap = new Map<string, number>();
+      for (const l of logs) {
+        const d = new Date(l.read_date + "T00:00:00");
+        dayCounts[d.getDay()]++;
+        totalChapters += l.chapters_count ?? 0;
+        dayMap.set(l.read_date, (dayMap.get(l.read_date) ?? 0) + (l.chapters_count ?? 0));
+      }
+      let favIdx = 0;
+      for (let i = 1; i < 7; i++) if (dayCounts[i] > dayCounts[favIdx]) favIdx = i;
+      setInsights({
+        favoriteDay: dayCounts[favIdx] > 0 ? dayNames[favIdx] : null,
+        avgChapters: totalChapters / logs.length,
+        last7: buildLast7(dayMap),
+        hasData: true,
+      });
     })();
     return () => { cancelled = true; };
   }, [user]);
@@ -234,6 +295,56 @@ function ProgressPage() {
 
   return (
     <AppShell title="Planos de leitura" subtitle="Crie e acompanhe suas jornadas">
+      {insights.hasData && (
+        <div className="mb-6 space-y-3">
+          <p className="px-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+            Insights pessoais
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
+              <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                <CalendarHeart className="h-3.5 w-3.5" /> Dia favorito
+              </div>
+              <p className="mt-2 font-display text-lg font-semibold">
+                {insights.favoriteDay ?? "—"}
+              </p>
+            </Card>
+            <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
+              <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                <TrendingUp className="h-3.5 w-3.5" /> Média por leitura
+              </div>
+              <p className="mt-2 font-display text-lg font-semibold">
+                {insights.avgChapters.toFixed(1)}{" "}
+                <span className="text-xs font-normal text-muted-foreground">caps</span>
+              </p>
+            </Card>
+          </div>
+          <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
+            <p className="mb-2 text-[11px] font-medium text-muted-foreground">
+              Últimos 7 dias
+            </p>
+            <div className="h-32">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={insights.last7} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                  <XAxis dataKey="day" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                  <Tooltip
+                    cursor={{ fill: "rgba(255,255,255,0.05)" }}
+                    contentStyle={{
+                      background: "rgba(20,20,30,0.9)",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      borderRadius: 12,
+                      fontSize: 12,
+                    }}
+                  />
+                  <Bar dataKey="chapters" fill="oklch(0.65 0.22 275)" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+        </div>
+      )}
+
       <Button
         onClick={openNew}
         className="mb-6 h-12 w-full gap-2 rounded-2xl gradient-primary font-semibold text-primary-foreground shadow-glow hover:brightness-110"

@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Flame, Crown, Copy, Loader2, Send, BookOpen, Users, MessageCircle, Trophy } from "lucide-react";
+import { ArrowLeft, Flame, Crown, Copy, Loader2, Send, BookOpen, Users, MessageCircle, Trophy, Heart, Medal, Award } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -60,10 +60,8 @@ type Message = {
 
 function weekStart() {
   const d = new Date();
-  const day = d.getDay();
-  const diff = (day + 6) % 7;
-  d.setDate(d.getDate() - diff);
   d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() - d.getDay()); // Sunday
   return d.toISOString().slice(0, 10);
 }
 
@@ -94,6 +92,9 @@ function GroupDetail() {
   const [notFound, setNotFound] = useState(false);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
+  const [reactions, setReactions] = useState<
+    Map<string, { fire: number; amen: number; myFire: boolean; myAmen: boolean }>
+  >(new Map());
   const chatEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -200,6 +201,29 @@ function GroupDetail() {
       if (cancelled) return;
       setActivities(feed);
       setLoadingActivities(false);
+
+      // Load reactions for these activities
+      const logIds = feed.map((f) => f.id);
+      if (logIds.length > 0) {
+        const { data: rx } = await supabase
+          .from("reactions")
+          .select("log_id, type, user_id")
+          .in("log_id", logIds);
+        if (cancelled) return;
+        const map = new Map<string, { fire: number; amen: number; myFire: boolean; myAmen: boolean }>();
+        (rx ?? []).forEach((r: { log_id: string; type: string; user_id: string }) => {
+          const cur = map.get(r.log_id) ?? { fire: 0, amen: 0, myFire: false, myAmen: false };
+          if (r.type === "fire") {
+            cur.fire++;
+            if (r.user_id === user.id) cur.myFire = true;
+          } else if (r.type === "amen") {
+            cur.amen++;
+            if (r.user_id === user.id) cur.myAmen = true;
+          }
+          map.set(r.log_id, cur);
+        });
+        setReactions(map);
+      }
     })();
     return () => { cancelled = true; };
   }, [members, user]);
@@ -257,6 +281,41 @@ function GroupDetail() {
     if (error) {
       toast.error(error.message);
       setDraft(text);
+    }
+  };
+
+  const toggleReaction = async (logId: string, type: "fire" | "amen") => {
+    if (!user) return;
+    const cur = reactions.get(logId) ?? { fire: 0, amen: 0, myFire: false, myAmen: false };
+    const mine = type === "fire" ? cur.myFire : cur.myAmen;
+    const next = { ...cur };
+    if (mine) {
+      if (type === "fire") { next.myFire = false; next.fire = Math.max(0, cur.fire - 1); }
+      else { next.myAmen = false; next.amen = Math.max(0, cur.amen - 1); }
+    } else {
+      if (type === "fire") { next.myFire = true; next.fire = cur.fire + 1; }
+      else { next.myAmen = true; next.amen = cur.amen + 1; }
+    }
+    setReactions((prev) => new Map(prev).set(logId, next));
+    if (mine) {
+      const { error } = await supabase
+        .from("reactions")
+        .delete()
+        .eq("log_id", logId)
+        .eq("user_id", user.id)
+        .eq("type", type);
+      if (error) {
+        toast.error(error.message);
+        setReactions((prev) => new Map(prev).set(logId, cur));
+      }
+    } else {
+      const { error } = await supabase
+        .from("reactions")
+        .insert({ log_id: logId, user_id: user.id, type });
+      if (error) {
+        toast.error(error.message);
+        setReactions((prev) => new Map(prev).set(logId, cur));
+      }
     }
   };
 
@@ -351,6 +410,37 @@ function GroupDetail() {
                           "{a.notes}"
                         </div>
                       )}
+                      {(() => {
+                        const r = reactions.get(a.id) ?? { fire: 0, amen: 0, myFire: false, myAmen: false };
+                        return (
+                          <div className="mt-3 flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => toggleReaction(a.id, "fire")}
+                              className={`flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs transition ${
+                                r.myFire
+                                  ? "border-transparent bg-orange-500/20 text-orange-300"
+                                  : "border-border/60 bg-background/40 text-muted-foreground hover:text-foreground"
+                              }`}
+                            >
+                              <Flame className="h-3.5 w-3.5" />
+                              {r.fire > 0 && <span>{r.fire}</span>}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => toggleReaction(a.id, "amen")}
+                              className={`flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs transition ${
+                                r.myAmen
+                                  ? "border-transparent bg-rose-500/20 text-rose-300"
+                                  : "border-border/60 bg-background/40 text-muted-foreground hover:text-foreground"
+                              }`}
+                            >
+                              <Heart className="h-3.5 w-3.5" />
+                              {r.amen > 0 && <span>{r.amen}</span>}
+                            </button>
+                          </div>
+                        );
+                      })()}
                     </Card>
                   </div>
                 );
@@ -428,9 +518,12 @@ function GroupDetail() {
 
         {/* RANKING */}
         <TabsContent value="leaderboard" className="mt-5 space-y-2">
-          <p className="mb-3 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-            Progresso desta semana
-          </p>
+          <div className="mb-3">
+            <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+              Ranking da Semana
+            </p>
+            <p className="text-[11px] text-muted-foreground/80">zera todo domingo</p>
+          </div>
           {loading ? (
             <div className="flex justify-center py-8">
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
@@ -442,23 +535,38 @@ function GroupDetail() {
           ) : (
             members.map((m, i) => {
               const rank = i + 1;
-              const podium = rank <= 3;
               const displayName = m.name ?? "Sem nome";
+              const podiumStyles: Record<number, { bg: string; ring: string; icon: ReactNode }> = {
+                1: {
+                  bg: "bg-gradient-to-br from-yellow-400 to-amber-600 text-white shadow-glow",
+                  ring: "ring-1 ring-yellow-400/40",
+                  icon: <Crown className="h-4 w-4" />,
+                },
+                2: {
+                  bg: "bg-gradient-to-br from-slate-300 to-slate-500 text-white",
+                  ring: "ring-1 ring-slate-300/30",
+                  icon: <Medal className="h-4 w-4" />,
+                },
+                3: {
+                  bg: "bg-gradient-to-br from-amber-700 to-orange-800 text-white",
+                  ring: "ring-1 ring-amber-700/30",
+                  icon: <Award className="h-4 w-4" />,
+                },
+              };
+              const style = podiumStyles[rank];
               return (
                 <Card
                   key={m.user_id}
                   className={`flex items-center gap-3 border-border/60 bg-card/70 p-3 backdrop-blur-sm ${
-                    rank === 1 ? "ring-1 ring-primary/40" : ""
+                    style?.ring ?? ""
                   }`}
                 >
                   <span
                     className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-bold ${
-                      podium
-                        ? "gradient-primary text-primary-foreground shadow-glow"
-                        : "bg-accent/60 text-muted-foreground"
+                      style ? style.bg : "bg-accent/60 text-muted-foreground"
                     }`}
                   >
-                    {rank === 1 ? <Crown className="h-4 w-4" /> : rank}
+                    {style ? style.icon : rank}
                   </span>
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={m.avatar_url ?? undefined} />
