@@ -238,6 +238,38 @@ function SettingsPage() {
         )}
       </Section>
 
+      <Section title="Preferências">
+        <Row>
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent/60">
+            <Bell className="h-4 w-4" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold">Lembretes diários</p>
+            <p className="text-xs text-muted-foreground">
+              Avisamos se você ainda não leu hoje
+            </p>
+          </div>
+          <Switch checked={reminderEnabled} onCheckedChange={toggleReminder} />
+        </Row>
+        {reminderEnabled && (
+          <Row>
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent/60 text-xs font-semibold">
+              🕗
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold">Hora do lembrete</p>
+              <p className="text-xs text-muted-foreground">Escolha quando ser avisado</p>
+            </div>
+            <Input
+              type="time"
+              value={reminderTime}
+              onChange={(e) => updateReminderTime(e.target.value)}
+              className="h-10 w-28 rounded-xl"
+            />
+          </Row>
+        )}
+      </Section>
+
       <Section title="Aparência">
         <Row>
           <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent/60">
