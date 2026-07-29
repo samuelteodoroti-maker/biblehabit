@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Flame, BookOpenCheck, CalendarDays } from "lucide-react";
 import { currentUser, readingHeatmap, readingPlans } from "@/lib/mockData";
+import { ReadingCalendar } from "@/components/ReadingCalendar";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
@@ -19,15 +20,17 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-function intensityClass(v: number) {
-  return [
-    "bg-muted",
-    "bg-primary/20",
-    "bg-primary/40",
-    "bg-primary/70",
-    "bg-primary",
-  ][v];
-}
+// Dados fixos para garantir consistência entre SSR e CSR.
+const CURRENT_YEAR = 2026;
+const CURRENT_MONTH = 6; // July (0-indexed)
+const TODAY = "2026-07-29";
+const readDates = new Set(
+  readingHeatmap
+    .filter((d) => d.value > 0)
+    .map((d) => d.date)
+    .filter((d) => d.startsWith("2026-07"))
+);
+
 
 function HomePage() {
   const [registered, setRegistered] = useState(false);
