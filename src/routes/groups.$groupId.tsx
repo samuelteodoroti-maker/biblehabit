@@ -12,9 +12,9 @@ import { groups, groupLeaderboard, groupMessages, currentUser } from "@/lib/mock
 export const Route = createFileRoute("/groups/$groupId")({
   head: () => ({
     meta: [
-      { title: "Grupo — Bible Tracker" },
+      { title: "Grupo — Bible Habit" },
       { name: "description", content: "Ranking e chat do grupo em tempo real." },
-      { property: "og:title", content: "Grupo — Bible Tracker" },
+      { property: "og:title", content: "Grupo — Bible Habit" },
       { property: "og:description", content: "Ranking e chat do grupo em tempo real." },
     ],
   }),

@@ -7,9 +7,9 @@ import { Trophy, Flame, CalendarDays } from "lucide-react";
 export const Route = createFileRoute("/achievements")({
   head: () => ({
     meta: [
-      { title: "Conquistas — Bible Tracker" },
+      { title: "Conquistas — Bible Habit" },
       { name: "description", content: "Emblemas, recordes e placar pessoal de leitura bíblica." },
-      { property: "og:title", content: "Conquistas — Bible Tracker" },
+      { property: "og:title", content: "Conquistas — Bible Habit" },
       { property: "og:description", content: "Emblemas, recordes e placar pessoal de leitura bíblica." },
     ],
   }),
