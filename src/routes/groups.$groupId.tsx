@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Flame, Crown, Copy, Loader2, Send, BookOpen, Users, MessageCircle, Trophy } from "lucide-react";
+import { ArrowLeft, Flame, Crown, Copy, Loader2, Send, BookOpen, Users, MessageCircle, Trophy, Heart, Medal, Award } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
