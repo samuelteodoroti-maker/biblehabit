@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowLeft, Send, Flame } from "lucide-react";
+import { ArrowLeft, Send, Flame, Crown } from "lucide-react";
 import { groups, groupLeaderboard, groupMessages, currentUser } from "@/lib/mockData";
 
 export const Route = createFileRoute("/groups/$groupId")({
@@ -64,48 +64,74 @@ function GroupDetail() {
 
   return (
     <AppShell>
-      <div className="mb-4 flex items-center gap-3">
-        <Link to="/groups" className="rounded-md p-1.5 hover:bg-accent">
-          <ArrowLeft className="h-5 w-5" />
+      <div className="mb-6 flex items-center gap-3">
+        <Link
+          to="/groups"
+          className="grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-card/60 text-foreground transition-colors hover:bg-accent"
+        >
+          <ArrowLeft className="h-4 w-4" />
         </Link>
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-xl">
+        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-accent/60 text-2xl">
           {group.avatar}
         </div>
-        <div>
-          <h1 className="font-semibold">{group.name}</h1>
-          <p className="text-xs text-muted-foreground">{group.members} membros</p>
+        <div className="min-w-0 flex-1">
+          <h1 className="truncate font-display text-lg font-semibold">{group.name}</h1>
+          <p className="text-xs text-muted-foreground">
+            {group.members} {group.members === 1 ? "membro" : "membros"}
+          </p>
         </div>
       </div>
 
       <Tabs defaultValue="leaderboard">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="leaderboard">Ranking</TabsTrigger>
-          <TabsTrigger value="chat">Chat</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 rounded-2xl bg-card/60 p-1 backdrop-blur-sm">
+          <TabsTrigger value="leaderboard" className="rounded-xl">Ranking</TabsTrigger>
+          <TabsTrigger value="chat" className="rounded-xl">Chat</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="leaderboard" className="mt-4 space-y-2">
-          <p className="mb-2 text-xs text-muted-foreground">Progresso desta semana</p>
-          {groupLeaderboard.map((m, i) => (
-            <Card key={m.id} className="flex items-center gap-3 p-3">
-              <span className="w-6 text-center text-sm font-bold text-muted-foreground">#{i + 1}</span>
-              <Avatar className="h-9 w-9">
-                <AvatarImage src={m.avatar} />
-                <AvatarFallback>{m.name[0]}</AvatarFallback>
-              </Avatar>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium">{m.name}</p>
-                <p className="text-xs text-muted-foreground">{m.chapters} capítulos</p>
-              </div>
-              <div className="flex items-center gap-1 text-xs">
-                <Flame className="h-3.5 w-3.5 text-orange-500" />
-                {m.streak}
-              </div>
-            </Card>
-          ))}
+        <TabsContent value="leaderboard" className="mt-5 space-y-2">
+          <p className="mb-3 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+            Progresso desta semana
+          </p>
+          {groupLeaderboard.map((m, i) => {
+            const rank = i + 1;
+            const podium = rank <= 3;
+            return (
+              <Card
+                key={m.id}
+                className={`flex items-center gap-3 border-border/60 bg-card/70 p-3 backdrop-blur-sm ${
+                  rank === 1 ? "ring-1 ring-primary/40" : ""
+                }`}
+              >
+                <span
+                  className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-bold ${
+                    podium
+                      ? "gradient-primary text-primary-foreground shadow-glow"
+                      : "bg-accent/60 text-muted-foreground"
+                  }`}
+                >
+                  {rank === 1 ? <Crown className="h-4 w-4" /> : rank}
+                </span>
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src={m.avatar} />
+                  <AvatarFallback>{m.name[0]}</AvatarFallback>
+                </Avatar>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold">{m.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {m.chapters} {m.chapters === 1 ? "capítulo" : "capítulos"}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1 rounded-full bg-background/60 px-2 py-1 text-xs font-medium">
+                  <Flame className="h-3.5 w-3.5 text-[color:var(--flame)]" />
+                  {m.streak}
+                </div>
+              </Card>
+            );
+          })}
         </TabsContent>
 
-        <TabsContent value="chat" className="mt-4">
-          <div className="mb-3 space-y-3 rounded-lg border border-border bg-card p-3">
+        <TabsContent value="chat" className="mt-5">
+          <Card className="mb-3 space-y-3 border-border/60 bg-card/60 p-4 backdrop-blur-sm">
             {messages.map((m) => {
               const mine = m.userId === currentUser.id;
               return (
@@ -114,25 +140,44 @@ function GroupDetail() {
                     <AvatarImage src={m.avatar} />
                     <AvatarFallback>{m.name[0]}</AvatarFallback>
                   </Avatar>
-                  <div className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm ${
-                    mine ? "bg-primary text-primary-foreground" : "bg-muted"
-                  }`}>
-                    {!mine && <p className="mb-0.5 text-[11px] font-semibold opacity-70">{m.name}</p>}
-                    <p>{m.text}</p>
-                    <p className={`mt-0.5 text-[10px] ${mine ? "opacity-70" : "text-muted-foreground"}`}>{m.time}</p>
+                  <div
+                    className={`max-w-[75%] rounded-2xl px-3.5 py-2 text-sm ${
+                      mine
+                        ? "gradient-primary text-primary-foreground shadow-glow"
+                        : "bg-background/70 text-foreground"
+                    }`}
+                  >
+                    {!mine && (
+                      <p className="mb-0.5 text-[11px] font-semibold opacity-70">{m.name}</p>
+                    )}
+                    <p className="leading-snug">{m.text}</p>
+                    <p
+                      className={`mt-1 text-[10px] ${
+                        mine ? "opacity-80" : "text-muted-foreground"
+                      }`}
+                    >
+                      {m.time}
+                    </p>
                   </div>
                 </div>
               );
             })}
-          </div>
+          </Card>
           <div className="flex gap-2">
             <Input
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && send()}
               placeholder="Escreva uma mensagem..."
+              className="h-11 rounded-xl border-border/70 bg-card/60"
             />
-            <Button onClick={send} size="icon"><Send className="h-4 w-4" /></Button>
+            <Button
+              onClick={send}
+              size="icon"
+              className="h-11 w-11 rounded-xl gradient-primary text-primary-foreground shadow-glow hover:brightness-110"
+            >
+              <Send className="h-4 w-4" />
+            </Button>
           </div>
         </TabsContent>
       </Tabs>
