@@ -18,12 +18,33 @@ export const Route = createFileRoute("/groups/$groupId")({
       { property: "og:description", content: "Ranking e chat do grupo em tempo real." },
     ],
   }),
+  notFoundComponent: () => (
+    <AppShell title="Grupo não encontrado">
+      <p className="text-sm text-muted-foreground">Este grupo não existe ou foi removido.</p>
+      <Link to="/groups" className="mt-4 inline-block text-sm text-primary hover:underline">
+        Voltar para grupos
+      </Link>
+    </AppShell>
+  ),
   component: GroupDetail,
 });
 
 function GroupDetail() {
   const { groupId } = Route.useParams();
-  const group = groups.find((g) => g.id === groupId) ?? groups[0];
+  const group = groups.find((g) => g.id === groupId);
+  const [messages, setMessages] = useState(groupMessages);
+  const [draft, setDraft] = useState("");
+
+  if (!group) {
+    return (
+      <AppShell title="Grupo não encontrado">
+        <p className="text-sm text-muted-foreground">Este grupo não existe ou foi removido.</p>
+        <Link to="/groups" className="mt-4 inline-block text-sm text-primary hover:underline">
+          Voltar para grupos
+        </Link>
+      </AppShell>
+    );
+  }
   const [messages, setMessages] = useState(groupMessages);
   const [draft, setDraft] = useState("");
 

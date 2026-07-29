@@ -9,14 +9,16 @@ export const currentUser = {
   youVersionLink: "",
 };
 
-// Heatmap: last 90 days, values 0-4 (intensity)
+// Heatmap: 90 dias fixos, determinístico. Datas em string ISO para evitar
+// mismatch de hidratação SSR/CSR causado por `new Date()` em escopo de módulo.
+const HEATMAP_END = "2026-07-29";
 export const readingHeatmap = Array.from({ length: 90 }, (_, i) => {
-  const date = new Date();
-  date.setDate(date.getDate() - (89 - i));
+  const end = new Date(HEATMAP_END + "T00:00:00Z");
+  end.setUTCDate(end.getUTCDate() - (89 - i));
   const seed = (i * 9301 + 49297) % 233280;
   const rand = seed / 233280;
   const value = rand > 0.75 ? 4 : rand > 0.55 ? 3 : rand > 0.35 ? 2 : rand > 0.2 ? 1 : 0;
-  return { date: date.toISOString().slice(0, 10), value };
+  return { date: end.toISOString().slice(0, 10), value };
 });
 
 export const readingPlans = [
