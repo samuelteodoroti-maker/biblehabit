@@ -410,6 +410,37 @@ function GroupDetail() {
                           "{a.notes}"
                         </div>
                       )}
+                      {(() => {
+                        const r = reactions.get(a.id) ?? { fire: 0, amen: 0, myFire: false, myAmen: false };
+                        return (
+                          <div className="mt-3 flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => toggleReaction(a.id, "fire")}
+                              className={`flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs transition ${
+                                r.myFire
+                                  ? "border-transparent bg-orange-500/20 text-orange-300"
+                                  : "border-border/60 bg-background/40 text-muted-foreground hover:text-foreground"
+                              }`}
+                            >
+                              <Flame className="h-3.5 w-3.5" />
+                              {r.fire > 0 && <span>{r.fire}</span>}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => toggleReaction(a.id, "amen")}
+                              className={`flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs transition ${
+                                r.myAmen
+                                  ? "border-transparent bg-rose-500/20 text-rose-300"
+                                  : "border-border/60 bg-background/40 text-muted-foreground hover:text-foreground"
+                              }`}
+                            >
+                              <Heart className="h-3.5 w-3.5" />
+                              {r.amen > 0 && <span>{r.amen}</span>}
+                            </button>
+                          </div>
+                        );
+                      })()}
                     </Card>
                   </div>
                 );
