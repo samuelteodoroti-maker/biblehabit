@@ -518,9 +518,12 @@ function GroupDetail() {
 
         {/* RANKING */}
         <TabsContent value="leaderboard" className="mt-5 space-y-2">
-          <p className="mb-3 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-            Progresso desta semana
-          </p>
+          <div className="mb-3">
+            <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+              Ranking da Semana
+            </p>
+            <p className="text-[11px] text-muted-foreground/80">zera todo domingo</p>
+          </div>
           {loading ? (
             <div className="flex justify-center py-8">
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
@@ -532,23 +535,38 @@ function GroupDetail() {
           ) : (
             members.map((m, i) => {
               const rank = i + 1;
-              const podium = rank <= 3;
               const displayName = m.name ?? "Sem nome";
+              const podiumStyles: Record<number, { bg: string; ring: string; icon: JSX.Element }> = {
+                1: {
+                  bg: "bg-gradient-to-br from-yellow-400 to-amber-600 text-white shadow-glow",
+                  ring: "ring-1 ring-yellow-400/40",
+                  icon: <Crown className="h-4 w-4" />,
+                },
+                2: {
+                  bg: "bg-gradient-to-br from-slate-300 to-slate-500 text-white",
+                  ring: "ring-1 ring-slate-300/30",
+                  icon: <Medal className="h-4 w-4" />,
+                },
+                3: {
+                  bg: "bg-gradient-to-br from-amber-700 to-orange-800 text-white",
+                  ring: "ring-1 ring-amber-700/30",
+                  icon: <Award className="h-4 w-4" />,
+                },
+              };
+              const style = podiumStyles[rank];
               return (
                 <Card
                   key={m.user_id}
                   className={`flex items-center gap-3 border-border/60 bg-card/70 p-3 backdrop-blur-sm ${
-                    rank === 1 ? "ring-1 ring-primary/40" : ""
+                    style?.ring ?? ""
                   }`}
                 >
                   <span
                     className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-bold ${
-                      podium
-                        ? "gradient-primary text-primary-foreground shadow-glow"
-                        : "bg-accent/60 text-muted-foreground"
+                      style ? style.bg : "bg-accent/60 text-muted-foreground"
                     }`}
                   >
-                    {rank === 1 ? <Crown className="h-4 w-4" /> : rank}
+                    {style ? style.icon : rank}
                   </span>
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={m.avatar_url ?? undefined} />
