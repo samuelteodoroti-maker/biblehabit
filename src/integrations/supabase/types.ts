@@ -151,10 +151,13 @@ export type Database = {
           completed_days: number
           created_at: string
           description: string | null
+          end_book: string | null
           goal_days: number
           id: string
           share_code: string | null
+          start_book: string | null
           title: string
+          total_days: number | null
           updated_at: string
           user_id: string
         }
@@ -163,10 +166,13 @@ export type Database = {
           completed_days?: number
           created_at?: string
           description?: string | null
+          end_book?: string | null
           goal_days?: number
           id?: string
           share_code?: string | null
+          start_book?: string | null
           title: string
+          total_days?: number | null
           updated_at?: string
           user_id: string
         }
@@ -175,10 +181,13 @@ export type Database = {
           completed_days?: number
           created_at?: string
           description?: string | null
+          end_book?: string | null
           goal_days?: number
           id?: string
           share_code?: string | null
+          start_book?: string | null
           title?: string
+          total_days?: number | null
           updated_at?: string
           user_id?: string
         }
