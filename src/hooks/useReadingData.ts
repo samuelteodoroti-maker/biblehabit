@@ -17,7 +17,9 @@ export type ActivePlan = {
   books_today: string | null;
   completed_days: number;
   total_days: number;
+  description: string | null;
 };
+
 
 export type DetailedLog = {
   id: string;
@@ -73,7 +75,7 @@ export function useReadingData() {
       // Fetch plans to determine active one
       const { data: allPlans } = await supabase
         .from("reading_plans")
-        .select("id, title, books_today, completed_days, total_days, updated_at")
+        .select("id, title, books_today, completed_days, total_days, description, updated_at")
         .eq("user_id", user.id)
         .order("updated_at", { ascending: false });
 
