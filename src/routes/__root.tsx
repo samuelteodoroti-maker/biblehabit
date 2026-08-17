@@ -99,6 +99,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:description", content: "Crie o hábito da leitura bíblica: ofensiva diária, planos personalizados, grupos com ranking semanal e conquistas." },
       { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/e43ca74d-8381-4cd6-9aa4-d643178f57fe" },
       { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/e43ca74d-8381-4cd6-9aa4-d643178f57fe" },
+      // Security Headers
+      { "http-equiv": "Content-Security-Policy-Report-Only", content: "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://*.lovable.app; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://mntomcjsbbhveliauopg.supabase.co wss://mntomcjsbbhveliauopg.supabase.co; frame-src 'self' blob:; worker-src 'self' blob:; manifest-src 'self'; upgrade-insecure-requests;" },
+      { "http-equiv": "X-Frame-Options", content: "DENY" },
+      { name: "Permissions-Policy", content: "camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), bluetooth=(), accelerometer=(), gyroscope=(), magnetometer=(), display-capture=()" },
     ],
     scripts: [
       {
