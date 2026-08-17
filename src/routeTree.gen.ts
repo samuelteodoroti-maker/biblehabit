@@ -25,6 +25,7 @@ import { Route as UpdatesSlugRouteImport } from './routes/updates.$slug'
 import { Route as GroupsGroupIdRouteImport } from './routes/groups.$groupId'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminUpdatesRouteImport } from './routes/admin.updates'
+import { Route as AdminUsersUserIdRouteImport } from './routes/admin/users.$userId'
 
 const UpdatesRoute = UpdatesRouteImport.update({
   id: '/updates',
@@ -106,6 +107,11 @@ const AdminUpdatesRoute = AdminUpdatesRouteImport.update({
   path: '/admin/updates',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminUsersUserIdRoute = AdminUsersUserIdRouteImport.update({
+  id: '/$userId',
+  path: '/$userId',
+  getParentRoute: () => AdminUsersRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -119,11 +125,12 @@ export interface FileRoutesByFullPath {
   '/support': typeof SupportRoute
   '/updates': typeof UpdatesRouteWithChildren
   '/admin/updates': typeof AdminUpdatesRoute
-  '/admin/users': typeof AdminUsersRoute
+  '/admin/users': typeof AdminUsersRouteWithChildren
   '/groups/$groupId': typeof GroupsGroupIdRoute
   '/updates/$slug': typeof UpdatesSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/groups/': typeof GroupsIndexRoute
+  '/admin/users/$userId': typeof AdminUsersUserIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -136,11 +143,12 @@ export interface FileRoutesByTo {
   '/support': typeof SupportRoute
   '/updates': typeof UpdatesRouteWithChildren
   '/admin/updates': typeof AdminUpdatesRoute
-  '/admin/users': typeof AdminUsersRoute
+  '/admin/users': typeof AdminUsersRouteWithChildren
   '/groups/$groupId': typeof GroupsGroupIdRoute
   '/updates/$slug': typeof UpdatesSlugRoute
   '/admin': typeof AdminIndexRoute
   '/groups': typeof GroupsIndexRoute
+  '/admin/users/$userId': typeof AdminUsersUserIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -155,11 +163,12 @@ export interface FileRoutesById {
   '/support': typeof SupportRoute
   '/updates': typeof UpdatesRouteWithChildren
   '/admin/updates': typeof AdminUpdatesRoute
-  '/admin/users': typeof AdminUsersRoute
+  '/admin/users': typeof AdminUsersRouteWithChildren
   '/groups/$groupId': typeof GroupsGroupIdRoute
   '/updates/$slug': typeof UpdatesSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/groups/': typeof GroupsIndexRoute
+  '/admin/users/$userId': typeof AdminUsersUserIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -180,6 +189,7 @@ export interface FileRouteTypes {
     | '/updates/$slug'
     | '/admin/'
     | '/groups/'
+    | '/admin/users/$userId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -197,6 +207,7 @@ export interface FileRouteTypes {
     | '/updates/$slug'
     | '/admin'
     | '/groups'
+    | '/admin/users/$userId'
   id:
     | '__root__'
     | '/'
@@ -215,6 +226,7 @@ export interface FileRouteTypes {
     | '/updates/$slug'
     | '/admin/'
     | '/groups/'
+    | '/admin/users/$userId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -229,7 +241,7 @@ export interface RootRouteChildren {
   SupportRoute: typeof SupportRoute
   UpdatesRoute: typeof UpdatesRouteWithChildren
   AdminUpdatesRoute: typeof AdminUpdatesRoute
-  AdminUsersRoute: typeof AdminUsersRoute
+  AdminUsersRoute: typeof AdminUsersRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -347,6 +359,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUpdatesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/users/$userId': {
+      id: '/admin/users/$userId'
+      path: '/$userId'
+      fullPath: '/admin/users/$userId'
+      preLoaderRoute: typeof AdminUsersUserIdRouteImport
+      parentRoute: typeof AdminUsersRoute
+    }
   }
 }
 
@@ -374,6 +393,18 @@ const UpdatesRouteChildren: UpdatesRouteChildren = {
 const UpdatesRouteWithChildren =
   UpdatesRoute._addFileChildren(UpdatesRouteChildren)
 
+interface AdminUsersRouteChildren {
+  AdminUsersUserIdRoute: typeof AdminUsersUserIdRoute
+}
+
+const AdminUsersRouteChildren: AdminUsersRouteChildren = {
+  AdminUsersUserIdRoute: AdminUsersUserIdRoute,
+}
+
+const AdminUsersRouteWithChildren = AdminUsersRoute._addFileChildren(
+  AdminUsersRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AchievementsRoute: AchievementsRoute,
@@ -386,7 +417,7 @@ const rootRouteChildren: RootRouteChildren = {
   SupportRoute: SupportRoute,
   UpdatesRoute: UpdatesRouteWithChildren,
   AdminUpdatesRoute: AdminUpdatesRoute,
-  AdminUsersRoute: AdminUsersRoute,
+  AdminUsersRoute: AdminUsersRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport

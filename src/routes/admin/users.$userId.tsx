@@ -12,7 +12,7 @@ import {
   BookOpen,
   AlertTriangle,
   Mail,
-  DevicePhoneMobile,
+  Smartphone,
   Globe,
   CheckCircle2,
   XCircle,

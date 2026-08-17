@@ -351,9 +351,9 @@ function HomePage() {
           </div>
 
           {/* Version / Admin link */}
-          {isAdmin && (
+          {['super_admin', 'admin', 'support', 'analyst'].includes(role) && (
             <div className="flex justify-center pt-2">
-              <Link to="/admin/updates">
+              <Link to="/admin">
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/40 hover:text-primary transition-colors cursor-pointer">
                   Bible Habit Admin v{APP_VERSION}
                 </span>
