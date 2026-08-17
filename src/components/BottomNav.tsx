@@ -4,10 +4,12 @@ import { Home, BookOpen, Users, Trophy, Settings } from "lucide-react";
 const tabs = [
   { to: "/", label: "Início", icon: Home },
   { to: "/progress", label: "Planos", icon: BookOpen },
+  { to: "/statistics", label: "Dados", icon: BarChart3 },
   { to: "/groups", label: "Grupos", icon: Users },
-  { to: "/achievements", label: "Conquistas", icon: Trophy },
   { to: "/settings", label: "Ajustes", icon: Settings },
 ] as const;
+
+import { BarChart3 } from "lucide-react";
 
 export function BottomNav() {
   return (
