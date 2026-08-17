@@ -132,7 +132,7 @@ function ProgressPage() {
   });
 
   const totalChapters = useMemo(
-    () => chaptersBetween(form.fromIdx, form.toIdx),
+    () => getChaptersBetween(form.fromIdx, form.toIdx),
     [form.fromIdx, form.toIdx],
   );
   const suggestedDays = Math.max(1, totalChapters);
