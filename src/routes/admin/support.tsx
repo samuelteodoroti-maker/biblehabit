@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { AdminLayout } from "@/components/AdminLayout";
-import { LifeBuoy, MessageCircle, UserCheck, Clock, ShieldInfo } from "lucide-react";
+import { LifeBuoy, MessageCircle, UserCheck, Clock, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BibleCard } from "@/components/BibleUI";
 
@@ -45,7 +45,7 @@ function AdminSupportPage() {
         </div>
 
         <div className="lg:col-span-4 space-y-6">
-          <BibleCard title="Regras de Suporte" icon={ShieldInfo}>
+          <BibleCard title="Regras de Suporte" icon={ShieldCheck}>
             <ul className="space-y-4">
               <li className="flex gap-3">
                 <Clock className="h-4 w-4 text-primary shrink-0 mt-0.5" />

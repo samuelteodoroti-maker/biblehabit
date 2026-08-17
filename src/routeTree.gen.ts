@@ -25,6 +25,11 @@ import { Route as UpdatesSlugRouteImport } from './routes/updates.$slug'
 import { Route as GroupsGroupIdRouteImport } from './routes/groups.$groupId'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminUpdatesRouteImport } from './routes/admin.updates'
+import { Route as AdminSupportRouteImport } from './routes/admin/support'
+import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
+import { Route as AdminSecurityRouteImport } from './routes/admin/security'
+import { Route as AdminAuditRouteImport } from './routes/admin/audit'
+import { Route as AdminAccessRouteImport } from './routes/admin/access'
 import { Route as AdminUsersUserIdRouteImport } from './routes/admin/users.$userId'
 
 const UpdatesRoute = UpdatesRouteImport.update({
@@ -107,6 +112,31 @@ const AdminUpdatesRoute = AdminUpdatesRouteImport.update({
   path: '/admin/updates',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminSupportRoute = AdminSupportRouteImport.update({
+  id: '/admin/support',
+  path: '/admin/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/admin/settings',
+  path: '/admin/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminSecurityRoute = AdminSecurityRouteImport.update({
+  id: '/admin/security',
+  path: '/admin/security',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAuditRoute = AdminAuditRouteImport.update({
+  id: '/admin/audit',
+  path: '/admin/audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAccessRoute = AdminAccessRouteImport.update({
+  id: '/admin/access',
+  path: '/admin/access',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminUsersUserIdRoute = AdminUsersUserIdRouteImport.update({
   id: '/$userId',
   path: '/$userId',
@@ -124,6 +154,11 @@ export interface FileRoutesByFullPath {
   '/statistics': typeof StatisticsRoute
   '/support': typeof SupportRoute
   '/updates': typeof UpdatesRouteWithChildren
+  '/admin/access': typeof AdminAccessRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/security': typeof AdminSecurityRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/support': typeof AdminSupportRoute
   '/admin/updates': typeof AdminUpdatesRoute
   '/admin/users': typeof AdminUsersRouteWithChildren
   '/groups/$groupId': typeof GroupsGroupIdRoute
@@ -142,6 +177,11 @@ export interface FileRoutesByTo {
   '/statistics': typeof StatisticsRoute
   '/support': typeof SupportRoute
   '/updates': typeof UpdatesRouteWithChildren
+  '/admin/access': typeof AdminAccessRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/security': typeof AdminSecurityRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/support': typeof AdminSupportRoute
   '/admin/updates': typeof AdminUpdatesRoute
   '/admin/users': typeof AdminUsersRouteWithChildren
   '/groups/$groupId': typeof GroupsGroupIdRoute
@@ -162,6 +202,11 @@ export interface FileRoutesById {
   '/statistics': typeof StatisticsRoute
   '/support': typeof SupportRoute
   '/updates': typeof UpdatesRouteWithChildren
+  '/admin/access': typeof AdminAccessRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/security': typeof AdminSecurityRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/support': typeof AdminSupportRoute
   '/admin/updates': typeof AdminUpdatesRoute
   '/admin/users': typeof AdminUsersRouteWithChildren
   '/groups/$groupId': typeof GroupsGroupIdRoute
@@ -183,6 +228,11 @@ export interface FileRouteTypes {
     | '/statistics'
     | '/support'
     | '/updates'
+    | '/admin/access'
+    | '/admin/audit'
+    | '/admin/security'
+    | '/admin/settings'
+    | '/admin/support'
     | '/admin/updates'
     | '/admin/users'
     | '/groups/$groupId'
@@ -201,6 +251,11 @@ export interface FileRouteTypes {
     | '/statistics'
     | '/support'
     | '/updates'
+    | '/admin/access'
+    | '/admin/audit'
+    | '/admin/security'
+    | '/admin/settings'
+    | '/admin/support'
     | '/admin/updates'
     | '/admin/users'
     | '/groups/$groupId'
@@ -220,6 +275,11 @@ export interface FileRouteTypes {
     | '/statistics'
     | '/support'
     | '/updates'
+    | '/admin/access'
+    | '/admin/audit'
+    | '/admin/security'
+    | '/admin/settings'
+    | '/admin/support'
     | '/admin/updates'
     | '/admin/users'
     | '/groups/$groupId'
@@ -240,6 +300,11 @@ export interface RootRouteChildren {
   StatisticsRoute: typeof StatisticsRoute
   SupportRoute: typeof SupportRoute
   UpdatesRoute: typeof UpdatesRouteWithChildren
+  AdminAccessRoute: typeof AdminAccessRoute
+  AdminAuditRoute: typeof AdminAuditRoute
+  AdminSecurityRoute: typeof AdminSecurityRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminSupportRoute: typeof AdminSupportRoute
   AdminUpdatesRoute: typeof AdminUpdatesRoute
   AdminUsersRoute: typeof AdminUsersRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
@@ -359,6 +424,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUpdatesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/support': {
+      id: '/admin/support'
+      path: '/admin/support'
+      fullPath: '/admin/support'
+      preLoaderRoute: typeof AdminSupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/admin/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/security': {
+      id: '/admin/security'
+      path: '/admin/security'
+      fullPath: '/admin/security'
+      preLoaderRoute: typeof AdminSecurityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/audit': {
+      id: '/admin/audit'
+      path: '/admin/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AdminAuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/access': {
+      id: '/admin/access'
+      path: '/admin/access'
+      fullPath: '/admin/access'
+      preLoaderRoute: typeof AdminAccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/users/$userId': {
       id: '/admin/users/$userId'
       path: '/$userId'
@@ -416,6 +516,11 @@ const rootRouteChildren: RootRouteChildren = {
   StatisticsRoute: StatisticsRoute,
   SupportRoute: SupportRoute,
   UpdatesRoute: UpdatesRouteWithChildren,
+  AdminAccessRoute: AdminAccessRoute,
+  AdminAuditRoute: AdminAuditRoute,
+  AdminSecurityRoute: AdminSecurityRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminSupportRoute: AdminSupportRoute,
   AdminUpdatesRoute: AdminUpdatesRoute,
   AdminUsersRoute: AdminUsersRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
