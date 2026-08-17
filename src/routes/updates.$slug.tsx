@@ -26,6 +26,8 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { toast } from "sonner";
 import { getVersionWhatsAppUrl } from "@/lib/app-utils";
+import { generateUpdatePDF } from "@/lib/pdf-generator";
+import { Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/updates/$slug")({
   head: ({ params }) => ({
@@ -41,6 +43,36 @@ function UpdateDetailPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [update, setUpdate] = useState<any>(null);
+  const [generatingPDF, setGeneratingPDF] = useState(false);
+
+  const handleDownloadPDF = async () => {
+    if (!update) return;
+    setGeneratingPDF(true);
+    try {
+      const doc = await generateUpdatePDF(update);
+      doc.save(`bible-habit-notas-v${update.version}.pdf`);
+      toast.success("PDF baixado com sucesso");
+    } catch (e) {
+      toast.error("Erro ao gerar PDF");
+    } finally {
+      setGeneratingPDF(false);
+    }
+  };
+
+  const handleViewPDF = async () => {
+    if (!update) return;
+    setGeneratingPDF(true);
+    try {
+      const doc = await generateUpdatePDF(update);
+      const blob = doc.output('blob');
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+    } catch (e) {
+      toast.error("Erro ao visualizar PDF");
+    } finally {
+      setGeneratingPDF(false);
+    }
+  };
 
   useEffect(() => {
     const fetchUpdate = async () => {
@@ -100,8 +132,25 @@ function UpdateDetailPage() {
         </header>
 
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" className="h-9 gap-2 rounded-xl border-border/60 bg-card/50 text-xs">
-            <Download className="h-3.5 w-3.5" /> PDF da versão
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="h-9 gap-2 rounded-xl border-border/60 bg-card/50 text-xs"
+            onClick={handleViewPDF}
+            disabled={generatingPDF}
+          >
+            {generatingPDF ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Eye className="h-3.5 w-3.5" />}
+            Visualizar PDF
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="h-9 gap-2 rounded-xl border-border/60 bg-card/50 text-xs"
+            onClick={handleDownloadPDF}
+            disabled={generatingPDF}
+          >
+            {generatingPDF ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
+            Baixar PDF
           </Button>
           <a href={waUrl} target="_blank" rel="noopener noreferrer">
             <Button variant="outline" size="sm" className="h-9 gap-2 rounded-xl border-border/60 bg-card/50 text-xs">
