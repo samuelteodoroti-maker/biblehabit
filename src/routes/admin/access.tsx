@@ -12,7 +12,7 @@ function AdminAccessPage() {
   const { role, roleLoading } = useAuth();
 
   if (roleLoading) return <div className="p-10 text-white">Carregando...</div>;
-  if (!role || !['super_admin', 'admin'].includes(role)) {
+  if (role !== 'super_admin') {
     return <div className="p-10 text-center text-white">Acesso negado.</div>;
   }
 

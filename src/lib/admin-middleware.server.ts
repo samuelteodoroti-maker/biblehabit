@@ -3,14 +3,22 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const requireAdminRole = (allowedRoles: string[]) => 
   createMiddleware().server(async ({ next }) => {
-    // In a server function, we should use the admin client or check context
-    // However, createServerFn context varies.
-    // We'll rely on the supabase client being correctly configured with the bearer token via middleware.
-    
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
       throw new Error("Unauthorized");
+    }
+
+    // Mandatory MFA Check for Admin routes
+    const { data: factors, error: factorsError } = await supabase.auth.mfa.listFactors();
+    if (factorsError) throw new Error("Security check failed");
+
+    // Check if the user has an active MFA session
+    const { data: mfaData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    
+    // If factors exist but level is not 'aal2', user must step up
+    if (factors.all.length > 0 && mfaData?.currentLevel !== 'aal2') {
+      throw new Error("MFA Required: Please verify your second factor");
     }
 
     const { data: roleData } = await supabase
