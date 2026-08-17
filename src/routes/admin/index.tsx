@@ -18,7 +18,7 @@ import { BibleCard } from "@/components/BibleUI";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/admin/")({
   component: AdminDashboard,
 });
 
