@@ -306,11 +306,12 @@ function ProgressPage() {
   };
 
   return (
-    <AppShell title="Planos de leitura" subtitle="Crie e acompanhe suas jornadas">
-      <div className="mb-6 space-y-3">
-        <h2 className="px-1 text-[11px] font-semibold tracking-[0.15em] text-muted-foreground">
-          Insights pessoais
+    <AppShell title="Jornadas" subtitle="Crie e acompanhe seus planos de leitura">
+      <div className="mb-8 space-y-4">
+        <h2 className="font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
+          Sua evolução
         </h2>
+
 
         <div className="grid grid-cols-2 gap-3">
           {insights.loading ? (
@@ -320,7 +321,8 @@ function ProgressPage() {
             </>
           ) : (
             <>
-              <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
+              <Card className="border-border/60 bg-card/70 p-5 backdrop-blur-sm rounded-3xl">
+
                 <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
                   <CalendarHeart className="h-3.5 w-3.5" /> Dia favorito
                 </div>
@@ -328,7 +330,8 @@ function ProgressPage() {
                   {insights.favoriteDay ?? "—"}
                 </p>
               </Card>
-              <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
+              <Card className="border-border/60 bg-card/70 p-5 backdrop-blur-sm rounded-3xl">
+
                 <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
                   <TrendingUp className="h-3.5 w-3.5" /> Média por leitura
                 </div>
@@ -344,7 +347,7 @@ function ProgressPage() {
         {insights.loading ? (
           <Skeleton className="h-[176px] rounded-2xl" />
         ) : insights.hasData ? (
-          <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
+          <Card className="border-border/60 bg-card/70 p-6 backdrop-blur-sm rounded-3xl">
             <p className="mb-2 text-[11px] font-medium text-muted-foreground">
               Últimos 7 dias
             </p>
@@ -362,7 +365,7 @@ function ProgressPage() {
                       fontSize: 12,
                     }}
                   />
-                  <Bar dataKey="chapters" fill="oklch(0.65 0.22 275)" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="chapters" fill="var(--primary)" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -376,7 +379,7 @@ function ProgressPage() {
 
       <Button
         onClick={openNew}
-        className="mb-6 h-12 w-full gap-2 rounded-2xl gradient-primary font-semibold text-primary-foreground shadow-glow hover:brightness-110"
+        className="mb-8 h-14 w-full gap-2 rounded-2xl gradient-primary font-bold text-primary-foreground shadow-glow hover:brightness-110"
         disabled={!user || loading}
         aria-label="Criar novo plano de leitura"
       >
@@ -410,51 +413,71 @@ function ProgressPage() {
           </p>
         </Card>
       ) : (
-        <div className="space-y-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {plans.map((p) => {
             const pct = p.total_days > 0 ? (p.completed_days / p.total_days) * 100 : 0;
             return (
               <Card
                 key={p.id}
-                className="border-border/60 bg-card/70 p-5 backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:shadow-card"
+                className="paper-texture flex flex-col justify-between border-border/60 bg-card/70 p-6 backdrop-blur-sm transition-all hover:-translate-y-1 hover:shadow-card rounded-[2rem]"
               >
-                <div className="flex items-start gap-4">
-                  <CircularProgress value={pct} />
-                  <div className="min-w-0 flex-1">
-                    <h2 className="truncate font-display text-base font-semibold">{p.title}</h2>
-                    <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
-                      {p.description ?? "—"}
-                    </p>
-                    <div className="mt-2.5 flex flex-wrap gap-1.5 text-[11px]">
-                      <span className="rounded-full border border-border/60 bg-background/50 px-2 py-0.5 font-medium text-muted-foreground">
-                        {p.completed_days}/{p.total_days} dias
-                      </span>
-                      {p.books_today ? (
-                        <span className="rounded-full bg-primary/15 px-2 py-0.5 font-medium text-primary">
-                          Hoje: {p.books_today}
-                        </span>
-                      ) : null}
+                <div>
+                  <div className="mb-4 flex items-center justify-between">
+                    <h2 className="font-serif-title text-xl font-bold tracking-tight">{p.title}</h2>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 rounded-full"
+                      onClick={() => share(p)}
+                      title="Compartilhar"
+                    >
+                      <Share2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="flex items-center gap-5">
+                    <CircularProgress value={pct} />
+                    <div className="min-w-0">
+                      <p className="line-clamp-2 text-xs text-muted-foreground italic">
+                        {p.description ?? "Jornada de leitura bíblica"}
+                      </p>
+                      <div className="mt-2 text-[10px] font-bold uppercase tracking-widest text-primary">
+                        {p.books_today ? `Hoje: ${p.books_today}` : "Meta concluída"}
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="mt-4 flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    className="flex-1 gap-1.5 rounded-xl"
-                    onClick={() => share(p)}
-                    aria-label={`Compartilhar plano ${p.title}`}
-                  >
-                    <Share2 className="h-3.5 w-3.5" /> Compartilhar
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="rounded-xl"
-                    onClick={() => openEdit(p)}
-                    aria-label={`Editar plano ${p.title}`}
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
+
+                <div className="mt-6 space-y-4">
+                  <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                    <span>{p.completed_days} de {p.total_days} dias</span>
+                    <span>{Math.round(pct)}%</span>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="flex-1 rounded-xl text-xs font-semibold"
+                      onClick={() => openEdit(p)}
+                    >
+                      <Pencil className="mr-1.5 h-3.5 w-3.5" /> Editar
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="rounded-xl px-3 text-destructive hover:bg-destructive/10"
+                      onClick={() => remove(p.id)}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
+          </div>
+
                   </Button>
                   <Button
                     size="sm"
