@@ -31,7 +31,17 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!loading && session) navigate({ to: "/" });
+    if (!loading && session) {
+      // Clear sensitive URL params after login
+      const url = new URL(window.location.href);
+      if (url.searchParams.has("code") || url.searchParams.has("token_hash")) {
+        url.searchParams.delete("code");
+        url.searchParams.delete("token_hash");
+        url.searchParams.delete("type");
+        window.history.replaceState({}, document.title, url.pathname + url.search);
+      }
+      navigate({ to: "/" });
+    }
   }, [session, loading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {

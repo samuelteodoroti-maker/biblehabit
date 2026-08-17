@@ -14,7 +14,7 @@ export const getUpdates = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     let query = supabase
       .from("app_updates")
-      .select("*", { count: "exact" });
+      .select("id, slug, title, summary, version, status, categories, published_at, cover_image_url", { count: "exact" });
 
     if (data.status) {
       query = query.eq("status", data.status);
@@ -49,7 +49,7 @@ export const getUpdateBySlug = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const { data: update, error } = await supabase
       .from("app_updates")
-      .select("*")
+      .select("id, slug, title, summary, version, status, categories, published_at, cover_image_url, highlights, improvements, fixes, accessibility_changes, content")
       .eq("slug", data.slug)
       .maybeSingle();
 

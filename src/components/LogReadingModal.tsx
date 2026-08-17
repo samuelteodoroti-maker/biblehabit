@@ -148,7 +148,8 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
       onSaved?.();
       onOpenChange(false);
     } catch (error: any) {
-      toast.error(error.message || "Erro ao salvar leitura");
+      console.error("Erro ao salvar leitura:", error);
+      toast.error(error.message || "Erro ao salvar leitura. Verifique se os dados são válidos.");
     } finally {
       setSaving(false);
     }

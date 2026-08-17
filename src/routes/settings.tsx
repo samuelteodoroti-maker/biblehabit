@@ -139,6 +139,8 @@ function SettingsPage() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
+    // Clear local cache/storage
+    localStorage.removeItem("bh_last_update_seen");
     toast.success("Sessão encerrada");
     navigate({ to: "/auth" });
   };
