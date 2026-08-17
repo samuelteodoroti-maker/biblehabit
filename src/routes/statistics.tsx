@@ -3,7 +3,7 @@ import { AppShell } from "@/components/AppShell";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BarChart3, PieChart, TrendingUp, History, BookOpen, Clock, Calendar } from "lucide-react";
+import { BarChart3, PieChart, TrendingUp, History, BookOpen, Clock, Calendar, Flame } from "lucide-react";
 import { useReadingData } from "@/hooks/useReadingData";
 import { useMemo } from "react";
 import { 
