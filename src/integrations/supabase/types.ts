@@ -443,7 +443,13 @@ export type Database = {
       join_group_by_code: { Args: { _code: string }; Returns: string }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user"
+      app_role:
+        | "admin"
+        | "moderator"
+        | "user"
+        | "super_admin"
+        | "support"
+        | "analyst"
       update_status: "draft" | "scheduled" | "published" | "archived"
     }
     CompositeTypes: {
@@ -572,7 +578,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user"],
+      app_role: [
+        "admin",
+        "moderator",
+        "user",
+        "super_admin",
+        "support",
+        "analyst",
+      ],
       update_status: ["draft", "scheduled", "published", "archived"],
     },
   },
