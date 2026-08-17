@@ -37,7 +37,7 @@ function greeting() {
 
 function HomePage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { profile, activePlan, logDates, loading, today, refresh } = useReadingData();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(today);
@@ -147,6 +147,17 @@ function HomePage() {
             </div>
           </div>
         </Card>
+      )}
+
+      {/* Version info for admins */}
+      {isAdmin && (
+        <div className="mb-4 flex items-center justify-end">
+          <Link to="/admin/updates">
+            <Badge variant="outline" className="text-[9px] font-bold opacity-50 hover:opacity-100">
+              Painel Admin v{APP_VERSION}
+            </Badge>
+          </Link>
+        </div>
       )}
 
       {/* Greeting */}
