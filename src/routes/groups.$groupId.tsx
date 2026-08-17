@@ -581,7 +581,7 @@ function GroupDetail() {
             </Card>
           ) : (
             members.map((m, i) => {
-              const rank = i + 1;
+              const rank = (m as any).rank ?? (i + 1);
               const displayName = m.name ?? "Sem nome";
               const podiumStyles: Record<number, { bg: string; ring: string; icon: ReactNode }> = {
                 1: {
@@ -601,6 +601,7 @@ function GroupDetail() {
                 },
               };
               const style = podiumStyles[rank];
+              const isTied = i > 0 && (members[i-1] as any).rank === rank;
               return (
                 <Card
                   key={m.user_id}
@@ -620,7 +621,10 @@ function GroupDetail() {
                     <AvatarFallback>{displayName[0]?.toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold">{displayName}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="truncate text-sm font-semibold">{displayName}</p>
+                      {isTied && <span className="text-[10px] text-muted-foreground">(Empate)</span>}
+                    </div>
                     <p className="text-xs text-muted-foreground">
                       {m.chapters} {m.chapters === 1 ? "capítulo" : "capítulos"}
                     </p>
