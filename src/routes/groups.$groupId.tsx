@@ -25,7 +25,6 @@ export const Route = createFileRoute("/groups/$groupId")({
   component: GroupDetail,
 });
 
-
 type Group = {
   id: string;
   name: string;
@@ -42,6 +41,7 @@ type MemberStat = {
   avatar_url: string | null;
   chapters: number;
   streak: number;
+  rank?: number;
 };
 
 type Activity = {
@@ -65,7 +65,6 @@ function weekStart() {
   const d = new Date();
   d.setHours(0, 0, 0, 0);
   d.setDate(d.getDate() - d.getDay()); // Sunday, local time
-  // Format in LOCAL time — reading_logs.read_date is stored as a local calendar date.
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
@@ -112,6 +111,7 @@ function GroupDetail() {
         .select("id, name, description, avatar, invite_code")
         .eq("id", groupId)
         .maybeSingle();
+      
       if (cancelled) return;
       if (!g) {
         setNotFound(true);
@@ -155,17 +155,24 @@ function GroupDetail() {
         chapters: chapterMap.get(p.id) ?? 0,
         streak: p.current_streak ?? 0,
       }));
+      
+      // Ranking logic with ties
       stats.sort((a, b) => b.chapters - a.chapters || b.streak - a.streak || a.user_id.localeCompare(b.user_id));
       
       const rankedStats = stats.map((s, idx) => {
-        const rank = idx > 0 && stats[idx-1].chapters === s.chapters && stats[idx-1].streak === s.streak
-          ? (stats as any)[idx-1].rank
-          : idx + 1;
-        return { ...s, rank };
+        let rank = idx + 1;
+        if (idx > 0) {
+          const prev = stats[idx - 1];
+          if (prev.chapters === s.chapters) {
+            rank = (stats as any)[idx - 1].rank;
+          }
+        }
+        (s as any).rank = rank;
+        return s;
       });
       
       if (cancelled) return;
-      setMembers(rankedStats as any);
+      setMembers(rankedStats);
       setLoading(false);
     })();
     return () => {
@@ -173,7 +180,6 @@ function GroupDetail() {
     };
   }, [groupId, user]);
 
-  // Load activities feed
   useEffect(() => {
     if (!user || members.length === 0) return;
     let cancelled = false;
@@ -188,7 +194,7 @@ function GroupDetail() {
         .limit(50);
 
       const planIds = Array.from(
-        new Set(((logs ?? []) as Array<{ plan_id: string | null }>).map((l) => l.plan_id).filter((x): x is string => !!x)),
+        new Set(((logs ?? []) as any[]).map((l) => l.plan_id).filter((x): x is string => !!x)),
       );
       const planMap = new Map<string, string>();
       if (planIds.length > 0) {
@@ -199,10 +205,7 @@ function GroupDetail() {
         (plans ?? []).forEach((p) => planMap.set(p.id, p.title));
       }
 
-      const feed: Activity[] = ((logs ?? []) as Array<{
-        id: string; user_id: string; created_at: string; read_date: string;
-        chapters_count: number; notes: string | null; plan_id: string | null;
-      }>).map((l) => ({
+      const feed: Activity[] = ((logs ?? []) as any[]).map((l) => ({
         id: l.id,
         user_id: l.user_id,
         created_at: l.created_at,
@@ -215,7 +218,6 @@ function GroupDetail() {
       setActivities(feed);
       setLoadingActivities(false);
 
-      // Load reactions for these activities
       const logIds = feed.map((f) => f.id);
       if (logIds.length > 0) {
         const { data: rx } = await supabase
@@ -224,7 +226,7 @@ function GroupDetail() {
           .in("log_id", logIds);
         if (cancelled) return;
         const map = new Map<string, { fire: number; amen: number; myFire: boolean; myAmen: boolean }>();
-        (rx ?? []).forEach((r: { log_id: string; type: string; user_id: string }) => {
+        (rx ?? []).forEach((r: any) => {
           const cur = map.get(r.log_id) ?? { fire: 0, amen: 0, myFire: false, myAmen: false };
           if (r.type === "fire") {
             cur.fire++;
@@ -241,7 +243,6 @@ function GroupDetail() {
     return () => { cancelled = true; };
   }, [members, user]);
 
-  // Load and subscribe messages
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
@@ -285,7 +286,6 @@ function GroupDetail() {
     setSending(true);
     const text = draft.trim();
     setDraft("");
-    // Optimistic insert so the sender sees the message immediately even if realtime lags.
     const tempId = `tmp-${Date.now()}`;
     const optimistic: Message = {
       id: tempId,
@@ -306,7 +306,6 @@ function GroupDetail() {
       setDraft(text);
       return;
     }
-    // Replace optimistic with the persisted row; realtime insert will dedupe by id.
     if (data) {
       setMessages((prev) => {
         const withoutTemp = prev.filter((m) => m.id !== tempId);
@@ -382,7 +381,7 @@ function GroupDetail() {
           </>
         ) : (
           <>
-            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-accent/60 text-2xl">
+            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-accent/60 text-2xl" aria-hidden="true">
               {group?.avatar ?? "📖"}
             </div>
             <div className="min-w-0 flex-1">
@@ -414,8 +413,18 @@ function GroupDetail() {
         {/* ATIVIDADES */}
         <TabsContent value="activities" className="mt-5">
           {loadingActivities ? (
-            <div className="flex justify-center py-8">
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            <div className="space-y-4 py-4">
+              {[1, 2, 3].map(i => (
+                <Card key={i} className="border-border/60 bg-card/70 p-4">
+                  <div className="flex gap-3">
+                    <Skeleton className="h-9 w-9 rounded-full" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-4 w-1/3" />
+                      <Skeleton className="h-3 w-full" />
+                    </div>
+                  </div>
+                </Card>
+              ))}
             </div>
           ) : activities.length === 0 ? (
             <Card className="border-dashed border-border/70 bg-card/40 p-8 text-center text-sm text-muted-foreground">
@@ -433,7 +442,7 @@ function GroupDetail() {
                     <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
                       <div className="flex items-center gap-3">
                         <Avatar className="h-9 w-9">
-                          <AvatarImage src={p?.avatar_url ?? undefined} />
+                          <AvatarImage src={p?.avatar_url ?? undefined} alt={`Foto de ${name}`} />
                           <AvatarFallback>{name[0]?.toUpperCase()}</AvatarFallback>
                         </Avatar>
                         <div className="min-w-0 flex-1">
@@ -501,8 +510,13 @@ function GroupDetail() {
           <Card className="flex h-[60vh] flex-col overflow-hidden border-border/60 bg-card/60 backdrop-blur-sm">
             <div className="flex-1 space-y-3 overflow-y-auto p-4">
               {loadingMessages ? (
-                <div className="flex justify-center py-8">
-                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                <div className="space-y-3 py-4">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="flex gap-2">
+                      <Skeleton className="h-8 w-8 rounded-full" />
+                      <Skeleton className="h-10 w-2/3 rounded-2xl" />
+                    </div>
+                  ))}
                 </div>
               ) : messages.length === 0 ? (
                 <p className="py-8 text-center text-sm text-muted-foreground">
@@ -517,7 +531,7 @@ function GroupDetail() {
                     <div key={m.id} className={`flex gap-2 ${mine ? "justify-end" : "justify-start"}`}>
                       {!mine && (
                         <Avatar className="h-8 w-8 shrink-0">
-                          <AvatarImage src={p?.avatar_url ?? undefined} />
+                          <AvatarImage src={p?.avatar_url ?? undefined} alt={`Avatar de ${name}`} />
                           <AvatarFallback>{name[0]?.toUpperCase()}</AvatarFallback>
                         </Avatar>
                       )}
@@ -550,12 +564,14 @@ function GroupDetail() {
                 placeholder="Escreva uma mensagem..."
                 className="rounded-full"
                 disabled={sending}
+                aria-label="Escreva sua mensagem"
               />
               <Button
                 type="submit"
                 size="icon"
                 className="h-10 w-10 shrink-0 rounded-full gradient-primary text-primary-foreground"
                 disabled={sending || !draft.trim()}
+                aria-label="Enviar mensagem"
               >
                 {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               </Button>
@@ -566,14 +582,16 @@ function GroupDetail() {
         {/* RANKING */}
         <TabsContent value="leaderboard" className="mt-5 space-y-2">
           <div className="mb-3">
-            <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-              Ranking da Semana
-            </p>
-            <p className="text-[11px] text-muted-foreground/80">zera todo domingo</p>
+            <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+              Ranking da semana
+            </h3>
+            <p className="text-[11px] text-muted-foreground/80">Zera todo domingo</p>
           </div>
           {loading ? (
-            <div className="flex justify-center py-8">
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            <div className="space-y-2 py-4">
+              {[1, 2, 3].map(i => (
+                <Skeleton key={i} className="h-16 w-full rounded-2xl" />
+              ))}
             </div>
           ) : members.length === 0 ? (
             <Card className="border-dashed border-border/70 bg-card/40 p-8 text-center text-sm text-muted-foreground">
@@ -587,37 +605,43 @@ function GroupDetail() {
                 1: {
                   bg: "bg-gradient-to-br from-yellow-400 to-amber-600 text-white shadow-glow",
                   ring: "ring-1 ring-yellow-400/40",
-                  icon: <Crown className="h-4 w-4" />,
+                  icon: <Crown className="h-4 w-4" aria-hidden="true" />,
                 },
                 2: {
                   bg: "bg-gradient-to-br from-slate-300 to-slate-500 text-white",
                   ring: "ring-1 ring-slate-300/30",
-                  icon: <Medal className="h-4 w-4" />,
+                  icon: <Medal className="h-4 w-4" aria-hidden="true" />,
                 },
                 3: {
                   bg: "bg-gradient-to-br from-amber-700 to-orange-800 text-white",
                   ring: "ring-1 ring-amber-700/30",
-                  icon: <Award className="h-4 w-4" />,
+                  icon: <Award className="h-4 w-4" aria-hidden="true" />,
                 },
               };
               const style = podiumStyles[rank];
               const isTied = i > 0 && (members[i-1] as any).rank === rank;
+              const chapterText = m.chapters === 0 
+                ? "Nenhuma leitura nesta semana" 
+                : `${m.chapters} ${m.chapters === 1 ? 'capítulo' : 'capítulos'}`;
+              
               return (
                 <Card
                   key={m.user_id}
                   className={`flex items-center gap-3 border-border/60 bg-card/70 p-3 backdrop-blur-sm ${
                     style?.ring ?? ""
                   }`}
+                  aria-label={`${rank}º lugar, ${displayName}, ${isTied ? 'empate, ' : ''}${chapterText}`}
                 >
                   <span
                     className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-bold ${
                       style ? style.bg : "bg-accent/60 text-muted-foreground"
                     }`}
+                    aria-hidden="true"
                   >
                     {style ? style.icon : rank}
                   </span>
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={m.avatar_url ?? undefined} />
+                    <AvatarImage src={m.avatar_url ?? undefined} alt={`Avatar de ${displayName}`} />
                     <AvatarFallback>{displayName[0]?.toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <div className="min-w-0 flex-1">
@@ -626,11 +650,11 @@ function GroupDetail() {
                       {isTied && <span className="text-[10px] text-muted-foreground">(Empate)</span>}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {m.chapters} {m.chapters === 1 ? "capítulo" : "capítulos"}
+                      {chapterText}
                     </p>
                   </div>
                   <div className="flex items-center gap-1 rounded-full bg-background/60 px-2 py-1 text-xs font-medium">
-                    <Flame className="h-3.5 w-3.5 text-[color:var(--flame)]" />
+                    <Flame className="h-3.5 w-3.5 text-[color:var(--flame)]" aria-hidden="true" />
                     {m.streak}
                   </div>
                 </Card>
@@ -641,9 +665,9 @@ function GroupDetail() {
 
         <TabsContent value="invite" className="mt-5">
           <Card className="border-border/60 bg-card/70 p-5 backdrop-blur-sm">
-            <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+            <h3 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
               Código de convite
-            </p>
+            </h3>
             <p className="mt-2 font-mono text-2xl font-bold tracking-widest">
               {group?.invite_code ?? "..."}
             </p>
@@ -658,6 +682,7 @@ function GroupDetail() {
                 navigator.clipboard.writeText(group.invite_code);
                 toast.success("Código copiado");
               }}
+              aria-label="Copiar código de convite para área de transferência"
             >
               <Copy className="h-4 w-4" /> Copiar código
             </Button>

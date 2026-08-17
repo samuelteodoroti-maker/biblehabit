@@ -19,7 +19,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
 
-
 export const Route = createFileRoute("/progress")({
   head: () => ({
     meta: [
@@ -33,7 +32,6 @@ export const Route = createFileRoute("/progress")({
   }),
   component: ProgressPage,
 });
-
 
 type Plan = {
   id: string;
@@ -62,8 +60,10 @@ function CircularProgress({ value }: { value: number }) {
     >
       <defs>
         <linearGradient id="progGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="oklch(0.55 0.22 275)" />
-          <stop offset="100%" stopColor="oklch(0.75 0.19 275)" />
+          <linearGradient id="progGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="oklch(0.55 0.22 275)" />
+            <stop offset="100%" stopColor="oklch(0.75 0.19 275)" />
+          </linearGradient>
         </linearGradient>
       </defs>
       <circle cx="40" cy="40" r={r} className="fill-none stroke-muted/60" strokeWidth="7" />
@@ -102,19 +102,17 @@ function buildLast7(dayMap: Map<string, number>) {
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
-    // Use local date to match how reading_logs.read_date is stored (local day).
     const key = localDateKey(d);
     out.push({ day: labels[d.getDay()], chapters: dayMap.get(key) ?? 0 });
   }
   return out;
 }
 
-
 function ProgressPage() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const [plans, setPlans] = useState<Plan[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState<Plan | null>(null);
@@ -123,7 +121,8 @@ function ProgressPage() {
     avgChapters: number;
     last7: { day: string; chapters: number }[];
     hasData: boolean;
-  }>({ favoriteDay: null, avgChapters: 0, last7: [], hasData: false });
+    loading: boolean;
+  }>({ favoriteDay: null, avgChapters: 0, last7: [], hasData: false, loading: true });
   const [form, setForm] = useState({
     title: "",
     totalDays: 30,
@@ -179,10 +178,10 @@ function ProgressPage() {
     return () => { cancelled = true; };
   }, [user]);
 
-  // Insights
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
+    setInsights(prev => ({ ...prev, loading: true }));
     (async () => {
       const since = new Date();
       since.setDate(since.getDate() - 89);
@@ -195,26 +194,27 @@ function ProgressPage() {
       if (cancelled) return;
       const logs = (data ?? []) as { read_date: string; chapters_count: number }[];
       if (logs.length === 0) {
-        setInsights({ favoriteDay: null, avgChapters: 0, last7: buildLast7(new Map()), hasData: false });
+        setInsights({ favoriteDay: null, avgChapters: 0, last7: buildLast7(new Map()), hasData: false, loading: false });
         return;
       }
       const dayNames = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
       const dayCounts = new Array(7).fill(0);
-      let totalChapters = 0;
+      let totalRead = 0;
       const dayMap = new Map<string, number>();
       for (const l of logs) {
         const d = new Date(l.read_date + "T00:00:00");
         dayCounts[d.getDay()]++;
-        totalChapters += l.chapters_count ?? 0;
+        totalRead += l.chapters_count ?? 0;
         dayMap.set(l.read_date, (dayMap.get(l.read_date) ?? 0) + (l.chapters_count ?? 0));
       }
       let favIdx = 0;
       for (let i = 1; i < 7; i++) if (dayCounts[i] > dayCounts[favIdx]) favIdx = i;
       setInsights({
         favoriteDay: dayCounts[favIdx] > 0 ? dayNames[favIdx] : null,
-        avgChapters: totalChapters / logs.length,
+        avgChapters: totalRead / logs.length,
         last7: buildLast7(dayMap),
         hasData: true,
+        loading: false,
       });
     })();
     return () => { cancelled = true; };
@@ -305,78 +305,80 @@ function ProgressPage() {
     toast.success("Link de convite copiado");
   };
 
-
   return (
     <AppShell title="Planos de leitura" subtitle="Crie e acompanhe suas jornadas">
-      {insights.hasData && (
-        <div className="mb-6 space-y-3">
-          <h2 className="px-1 text-[11px] font-semibold tracking-[0.15em] text-muted-foreground">
-            Insights pessoais
-          </h2>
+      <div className="mb-6 space-y-3">
+        <h2 className="px-1 text-[11px] font-semibold tracking-[0.15em] text-muted-foreground">
+          Insights pessoais
+        </h2>
 
-          <div className="grid grid-cols-2 gap-3">
-            {!insights.hasData ? (
-              <>
-                <Skeleton className="h-[88px] rounded-2xl" />
-                <Skeleton className="h-[88px] rounded-2xl" />
-              </>
-            ) : (
-              <>
-                <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
-                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                    <CalendarHeart className="h-3.5 w-3.5" /> Dia favorito
-                  </div>
-                  <p className="mt-2 font-display text-lg font-semibold">
-                    {insights.favoriteDay ?? "—"}
-                  </p>
-                </Card>
-                <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
-                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                    <TrendingUp className="h-3.5 w-3.5" /> Média por leitura
-                  </div>
-                  <p className="mt-2 font-display text-lg font-semibold">
-                    {insights.avgChapters.toFixed(1)}{" "}
-                    <span className="text-xs font-normal text-muted-foreground">caps</span>
-                  </p>
-                </Card>
-              </>
-            )}
-          </div>
-          
-          {!insights.hasData ? (
-            <Skeleton className="h-[176px] rounded-2xl" />
+        <div className="grid grid-cols-2 gap-3">
+          {insights.loading ? (
+            <>
+              <Skeleton className="h-[88px] rounded-2xl" />
+              <Skeleton className="h-[88px] rounded-2xl" />
+            </>
           ) : (
-            <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
-              <p className="mb-2 text-[11px] font-medium text-muted-foreground">
-                Últimos 7 dias
-              </p>
-              <div className="h-32">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={insights.last7} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-                    <XAxis dataKey="day" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
-                    <Tooltip
-                      cursor={{ fill: "rgba(255,255,255,0.05)" }}
-                      contentStyle={{
-                        background: "rgba(20,20,30,0.9)",
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        borderRadius: 12,
-                        fontSize: 12,
-                      }}
-                    />
-                    <Bar dataKey="chapters" fill="oklch(0.65 0.22 275)" radius={[6, 6, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </Card>
+            <>
+              <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
+                <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                  <CalendarHeart className="h-3.5 w-3.5" /> Dia favorito
+                </div>
+                <p className="mt-2 font-display text-lg font-semibold">
+                  {insights.favoriteDay ?? "—"}
+                </p>
+              </Card>
+              <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
+                <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                  <TrendingUp className="h-3.5 w-3.5" /> Média por leitura
+                </div>
+                <p className="mt-2 font-display text-lg font-semibold">
+                  {insights.avgChapters.toFixed(1)}{" "}
+                  <span className="text-xs font-normal text-muted-foreground">caps</span>
+                </p>
+              </Card>
+            </>
           )}
         </div>
-      )}
+        
+        {insights.loading ? (
+          <Skeleton className="h-[176px] rounded-2xl" />
+        ) : insights.hasData ? (
+          <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
+            <p className="mb-2 text-[11px] font-medium text-muted-foreground">
+              Últimos 7 dias
+            </p>
+            <div className="h-32">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={insights.last7} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                  <XAxis dataKey="day" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                  <Tooltip
+                    cursor={{ fill: "rgba(255,255,255,0.05)" }}
+                    contentStyle={{
+                      background: "rgba(20,20,30,0.9)",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      borderRadius: 12,
+                      fontSize: 12,
+                    }}
+                  />
+                  <Bar dataKey="chapters" fill="oklch(0.65 0.22 275)" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+        ) : (
+          <Card className="border-dashed border-border/70 bg-card/40 p-6 text-center text-xs text-muted-foreground">
+            Registre leituras para ver seus insights.
+          </Card>
+        )}
+      </div>
 
       <Button
         onClick={openNew}
         className="mb-6 h-12 w-full gap-2 rounded-2xl gradient-primary font-semibold text-primary-foreground shadow-glow hover:brightness-110"
-        disabled={!user}
+        disabled={!user || loading}
+        aria-label="Criar novo plano de leitura"
       >
         <Plus className="h-4 w-4" /> Novo plano
       </Button>
@@ -399,7 +401,7 @@ function ProgressPage() {
             </Card>
           ))}
         </div>
-      ) : plans.length === 0 && user ? (
+      ) : plans.length === 0 ? (
         <Card className="border-dashed border-border/70 bg-card/40 p-8 text-center">
           <BookOpen className="mx-auto h-8 w-8 text-muted-foreground" />
           <p className="mt-3 font-display text-base font-semibold">Sem planos ainda</p>
@@ -409,123 +411,120 @@ function ProgressPage() {
         </Card>
       ) : (
         <div className="space-y-3">
-
-        {plans.map((p) => {
-          const pct = p.total_days > 0 ? (p.completed_days / p.total_days) * 100 : 0;
-          return (
-            <Card
-              key={p.id}
-              className="border-border/60 bg-card/70 p-5 backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:shadow-card"
-            >
-              <div className="flex items-start gap-4">
-                <CircularProgress value={pct} />
-                <div className="min-w-0 flex-1">
-                  <h2 className="truncate font-display text-base font-semibold">{p.title}</h2>
-                  <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
-                    {p.description ?? "—"}
-                  </p>
-                  <div className="mt-2.5 flex flex-wrap gap-1.5 text-[11px]">
-                    <span className="rounded-full border border-border/60 bg-background/50 px-2 py-0.5 font-medium text-muted-foreground">
-                      {p.completed_days}/{p.total_days} dias
-                    </span>
-                    {p.books_today ? (
-                      <span className="rounded-full bg-primary/15 px-2 py-0.5 font-medium text-primary">
-                        Hoje: {p.books_today}
+          {plans.map((p) => {
+            const pct = p.total_days > 0 ? (p.completed_days / p.total_days) * 100 : 0;
+            return (
+              <Card
+                key={p.id}
+                className="border-border/60 bg-card/70 p-5 backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:shadow-card"
+              >
+                <div className="flex items-start gap-4">
+                  <CircularProgress value={pct} />
+                  <div className="min-w-0 flex-1">
+                    <h2 className="truncate font-display text-base font-semibold">{p.title}</h2>
+                    <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                      {p.description ?? "—"}
+                    </p>
+                    <div className="mt-2.5 flex flex-wrap gap-1.5 text-[11px]">
+                      <span className="rounded-full border border-border/60 bg-background/50 px-2 py-0.5 font-medium text-muted-foreground">
+                        {p.completed_days}/{p.total_days} dias
                       </span>
-                    ) : null}
+                      {p.books_today ? (
+                        <span className="rounded-full bg-primary/15 px-2 py-0.5 font-medium text-primary">
+                          Hoje: {p.books_today}
+                        </span>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="mt-4 flex gap-2">
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  className="flex-1 gap-1.5 rounded-xl"
-                  onClick={() => share(p)}
-                >
-                  <Share2 className="h-3.5 w-3.5" /> Compartilhar
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="rounded-xl"
-                  onClick={() => openEdit(p)}
-                  aria-label="Editar"
-                >
-                  <Pencil className="h-3.5 w-3.5" />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="rounded-xl text-destructive hover:bg-destructive/10 hover:text-destructive"
-                  onClick={() => remove(p.id)}
-                  aria-label="Remover plano"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
-              </div>
-            </Card>
-          );
-        })}
-      </div>
+                <div className="mt-4 flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="flex-1 gap-1.5 rounded-xl"
+                    onClick={() => share(p)}
+                    aria-label={`Compartilhar plano ${p.title}`}
+                  >
+                    <Share2 className="h-3.5 w-3.5" /> Compartilhar
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="rounded-xl"
+                    onClick={() => openEdit(p)}
+                    aria-label={`Editar plano ${p.title}`}
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="rounded-xl text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    onClick={() => remove(p.id)}
+                    aria-label={`Remover plano ${p.title}`}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>
-
-        <DialogContent className="rounded-2xl border-border/60 bg-card/95 backdrop-blur-xl">
+        <DialogContent className="max-w-md border-border/60 bg-card/95 backdrop-blur-xl">
           <DialogHeader>
             <DialogTitle className="font-display text-xl">
-              {editing ? "Editar plano" : "Novo plano"}
+              {editing ? "Editar plano" : "Novo plano de leitura"}
             </DialogTitle>
             <DialogDescription>
-              Defina o título, a meta de dias e os livros que deseja ler.
+              Defina o que você quer ler e em quantos dias.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="plan-title" className="text-xs">Título</Label>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="plan-title" className="text-xs uppercase tracking-wider text-muted-foreground">Título</Label>
               <Input
                 id="plan-title"
                 value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                placeholder="Ex.: Novo Testamento em 90 dias"
-                className="h-10 rounded-xl"
+                onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+                placeholder="Ex: Novo Testamento"
+                className="rounded-xl"
               />
             </div>
+
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="plan-from" className="text-xs">De</Label>
+              <div className="space-y-2">
+                <Label className="text-xs uppercase tracking-wider text-muted-foreground">Início</Label>
                 <Select
-                  name="plan-from"
                   value={String(form.fromIdx)}
-                  onValueChange={(v) => {
-                    const from = Number(v);
-                    setForm((f) => ({ ...f, fromIdx: from, toIdx: Math.max(from, f.toIdx) }));
-                  }}
+                  onValueChange={(v) => setForm((f) => ({ ...f, fromIdx: Number(v), toIdx: Math.max(Number(v), f.toIdx) }))}
                 >
-                  <SelectTrigger className="h-10 rounded-xl">
-                    <SelectValue placeholder="Selecionar" />
+                  <SelectTrigger className="rounded-xl" aria-label="Livro de início">
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {bibleBooks.map((b, i) => (
-                      <SelectItem key={b.name} value={String(i)}>{b.name}</SelectItem>
+                      <SelectItem key={b.name} value={String(i)}>
+                        {b.name}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="plan-to" className="text-xs">Até</Label>
+              <div className="space-y-2">
+                <Label className="text-xs uppercase tracking-wider text-muted-foreground">Fim</Label>
                 <Select
-                  name="plan-to"
                   value={String(form.toIdx)}
                   onValueChange={(v) => setForm((f) => ({ ...f, toIdx: Number(v) }))}
                 >
-                  <SelectTrigger className="h-10 rounded-xl">
-                    <SelectValue placeholder="Selecionar" />
+                  <SelectTrigger className="rounded-xl" aria-label="Livro de fim">
+                    <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {bibleBooks.map((b, i) => (
-                      <SelectItem key={b.name} value={String(i)} disabled={i < form.fromIdx}>
+                    {bibleBooks.slice(form.fromIdx).map((b, i) => (
+                      <SelectItem key={b.name} value={String(i + form.fromIdx)}>
                         {b.name}
                       </SelectItem>
                     ))}
@@ -533,44 +532,42 @@ function ProgressPage() {
                 </Select>
               </div>
             </div>
-            {totalChapters > 0 && (
-              <div className="rounded-xl border border-border/60 bg-background/50 px-3 py-2.5 text-xs text-muted-foreground">
-                Total: <span className="font-semibold text-foreground">{totalChapters}</span>{" "}
-                capítulos · Sugestão:{" "}
-                <span className="font-semibold text-foreground">{suggestedDays}</span> dias (1
-                capítulo/dia).
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="plan-days" className="text-xs uppercase tracking-wider text-muted-foreground">
+                  Duração (dias)
+                </Label>
+                <span className="text-[10px] text-primary">Sugestão: {suggestedDays} dias</span>
               </div>
-            )}
-            <div className="space-y-1.5">
-              <Label htmlFor="plan-days" className="text-xs">Dias</Label>
               <Input
                 id="plan-days"
                 type="number"
-                min={1}
                 value={form.totalDays}
-                onChange={(e) =>
-                  setForm({ ...form, totalDays: Number(e.target.value), daysTouched: true })
-                }
-                className="h-10 rounded-xl"
+                onChange={(e) => setForm((f) => ({ ...f, totalDays: Number(e.target.value), daysTouched: true }))}
+                className="rounded-xl"
               />
             </div>
+
+            {totalChapters > 0 && (
+              <div className="rounded-xl bg-accent/30 p-3 text-center">
+                <p className="text-xs text-muted-foreground">
+                  Meta diária estimada:
+                </p>
+                <p className="mt-1 font-display text-lg font-bold text-primary">
+                  {Math.ceil(totalChapters / form.totalDays)} capítulos/dia
+                </p>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button
-              variant="outline"
-              className="rounded-xl"
-              onClick={() => setOpen(false)}
-              disabled={saving}
-            >
-              Cancelar
-            </Button>
-            <Button
-              className="rounded-xl gradient-primary font-semibold text-primary-foreground shadow-glow hover:brightness-110"
+              className="h-12 w-full rounded-2xl gradient-primary font-semibold text-primary-foreground shadow-glow"
               onClick={save}
               disabled={saving}
+              aria-label={editing ? "Salvar alterações no plano" : "Criar novo plano de leitura"}
             >
-              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Salvar
+              {saving ? <Loader2 className="h-5 w-5 animate-spin" /> : editing ? "Salvar alterações" : "Criar plano"}
             </Button>
           </DialogFooter>
         </DialogContent>
