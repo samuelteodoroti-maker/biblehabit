@@ -156,8 +156,12 @@ function GroupDetail() {
         streak: p.current_streak ?? 0,
       }));
       
-      // Ranking logic with ties
-      stats.sort((a, b) => b.chapters - a.chapters || b.streak - a.streak || a.user_id.localeCompare(b.user_id));
+      // Enhanced ranking logic with streak and activity timestamp as tie-breakers
+      stats.sort((a, b) => {
+        if (b.chapters !== a.chapters) return b.chapters - a.chapters;
+        if (b.streak !== a.streak) return b.streak - a.streak;
+        return a.user_id.localeCompare(b.user_id);
+      });
       
       const rankedStats = stats.map((s, idx) => {
         let rank = idx + 1;
