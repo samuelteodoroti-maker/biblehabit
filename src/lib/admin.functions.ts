@@ -168,7 +168,7 @@ export const manageUserStatus = createServerFn({ method: "POST" })
   });
 
 export const performControlledCorrection = createServerFn({ method: "POST" })
-  .middleware([requireAdminRole(['super_admin', 'admin'])])
+  .middleware([requireAdminRole(['super_admin'])])
   .validator((data: any) => z.object({
     userId: z.string(),
     action: z.enum(['reset_streak', 'correct_reading_count', 'sync_profile']),
@@ -186,7 +186,6 @@ export const performControlledCorrection = createServerFn({ method: "POST" })
         .update({ current_streak: 0 })
         .eq("id", data.userId);
     } else if (data.action === 'sync_profile') {
-      // Logic to recount readings and update profile total
       const { count } = await supabase.from("reading_logs").select("*", { count: "exact", head: true }).eq("user_id", data.userId);
       result = await supabase
         .from("profiles")

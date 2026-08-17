@@ -37,7 +37,15 @@ function AdminUsersPage() {
 
   if (roleLoading) return <div className="p-10">Carregando...</div>;
   if (!role || !['super_admin', 'admin', 'support'].includes(role)) {
-    return <div className="p-10 text-center">Acesso negado.</div>;
+    return (
+      <AdminLayout title="Acesso Negado">
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <AlertCircle className="h-12 w-12 text-destructive mb-4" />
+          <h2 className="text-xl font-bold">Acesso Restrito</h2>
+          <p className="text-slate-400 mt-2">Você não possui o papel necessário para visualizar a lista de usuários.</p>
+        </div>
+      </AdminLayout>
+    );
   }
 
   return (
