@@ -290,6 +290,7 @@ function ProgressPage() {
   };
 
   const remove = async (id: string) => {
+    if (!confirm("Tem certeza que deseja remover este plano?")) return;
     const { error } = await supabase.from("reading_plans").delete().eq("id", id);
     if (error) return toast.error(error.message);
     setPlans((prev) => prev.filter((p) => p.id !== id));
@@ -303,6 +304,7 @@ function ProgressPage() {
     navigator.clipboard?.writeText(link).catch(() => {});
     toast.success("Link de convite copiado");
   };
+
 
   return (
     <AppShell title="Planos de leitura" subtitle="Crie e acompanhe suas jornadas">
