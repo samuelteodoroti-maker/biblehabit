@@ -4,6 +4,7 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import { Flame, BookOpenCheck, CalendarDays, Sparkles, Check, ChevronRight, Book, Bell, X } from "lucide-react";
 import { ReadingCalendar } from "@/components/ReadingCalendar";
 import { LogReadingModal } from "@/components/LogReadingModal";
@@ -46,7 +47,7 @@ function HomePage() {
   useEffect(() => {
     const checkUpdates = async () => {
       try {
-        const { updates } = await getUpdates({ limit: 1 });
+        const { updates } = await getUpdates({ data: { limit: 1 } });
         if (updates && updates.length > 0) {
           const update = updates[0];
           const lastSeen = localStorage.getItem("bh_last_update_seen");
