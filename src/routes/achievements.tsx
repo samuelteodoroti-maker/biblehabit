@@ -90,10 +90,12 @@ const ACHIEVEMENTS: Achievement[] = [
 function AchievementsPage() {
   const { user } = useAuth();
   const [stats, setStats] = useState<Stats>({ current_streak: 0, longest_streak: 0, total_chapters_read: 0 });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
+    setLoading(true);
     (async () => {
       const { data } = await supabase
         .from("profiles")
@@ -101,11 +103,13 @@ function AchievementsPage() {
         .eq("id", user.id)
         .maybeSingle();
       if (!cancelled && data) setStats(data as Stats);
+      if (!cancelled) setLoading(false);
     })();
     return () => {
       cancelled = true;
     };
   }, [user]);
+
 
   const unlocked = ACHIEVEMENTS.filter((a) => a.unlocked(stats)).length;
 
