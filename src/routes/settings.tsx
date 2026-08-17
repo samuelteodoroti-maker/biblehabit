@@ -231,9 +231,9 @@ function SettingsPage() {
             <div key={l.id} className="p-4">
               <div className="flex justify-between text-sm">
                 <span className="font-semibold">
-                  {l.chapters_text ?? `${l.chapters_count} ${l.chapters_count === 1 ? "capítulo" : "capítulos"}`}
+                  {l.notes ?? `${l.chapters_count} ${l.chapters_count === 1 ? "capítulo" : "capítulos"}`}
                 </span>
-                <span className="text-xs text-muted-foreground">{l.read_date}</span>
+                <span className="text-xs text-muted-foreground">{l.reading_date}</span>
               </div>
             </div>
           ))
