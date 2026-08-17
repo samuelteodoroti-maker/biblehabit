@@ -6,7 +6,8 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Flame, Crown, Copy, Loader2, Send, BookOpen, Users, MessageCircle, Trophy, Heart, Medal, Award } from "lucide-react";
+import { ArrowLeft, Flame, Crown, Copy, Loader2, Send, BookOpen, Users, MessageCircle, Trophy, Heart, Medal, Award, ChevronLeft } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -154,9 +155,17 @@ function GroupDetail() {
         chapters: chapterMap.get(p.id) ?? 0,
         streak: p.current_streak ?? 0,
       }));
-      stats.sort((a, b) => b.chapters - a.chapters || b.streak - a.streak);
+      stats.sort((a, b) => b.chapters - a.chapters || b.streak - a.streak || a.user_id.localeCompare(b.user_id));
+      
+      const rankedStats = stats.map((s, idx) => {
+        const rank = idx > 0 && stats[idx-1].chapters === s.chapters && stats[idx-1].streak === s.streak
+          ? (stats as any)[idx-1].rank
+          : idx + 1;
+        return { ...s, rank };
+      });
+      
       if (cancelled) return;
-      setMembers(stats);
+      setMembers(rankedStats as any);
       setLoading(false);
     })();
     return () => {
@@ -359,18 +368,31 @@ function GroupDetail() {
         <Link
           to="/groups"
           className="grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-card/60 text-foreground transition-colors hover:bg-accent"
+          aria-label="Voltar para grupos"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ChevronLeft className="h-4 w-4" />
         </Link>
-        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-accent/60 text-2xl">
-          {group?.avatar ?? "📖"}
-        </div>
-        <div className="min-w-0 flex-1">
-          <h1 className="truncate font-display text-lg font-semibold">{group?.name ?? "..."}</h1>
-          <p className="text-xs text-muted-foreground">
-            {members.length} {members.length === 1 ? "membro" : "membros"}
-          </p>
-        </div>
+        {loading ? (
+          <>
+            <Skeleton className="h-12 w-12 rounded-2xl" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-3 w-16" />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-accent/60 text-2xl">
+              {group?.avatar ?? "📖"}
+            </div>
+            <div className="min-w-0 flex-1">
+              <h1 className="truncate font-display text-lg font-semibold">{group?.name ?? "..."}</h1>
+              <p className="text-xs text-muted-foreground">
+                {members.length} {members.length === 1 ? "membro" : "membros"}
+              </p>
+            </div>
+          </>
+        )}
       </div>
 
       <Tabs defaultValue="activities">
@@ -384,7 +406,7 @@ function GroupDetail() {
           <TabsTrigger value="leaderboard" className="rounded-xl gap-1.5 text-xs">
             <Trophy className="h-3.5 w-3.5" /> Ranking
           </TabsTrigger>
-          <TabsTrigger value="invite" className="rounded-xl gap-1.5 text-xs">
+          <TabsTrigger value="invite" className="rounded-xl gap-1.5 text-xs" aria-label="Gerar código de convite">
             <Copy className="h-3.5 w-3.5" /> Convite
           </TabsTrigger>
         </TabsList>
@@ -440,6 +462,7 @@ function GroupDetail() {
                             <button
                               type="button"
                               onClick={() => toggleReaction(a.id, "fire")}
+                              aria-label={r.myFire ? "Remover reação de fogo" : "Reagir com fogo"}
                               className={`flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs transition ${
                                 r.myFire
                                   ? "border-transparent bg-orange-500/20 text-orange-300"
@@ -452,9 +475,10 @@ function GroupDetail() {
                             <button
                               type="button"
                               onClick={() => toggleReaction(a.id, "amen")}
+                              aria-label={r.myAmen ? "Remover reação de amém" : "Reagir com amém"}
                               className={`flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs transition ${
                                 r.myAmen
-                                  ? "border-transparent bg-rose-500/20 text-rose-300"
+                                  ? "border-transparent bg-primary/20 text-primary-glow"
                                   : "border-border/60 bg-background/40 text-muted-foreground hover:text-foreground"
                               }`}
                             >
@@ -557,7 +581,7 @@ function GroupDetail() {
             </Card>
           ) : (
             members.map((m, i) => {
-              const rank = i + 1;
+              const rank = (m as any).rank ?? (i + 1);
               const displayName = m.name ?? "Sem nome";
               const podiumStyles: Record<number, { bg: string; ring: string; icon: ReactNode }> = {
                 1: {
@@ -577,6 +601,7 @@ function GroupDetail() {
                 },
               };
               const style = podiumStyles[rank];
+              const isTied = i > 0 && (members[i-1] as any).rank === rank;
               return (
                 <Card
                   key={m.user_id}
@@ -596,7 +621,10 @@ function GroupDetail() {
                     <AvatarFallback>{displayName[0]?.toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold">{displayName}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="truncate text-sm font-semibold">{displayName}</p>
+                      {isTied && <span className="text-[10px] text-muted-foreground">(Empate)</span>}
+                    </div>
                     <p className="text-xs text-muted-foreground">
                       {m.chapters} {m.chapters === 1 ? "capítulo" : "capítulos"}
                     </p>

@@ -6,17 +6,19 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Plus, Share2, Pencil, Trash2, Loader2, BookOpen, CalendarHeart, TrendingUp } from "lucide-react";
 import { bibleBooks, chaptersBetween } from "@/lib/bibleBooks";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
+
 
 export const Route = createFileRoute("/progress")({
   head: () => ({
@@ -288,6 +290,7 @@ function ProgressPage() {
   };
 
   const remove = async (id: string) => {
+    if (!confirm("Tem certeza que deseja remover este plano?")) return;
     const { error } = await supabase.from("reading_plans").delete().eq("id", id);
     if (error) return toast.error(error.message);
     setPlans((prev) => prev.filter((p) => p.id !== id));
@@ -302,56 +305,71 @@ function ProgressPage() {
     toast.success("Link de convite copiado");
   };
 
+
   return (
     <AppShell title="Planos de leitura" subtitle="Crie e acompanhe suas jornadas">
       {insights.hasData && (
         <div className="mb-6 space-y-3">
-          <h2 className="px-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+          <h2 className="px-1 text-[11px] font-semibold tracking-[0.15em] text-muted-foreground">
             Insights pessoais
           </h2>
 
           <div className="grid grid-cols-2 gap-3">
-            <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
-              <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                <CalendarHeart className="h-3.5 w-3.5" /> Dia favorito
-              </div>
-              <p className="mt-2 font-display text-lg font-semibold">
-                {insights.favoriteDay ?? "—"}
-              </p>
-            </Card>
-            <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
-              <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                <TrendingUp className="h-3.5 w-3.5" /> Média por leitura
-              </div>
-              <p className="mt-2 font-display text-lg font-semibold">
-                {insights.avgChapters.toFixed(1)}{" "}
-                <span className="text-xs font-normal text-muted-foreground">caps</span>
-              </p>
-            </Card>
+            {!insights.hasData ? (
+              <>
+                <Skeleton className="h-[88px] rounded-2xl" />
+                <Skeleton className="h-[88px] rounded-2xl" />
+              </>
+            ) : (
+              <>
+                <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
+                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                    <CalendarHeart className="h-3.5 w-3.5" /> Dia favorito
+                  </div>
+                  <p className="mt-2 font-display text-lg font-semibold">
+                    {insights.favoriteDay ?? "—"}
+                  </p>
+                </Card>
+                <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
+                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                    <TrendingUp className="h-3.5 w-3.5" /> Média por leitura
+                  </div>
+                  <p className="mt-2 font-display text-lg font-semibold">
+                    {insights.avgChapters.toFixed(1)}{" "}
+                    <span className="text-xs font-normal text-muted-foreground">caps</span>
+                  </p>
+                </Card>
+              </>
+            )}
           </div>
-          <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
-            <p className="mb-2 text-[11px] font-medium text-muted-foreground">
-              Últimos 7 dias
-            </p>
-            <div className="h-32">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={insights.last7} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-                  <XAxis dataKey="day" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
-                  <Tooltip
-                    cursor={{ fill: "rgba(255,255,255,0.05)" }}
-                    contentStyle={{
-                      background: "rgba(20,20,30,0.9)",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      borderRadius: 12,
-                      fontSize: 12,
-                    }}
-                  />
-                  <Bar dataKey="chapters" fill="oklch(0.65 0.22 275)" radius={[6, 6, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
+          
+          {!insights.hasData ? (
+            <Skeleton className="h-[176px] rounded-2xl" />
+          ) : (
+            <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
+              <p className="mb-2 text-[11px] font-medium text-muted-foreground">
+                Últimos 7 dias
+              </p>
+              <div className="h-32">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={insights.last7} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                    <XAxis dataKey="day" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                    <Tooltip
+                      cursor={{ fill: "rgba(255,255,255,0.05)" }}
+                      contentStyle={{
+                        background: "rgba(20,20,30,0.9)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        borderRadius: 12,
+                        fontSize: 12,
+                      }}
+                    />
+                    <Bar dataKey="chapters" fill="oklch(0.65 0.22 275)" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
+          )}
         </div>
       )}
 
@@ -363,13 +381,25 @@ function ProgressPage() {
         <Plus className="h-4 w-4" /> Novo plano
       </Button>
 
-      {loading && (
-        <div className="flex justify-center py-10 text-muted-foreground">
-          <Loader2 className="h-5 w-5 animate-spin" />
+      {loading ? (
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="border-border/60 bg-card/70 p-5 backdrop-blur-sm">
+              <div className="flex items-start gap-4">
+                <Skeleton className="h-14 w-14 rounded-full" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-5 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <div className="flex gap-2 pt-2">
+                    <Skeleton className="h-4 w-16 rounded-full" />
+                    <Skeleton className="h-4 w-16 rounded-full" />
+                  </div>
+                </div>
+              </div>
+            </Card>
+          ))}
         </div>
-      )}
-
-      {!loading && plans.length === 0 && user && (
+      ) : plans.length === 0 && user ? (
         <Card className="border-dashed border-border/70 bg-card/40 p-8 text-center">
           <BookOpen className="mx-auto h-8 w-8 text-muted-foreground" />
           <p className="mt-3 font-display text-base font-semibold">Sem planos ainda</p>
@@ -377,9 +407,9 @@ function ProgressPage() {
             Crie o primeiro para começar sua jornada.
           </p>
         </Card>
-      )}
+      ) : (
+        <div className="space-y-3">
 
-      <div className="space-y-3">
         {plans.map((p) => {
           const pct = p.total_days > 0 ? (p.completed_days / p.total_days) * 100 : 0;
           return (
@@ -429,7 +459,7 @@ function ProgressPage() {
                   variant="outline"
                   className="rounded-xl text-destructive hover:bg-destructive/10 hover:text-destructive"
                   onClick={() => remove(p.id)}
-                  aria-label="Remover"
+                  aria-label="Remover plano"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
@@ -438,18 +468,24 @@ function ProgressPage() {
           );
         })}
       </div>
+      )}
 
       <Dialog open={open} onOpenChange={setOpen}>
+
         <DialogContent className="rounded-2xl border-border/60 bg-card/95 backdrop-blur-xl">
           <DialogHeader>
             <DialogTitle className="font-display text-xl">
               {editing ? "Editar plano" : "Novo plano"}
             </DialogTitle>
+            <DialogDescription>
+              Defina o título, a meta de dias e os livros que deseja ler.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <Label className="text-xs">Título</Label>
+              <Label htmlFor="plan-title" className="text-xs">Título</Label>
               <Input
+                id="plan-title"
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
                 placeholder="Ex.: Novo Testamento em 90 dias"
@@ -458,8 +494,9 @@ function ProgressPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs">De</Label>
+                <Label htmlFor="plan-from" className="text-xs">De</Label>
                 <Select
+                  name="plan-from"
                   value={String(form.fromIdx)}
                   onValueChange={(v) => {
                     const from = Number(v);
@@ -477,8 +514,9 @@ function ProgressPage() {
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs">Até</Label>
+                <Label htmlFor="plan-to" className="text-xs">Até</Label>
                 <Select
+                  name="plan-to"
                   value={String(form.toIdx)}
                   onValueChange={(v) => setForm((f) => ({ ...f, toIdx: Number(v) }))}
                 >
@@ -504,8 +542,9 @@ function ProgressPage() {
               </div>
             )}
             <div className="space-y-1.5">
-              <Label className="text-xs">Dias</Label>
+              <Label htmlFor="plan-days" className="text-xs">Dias</Label>
               <Input
+                id="plan-days"
                 type="number"
                 min={1}
                 value={form.totalDays}

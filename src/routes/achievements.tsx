@@ -2,7 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
+
   Trophy,
   Flame,
   CalendarDays,
@@ -88,10 +90,12 @@ const ACHIEVEMENTS: Achievement[] = [
 function AchievementsPage() {
   const { user } = useAuth();
   const [stats, setStats] = useState<Stats>({ current_streak: 0, longest_streak: 0, total_chapters_read: 0 });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
+    setLoading(true);
     (async () => {
       const { data } = await supabase
         .from("profiles")
@@ -99,11 +103,13 @@ function AchievementsPage() {
         .eq("id", user.id)
         .maybeSingle();
       if (!cancelled && data) setStats(data as Stats);
+      if (!cancelled) setLoading(false);
     })();
     return () => {
       cancelled = true;
     };
   }, [user]);
+
 
   const unlocked = ACHIEVEMENTS.filter((a) => a.unlocked(stats)).length;
 
@@ -137,7 +143,17 @@ function AchievementsPage() {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        {ACHIEVEMENTS.map((a) => {
+        {loading ? (
+          Array.from({ length: 8 }).map((_, i) => (
+            <Card key={i} className="border-border/60 bg-card/70 p-5 text-center">
+              <Skeleton className="mx-auto h-10 w-10 rounded-full" />
+              <Skeleton className="mt-3 h-4 w-20 mx-auto" />
+              <Skeleton className="mt-1 h-3 w-24 mx-auto" />
+            </Card>
+          ))
+        ) : (
+          ACHIEVEMENTS.map((a) => {
+
           const isUnlocked = a.unlocked(stats);
           const Icon = a.icon;
           return (
@@ -161,7 +177,8 @@ function AchievementsPage() {
               <p className="mt-1 text-[11px] leading-tight text-muted-foreground">{a.description}</p>
             </Card>
           );
-        })}
+        })
+        )}
       </div>
     </AppShell>
   );
