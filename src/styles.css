@@ -138,12 +138,17 @@
 }
 
 @layer base {
-  * {
+  *, *::before, *::after {
+    box-sizing: border-box;
     border-color: var(--color-border);
   }
 
   html {
     -webkit-tap-highlight-color: transparent;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   body {
@@ -153,17 +158,55 @@
     font-feature-settings: "cv11", "ss01";
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  #root {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
     letter-spacing: -0.015em;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    white-space: normal;
   }
 
   /* Editorial Titles */
   .font-serif-title {
     font-family: var(--font-serif);
     letter-spacing: -0.01em;
+  }
+
+  /* Fluid scales */
+  .page-title {
+    font-size: clamp(1.75rem, 4vw, 3rem);
+  }
+  
+  .section-title {
+    font-size: clamp(1.25rem, 3vw, 2rem);
+  }
+  
+  .card-title {
+    font-size: clamp(1rem, 2.2vw, 1.5rem);
+  }
+  
+  .body-text {
+    font-size: clamp(0.9375rem, 1.4vw, 1.0625rem);
+  }
+  
+  .stat-number {
+    font-size: clamp(2rem, 6vw, 3.5rem);
+  }
+  
+  .small-label {
+    font-size: clamp(0.75rem, 1.4vw, 0.875rem);
   }
 
   ::selection {

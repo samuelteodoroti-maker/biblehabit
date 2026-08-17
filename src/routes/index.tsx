@@ -189,7 +189,7 @@ function HomePage() {
               </Badge>
             }
           >
-            <div className="flex flex-col items-center py-4 md:flex-row md:justify-around md:py-6">
+            <div className="flex flex-col items-center py-4 md:flex-row md:justify-around md:py-6 gap-6">
               <div className="text-center md:text-left">
                 <div className="flex items-baseline justify-center gap-2 md:justify-start">
                   <span className="font-display text-7xl font-bold leading-none tracking-tighter text-foreground md:text-8xl">
@@ -211,7 +211,7 @@ function HomePage() {
               <div className="mt-8 flex w-full flex-col gap-3 md:mt-0 md:w-auto">
                 <Button
                   size="lg"
-                  className={`h-16 w-full gap-3 rounded-2xl text-base font-bold transition-all px-8 md:w-auto ${
+                  className={`h-14 md:h-16 w-full gap-3 rounded-2xl text-base font-bold transition-all px-6 md:px-8 md:w-auto ${
                     registeredToday
                       ? "bg-success/15 text-success hover:bg-success/20 border border-success/20"
                       : "gradient-primary text-primary-foreground shadow-glow hover:brightness-110"
@@ -284,14 +284,14 @@ function HomePage() {
         <div className="space-y-6 lg:col-span-5 xl:col-span-4">
           
           {/* Quick Stats Grid */}
-          <div className="grid grid-cols-2 gap-4">
-            <BibleCard title="Capítulos" icon={BookOpenCheck} className="px-5 py-5">
+          <div className="grid grid-cols-1 xs:grid-cols-2 gap-4">
+            <BibleCard title="Capítulos" icon={BookOpenCheck} className="px-4 py-4 md:px-5 md:py-5 min-h-[140px]">
                <div className="flex items-baseline gap-1">
                  <span className="font-display text-3xl font-bold">{total}</span>
                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Total</span>
                </div>
             </BibleCard>
-            <BibleCard title="Progresso" icon={TrendingUp} className="px-5 py-5">
+            <BibleCard title="Progresso" icon={TrendingUp} className="px-4 py-4 md:px-5 md:py-5 min-h-[140px]">
                <div className="flex items-baseline gap-1">
                  <span className="font-display text-3xl font-bold">{logDates.size}</span>
                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Dias</span>

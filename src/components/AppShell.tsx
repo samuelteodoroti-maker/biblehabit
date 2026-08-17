@@ -53,8 +53,8 @@ export function AppShell({
 
         {hero && <div className="px-6 pt-6 lg:px-10 lg:pt-8">{hero}</div>}
 
-        <main className="mx-auto w-full max-w-7xl flex-1 px-6 py-6 md:py-8 lg:px-10">
-          <div className="pb-24 md:pb-0">{children}</div>
+        <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 md:py-8 md:px-6 lg:px-10">
+          <div className="pb-[calc(80px+env(safe-area-inset-bottom))] md:pb-0">{children}</div>
         </main>
       </div>
 
