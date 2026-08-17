@@ -6,17 +6,19 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Plus, Share2, Pencil, Trash2, Loader2, BookOpen, CalendarHeart, TrendingUp } from "lucide-react";
 import { bibleBooks, chaptersBetween } from "@/lib/bibleBooks";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
+
 
 export const Route = createFileRoute("/progress")({
   head: () => ({
@@ -363,13 +365,22 @@ function ProgressPage() {
         <Plus className="h-4 w-4" /> Novo plano
       </Button>
 
-      {loading && (
-        <div className="flex justify-center py-10 text-muted-foreground">
-          <Loader2 className="h-5 w-5 animate-spin" />
+      {loading ? (
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="border-border/60 bg-card/70 p-5">
+              <div className="flex items-center gap-4">
+                <Skeleton className="h-20 w-20 rounded-full" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-full" />
+                  <Skeleton className="h-6 w-24 rounded-full" />
+                </div>
+              </div>
+            </Card>
+          ))}
         </div>
-      )}
-
-      {!loading && plans.length === 0 && user && (
+      ) : plans.length === 0 && user ? (
         <Card className="border-dashed border-border/70 bg-card/40 p-8 text-center">
           <BookOpen className="mx-auto h-8 w-8 text-muted-foreground" />
           <p className="mt-3 font-display text-base font-semibold">Sem planos ainda</p>

@@ -4,11 +4,13 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
-  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Plus, ChevronRight, Users, Loader2, LogIn } from "lucide-react";
+
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -145,8 +147,16 @@ function GroupsPage() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-10">
-          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="flex items-center gap-3 border-border/60 bg-card/70 p-4">
+              <Skeleton className="h-12 w-12 rounded-2xl" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-3 w-1/4" />
+              </div>
+            </Card>
+          ))}
         </div>
       ) : groups.length === 0 ? (
         <Card className="border-dashed border-border/70 bg-card/40 p-8 text-center">

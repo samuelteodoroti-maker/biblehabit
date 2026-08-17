@@ -213,60 +213,92 @@ function HomePage() {
     <AppShell>
       {/* Greeting */}
       <div className="mb-6">
-        <p className="text-xs font-medium uppercase tracking-[0.15em] text-muted-foreground">
-          {greeting()}, {displayName} 👋
-        </p>
-        <h1 className="mt-1 font-display text-3xl font-bold tracking-tight">
-          Seu hábito bíblico — Bible Habit
-        </h1>
+        {authLoading || dataLoading ? (
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-8 w-64" />
+          </div>
+        ) : (
+          <>
+            <p className="text-xs font-medium uppercase tracking-[0.15em] text-muted-foreground">
+              {greeting()}, {displayName} 👋
+            </p>
+            <h1 className="mt-1 font-display text-3xl font-bold tracking-tight">
+              Seu hábito bíblico — Bible Habit
+            </h1>
+          </>
+        )}
       </div>
 
 
 
       {/* Streak hero */}
-      <Card className="relative mb-4 overflow-hidden border-border/60 bg-card/70 p-6 shadow-card backdrop-blur-sm">
-        <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full gradient-primary opacity-25 blur-3xl" />
-        <div className="relative">
-          <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            <Flame className="h-4 w-4 text-[color:var(--flame)]" />
-            Ofensiva atual
+      {authLoading || dataLoading ? (
+        <Card className="mb-4 border-border/60 bg-card/70 p-6 shadow-card backdrop-blur-sm">
+          <Skeleton className="h-4 w-24 mb-4" />
+          <Skeleton className="h-16 w-32 mb-4" />
+          <Skeleton className="h-4 w-full" />
+        </Card>
+      ) : (
+        <Card className="relative mb-4 overflow-hidden border-border/60 bg-card/70 p-6 shadow-card backdrop-blur-sm">
+          <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full gradient-primary opacity-25 blur-3xl" />
+          <div className="relative">
+            <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              <Flame className="h-4 w-4 text-[color:var(--flame)]" />
+              Ofensiva atual
+            </div>
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className="font-display text-6xl font-bold leading-none gradient-text">
+                {streak}
+              </span>
+              <span className="text-lg font-medium text-muted-foreground">
+                {streak === 1 ? "dia" : "dias"}
+              </span>
+            </div>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {registeredToday
+                ? "Você já leu hoje. Continue firme amanhã."
+                : streak === 0
+                  ? "Comece hoje sua primeira leitura para acender a chama."
+                  : "Registre a leitura de hoje para manter a chama acesa."}
+            </p>
           </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="font-display text-6xl font-bold leading-none gradient-text">
-              {streak}
-            </span>
-            <span className="text-lg font-medium text-muted-foreground">
-              {streak === 1 ? "dia" : "dias"}
-            </span>
-          </div>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {registeredToday
-              ? "Você já leu hoje. Continue firme amanhã."
-              : streak === 0
-                ? "Comece hoje sua primeira leitura para acender a chama."
-                : "Registre a leitura de hoje para manter a chama acesa."}
-          </p>
-        </div>
-      </Card>
+        </Card>
+      )}
 
       {/* Secondary stats */}
       <div className="mb-6 grid grid-cols-2 gap-3">
-        <Card className="border-border/60 bg-card/60 p-4 backdrop-blur-sm">
-          <div className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-            <CalendarDays className="h-3.5 w-3.5" />
-            Capítulos
-          </div>
-          <p className="mt-2 font-display text-2xl font-bold">{total}</p>
-        </Card>
-        <Card className="border-border/60 bg-card/60 p-4 backdrop-blur-sm">
-          <div className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-            <Sparkles className="h-3.5 w-3.5" />
-            Hoje
-          </div>
-          <p className="mt-2 truncate font-display text-base font-semibold">
-            {activePlan?.books_today ?? "Sem plano ativo"}
-          </p>
-        </Card>
+        {authLoading || dataLoading ? (
+          <>
+            <Card className="border-border/60 bg-card/60 p-4 backdrop-blur-sm">
+              <Skeleton className="h-3 w-20 mb-3" />
+              <Skeleton className="h-8 w-12" />
+            </Card>
+            <Card className="border-border/60 bg-card/60 p-4 backdrop-blur-sm">
+              <Skeleton className="h-3 w-16 mb-3" />
+              <Skeleton className="h-8 w-full" />
+            </Card>
+          </>
+        ) : (
+          <>
+            <Card className="border-border/60 bg-card/60 p-4 backdrop-blur-sm">
+              <div className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                <CalendarDays className="h-3.5 w-3.5" />
+                Capítulos
+              </div>
+              <p className="mt-2 font-display text-2xl font-bold">{total}</p>
+            </Card>
+            <Card className="border-border/60 bg-card/60 p-4 backdrop-blur-sm">
+              <div className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                <Sparkles className="h-3.5 w-3.5" />
+                Hoje
+              </div>
+              <p className="mt-2 truncate font-display text-base font-semibold">
+                {activePlan?.books_today ?? "Sem plano ativo"}
+              </p>
+            </Card>
+          </>
+        )}
       </div>
 
       {/* CTA */}
@@ -292,12 +324,18 @@ function HomePage() {
             : "Entrar para registrar"}
       </Button>
 
-      <ReadingCalendar
-        year={currentYear}
-        month={currentMonth}
-        today={today}
-        readDates={logDates}
-      />
+      {authLoading || dataLoading ? (
+        <Card className="border-border/60 bg-card/60 p-6 backdrop-blur-sm">
+          <Skeleton className="h-[200px] w-full" />
+        </Card>
+      ) : (
+        <ReadingCalendar
+          year={currentYear}
+          month={currentMonth}
+          today={today}
+          readDates={logDates}
+        />
+      )}
 
       {user && (
         <LogReadingModal
