@@ -38,7 +38,11 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
         .select("id, title")
         .eq("user_id", userId)
         .order("updated_at", { ascending: false });
-      setPlans((data as Plan[]) ?? []);
+      const planList = (data as Plan[]) ?? [];
+      setPlans(planList);
+      if (planList.length > 0) {
+        setPlanId(planList[0].id);
+      }
     })();
   }, [open, userId]);
 
