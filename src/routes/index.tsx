@@ -181,7 +181,6 @@ function HomePage() {
         )}
       </div>
 
-import { ChevronRight, Book } from "lucide-react";
 
       {/* CTA */}
       {loading ? (
