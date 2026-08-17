@@ -6,6 +6,7 @@ export type Profile = {
   name: string | null;
   avatar_url: string | null;
   current_streak: number;
+  longest_streak: number;
   total_chapters_read: number;
   last_read_date: string | null;
 };
@@ -43,7 +44,7 @@ export function useReadingData() {
       // Fetch profile
       const { data: p } = await supabase
         .from("profiles")
-        .select("name, avatar_url, current_streak, total_chapters_read, last_read_date")
+        .select("name, avatar_url, current_streak, longest_streak, total_chapters_read, last_read_date")
         .eq("id", user.id)
         .maybeSingle();
         
