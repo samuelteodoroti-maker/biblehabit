@@ -321,23 +321,21 @@ function ProgressPage() {
             </>
           ) : (
             <>
-              <Card className="border-border/60 bg-card/70 p-5 backdrop-blur-sm rounded-3xl">
-
-                <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                  <CalendarHeart className="h-3.5 w-3.5" /> Dia favorito
+              <Card className="border-border/50 bg-card/80 p-6 backdrop-blur-xl rounded-[2rem] shadow-card hover:shadow-xl transition-all duration-300">
+                <div className="flex items-center gap-2.5 small-label text-muted-foreground">
+                  <CalendarHeart className="h-4 w-4 text-primary/70" /> Dia favorito
                 </div>
-                <p className="mt-2 font-display text-lg font-semibold">
+                <p className="mt-3 font-display text-2xl font-bold tracking-tight">
                   {insights.favoriteDay ?? "—"}
                 </p>
               </Card>
-              <Card className="border-border/60 bg-card/70 p-5 backdrop-blur-sm rounded-3xl">
-
-                <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                  <TrendingUp className="h-3.5 w-3.5" /> Média por leitura
+              <Card className="border-border/50 bg-card/80 p-6 backdrop-blur-xl rounded-[2rem] shadow-card hover:shadow-xl transition-all duration-300">
+                <div className="flex items-center gap-2.5 small-label text-muted-foreground">
+                  <TrendingUp className="h-4 w-4 text-primary/70" /> Média por leitura
                 </div>
-                <p className="mt-2 font-display text-lg font-semibold">
+                <p className="mt-3 font-display text-2xl font-bold tracking-tight">
                   {insights.avgChapters.toFixed(1)}{" "}
-                  <span className="text-xs font-normal text-muted-foreground">caps</span>
+                  <span className="text-sm font-bold text-muted-foreground/50 uppercase tracking-widest">caps</span>
                 </p>
               </Card>
             </>

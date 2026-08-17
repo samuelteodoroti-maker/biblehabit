@@ -150,13 +150,14 @@
     min-width: 0;
     max-width: 100%;
     overflow-x: hidden;
+    scroll-behavior: smooth;
   }
 
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
-    font-feature-settings: "cv11", "ss01";
+    font-feature-settings: "cv11", "ss01", "cv01";
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     width: 100%;
@@ -173,46 +174,62 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
-    letter-spacing: -0.015em;
+    letter-spacing: -0.02em;
     overflow-wrap: anywhere;
     word-break: normal;
     white-space: normal;
+    font-weight: 700;
   }
 
   /* Editorial Titles */
   .font-serif-title {
     font-family: var(--font-serif);
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
+    font-weight: 700;
   }
 
   /* Fluid scales */
   .page-title {
-    font-size: clamp(1.75rem, 4vw, 3rem);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1.1;
   }
   
   .section-title {
-    font-size: clamp(1.25rem, 3vw, 2rem);
+    font-size: clamp(1.5rem, 3.5vw, 2.25rem);
+    line-height: 1.2;
   }
   
   .card-title {
-    font-size: clamp(1rem, 2.2vw, 1.5rem);
+    font-size: clamp(1.125rem, 2.5vw, 1.75rem);
+    line-height: 1.3;
   }
   
   .body-text {
-    font-size: clamp(0.9375rem, 1.4vw, 1.0625rem);
+    font-size: clamp(0.9375rem, 1.5vw, 1.125rem);
+    line-height: 1.6;
   }
   
   .stat-number {
-    font-size: clamp(2rem, 6vw, 3.5rem);
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
   }
   
   .small-label {
-    font-size: clamp(0.75rem, 1.4vw, 0.875rem);
+    font-size: clamp(0.7rem, 1.3vw, 0.8rem);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 700;
   }
 
   ::selection {
-    background: color-mix(in oklab, var(--color-primary) 30%, transparent);
-    color: var(--color-foreground);
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+  }
+
+  /* Smooth Transitions for interactions */
+  button, a, input, select, textarea {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
