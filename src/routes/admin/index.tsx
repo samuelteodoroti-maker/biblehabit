@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 
-export const Route = createFileRoute("/admin")({
+export const Route = createFileRoute("/admin/")({
   beforeLoad: async ({ context }) => {
     // We check the admin status from the client/hook context if available
     // But since this is a route, we could add a server check or just rely on AdminGuard component

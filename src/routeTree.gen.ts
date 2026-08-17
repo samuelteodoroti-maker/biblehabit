@@ -20,6 +20,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AchievementsRouteImport } from './routes/achievements'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GroupsIndexRouteImport } from './routes/groups.index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as UpdatesSlugRouteImport } from './routes/updates.$slug'
 import { Route as GroupsGroupIdRouteImport } from './routes/groups.$groupId'
 import { Route as AdminUpdatesRouteImport } from './routes/admin.updates'
@@ -79,6 +80,11 @@ const GroupsIndexRoute = GroupsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => GroupsRoute,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UpdatesSlugRoute = UpdatesSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -109,6 +115,7 @@ export interface FileRoutesByFullPath {
   '/admin/updates': typeof AdminUpdatesRoute
   '/groups/$groupId': typeof GroupsGroupIdRoute
   '/updates/$slug': typeof UpdatesSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/groups/': typeof GroupsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -124,6 +131,7 @@ export interface FileRoutesByTo {
   '/admin/updates': typeof AdminUpdatesRoute
   '/groups/$groupId': typeof GroupsGroupIdRoute
   '/updates/$slug': typeof UpdatesSlugRoute
+  '/admin': typeof AdminIndexRoute
   '/groups': typeof GroupsIndexRoute
 }
 export interface FileRoutesById {
@@ -141,6 +149,7 @@ export interface FileRoutesById {
   '/admin/updates': typeof AdminUpdatesRoute
   '/groups/$groupId': typeof GroupsGroupIdRoute
   '/updates/$slug': typeof UpdatesSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/groups/': typeof GroupsIndexRoute
 }
 export interface FileRouteTypes {
@@ -159,6 +168,7 @@ export interface FileRouteTypes {
     | '/admin/updates'
     | '/groups/$groupId'
     | '/updates/$slug'
+    | '/admin/'
     | '/groups/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -174,6 +184,7 @@ export interface FileRouteTypes {
     | '/admin/updates'
     | '/groups/$groupId'
     | '/updates/$slug'
+    | '/admin'
     | '/groups'
   id:
     | '__root__'
@@ -190,6 +201,7 @@ export interface FileRouteTypes {
     | '/admin/updates'
     | '/groups/$groupId'
     | '/updates/$slug'
+    | '/admin/'
     | '/groups/'
   fileRoutesById: FileRoutesById
 }
@@ -205,6 +217,7 @@ export interface RootRouteChildren {
   SupportRoute: typeof SupportRoute
   UpdatesRoute: typeof UpdatesRouteWithChildren
   AdminUpdatesRoute: typeof AdminUpdatesRoute
+  AdminIndexRoute: typeof AdminIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -286,6 +299,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GroupsIndexRouteImport
       parentRoute: typeof GroupsRoute
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/updates/$slug': {
       id: '/updates/$slug'
       path: '/$slug'
@@ -346,6 +366,7 @@ const rootRouteChildren: RootRouteChildren = {
   SupportRoute: SupportRoute,
   UpdatesRoute: UpdatesRouteWithChildren,
   AdminUpdatesRoute: AdminUpdatesRoute,
+  AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
