@@ -19,6 +19,7 @@ import { useState, useEffect } from "react";
 import { getUpdates } from "@/lib/updates.functions";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { generateUpdatePDF } from "@/lib/pdf-generator";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -64,6 +65,19 @@ function UpdatesPage() {
       toast.error("Erro ao carregar atualizações");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDownloadPDF = async (update: any, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      const doc = await generateUpdatePDF(update);
+      doc.save(`bible-habit-update-${update.version}.pdf`);
+      toast.success("PDF gerado com sucesso!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro ao gerar PDF");
     }
   };
 
@@ -171,7 +185,12 @@ function UpdatesPage() {
                       </Button>
                     </Link>
                     
-                    <Button variant="outline" size="icon" className="h-10 w-10 shrink-0 rounded-xl border-border/60 bg-card/50">
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="h-10 w-10 shrink-0 rounded-xl border-border/60 bg-card/50"
+                      onClick={(e) => handleDownloadPDF(update, e)}
+                    >
                       <Download className="h-4 w-4" />
                     </Button>
                   </div>
