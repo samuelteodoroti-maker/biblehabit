@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_updates: {
+        Row: {
+          accessibility_changes: string[] | null
+          categories: string[] | null
+          content: string | null
+          cover_image_url: string | null
+          created_at: string | null
+          created_by: string | null
+          fixes: string[] | null
+          highlights: string[] | null
+          id: string
+          improvements: string[] | null
+          published_at: string | null
+          slug: string
+          status: Database["public"]["Enums"]["update_status"]
+          summary: string
+          title: string
+          updated_at: string | null
+          version: string
+        }
+        Insert: {
+          accessibility_changes?: string[] | null
+          categories?: string[] | null
+          content?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          fixes?: string[] | null
+          highlights?: string[] | null
+          id?: string
+          improvements?: string[] | null
+          published_at?: string | null
+          slug: string
+          status?: Database["public"]["Enums"]["update_status"]
+          summary: string
+          title: string
+          updated_at?: string | null
+          version: string
+        }
+        Update: {
+          accessibility_changes?: string[] | null
+          categories?: string[] | null
+          content?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          fixes?: string[] | null
+          highlights?: string[] | null
+          id?: string
+          improvements?: string[] | null
+          published_at?: string | null
+          slug?: string
+          status?: Database["public"]["Enums"]["update_status"]
+          summary?: string
+          title?: string
+          updated_at?: string | null
+          version?: string
+        }
+        Relationships: []
+      }
       group_members: {
         Row: {
           group_id: string
@@ -313,6 +373,24 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       public_profiles: {
@@ -351,6 +429,13 @@ export type Database = {
           longest_streak: number
         }[]
       }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       is_group_member: {
         Args: { _group_id: string; _user_id: string }
         Returns: boolean
@@ -358,7 +443,8 @@ export type Database = {
       join_group_by_code: { Args: { _code: string }; Returns: string }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
+      update_status: "draft" | "scheduled" | "published" | "archived"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -485,6 +571,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+      update_status: ["draft", "scheduled", "published", "archived"],
+    },
   },
 } as const
