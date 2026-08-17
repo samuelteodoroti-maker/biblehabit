@@ -58,10 +58,11 @@ export function useReadingData() {
       // Fetch plans to determine active one
       const { data: allPlans } = await supabase
         .from("reading_plans")
-        .select("id, title, books_today, completed_days, total_days")
+        .select("id, title, books_today, completed_days, total_days, updated_at")
         .eq("user_id", user.id)
         .order("updated_at", { ascending: false });
 
+      // Logic: Favor uncompleted plans updated most recently
       const finalPlan = allPlans?.find(p => (p.completed_days ?? 0) < (p.total_days ?? 0)) || allPlans?.[0];
       
       setProfile(p as Profile | null);
