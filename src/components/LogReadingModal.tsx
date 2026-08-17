@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Minus, Plus, Loader2, BookOpenCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useReadingData } from "@/hooks/useReadingData";
 
 const FREE = "__free__";
 
@@ -21,6 +22,7 @@ type Props = {
 };
 
 export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: Props) {
+  const { activePlan } = useReadingData();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [planId, setPlanId] = useState<string>(FREE);
   const [chapters, setChapters] = useState(1);
@@ -31,7 +33,14 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
     if (!open) return;
     setChapters(1);
     setNotes("");
-    setPlanId(FREE);
+    
+    // Default to active plan from hook if available
+    if (activePlan) {
+      setPlanId(activePlan.id);
+    } else {
+      setPlanId(FREE);
+    }
+
     (async () => {
       const { data } = await supabase
         .from("reading_plans")
@@ -40,11 +49,8 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
         .order("updated_at", { ascending: false });
       const planList = (data as Plan[]) ?? [];
       setPlans(planList);
-      if (planList.length > 0) {
-        setPlanId(planList[0].id);
-      }
     })();
-  }, [open, userId]);
+  }, [open, userId, activePlan]);
 
   const save = async () => {
     setSaving(true);
@@ -93,7 +99,7 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
               Qual plano você está lendo?
             </Label>
             <Select value={planId} onValueChange={setPlanId}>
-              <SelectTrigger className="rounded-xl">
+              <SelectTrigger className="rounded-xl" aria-label="Selecionar plano de leitura">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -152,6 +158,7 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
               className="resize-none rounded-xl"
+              aria-label="Anotações sobre a leitura"
             />
           </div>
 
@@ -160,6 +167,7 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
             className="h-12 w-full gap-2 rounded-2xl gradient-primary text-base font-semibold text-primary-foreground shadow-glow hover:brightness-110"
             disabled={saving}
             onClick={save}
+            aria-label="Salvar registro de leitura"
           >
             {saving ? <Loader2 className="h-5 w-5 animate-spin" /> : <BookOpenCheck className="h-5 w-5" />}
             {saving ? "Salvando..." : "Salvar leitura"}

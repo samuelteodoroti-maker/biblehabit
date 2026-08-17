@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -8,10 +8,8 @@ import { Flame, BookOpenCheck, CalendarDays, Sparkles, Check } from "lucide-reac
 import { ReadingCalendar } from "@/components/ReadingCalendar";
 import { LogReadingModal } from "@/components/LogReadingModal";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-
-
+import { useReadingData } from "@/hooks/useReadingData";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -27,13 +25,6 @@ export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-
-const pad = (n: number) => String(n).padStart(2, "0");
-function todayKey() {
-  const d = new Date();
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
-
 function greeting() {
   const h = new Date().getHours();
   if (h < 12) return "Bom dia";
@@ -41,145 +32,16 @@ function greeting() {
   return "Boa noite";
 }
 
-type Profile = {
-  name: string | null;
-  avatar_url: string | null;
-  current_streak: number;
-  total_chapters_read: number;
-  last_read_date: string | null;
-};
-
-type ActivePlan = {
-  id: string;
-  title: string;
-  books_today: string | null;
-};
-
 function HomePage() {
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [activePlan, setActivePlan] = useState<ActivePlan | null>(null);
-  const [logDates, setLogDates] = useState<Set<string>>(new Set());
+  const { user } = useAuth();
+  const { profile, activePlan, logDates, loading, today, refresh } = useReadingData();
   const [modalOpen, setModalOpen] = useState(false);
-  const [dataLoading, setDataLoading] = useState(false);
 
-
-  const today = useMemo(() => todayKey(), []);
+  const registeredToday = logDates.has(today);
   const now = useMemo(() => new Date(), []);
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth();
-  const registeredToday = logDates.has(today);
-
-  useEffect(() => {
-    if (!user) {
-      setProfile(null);
-      setActivePlan(null);
-      setLogDates(new Set());
-      return;
-    }
-    let cancelled = false;
-    setDataLoading(true);
-    (async () => {
-      // Ensure profile enrichment from OAuth metadata (name / avatar) if missing.
-      const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
-      const metaName =
-        (meta.full_name as string | undefined) ??
-        (meta.name as string | undefined) ??
-        null;
-      const metaAvatar =
-        (meta.avatar_url as string | undefined) ??
-        (meta.picture as string | undefined) ??
-        null;
-
-      const { data: existing } = await supabase
-        .from("profiles")
-        .select("name, avatar_url, current_streak, total_chapters_read, last_read_date")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      let p = existing as Profile | null;
-
-      if (!p) {
-        const { data: inserted } = await supabase
-          .from("profiles")
-          .insert({
-            id: user.id,
-            email: user.email ?? null,
-            name: metaName,
-            avatar_url: metaAvatar,
-          })
-          .select("name, avatar_url, current_streak, total_chapters_read, last_read_date")
-          .maybeSingle();
-        p = (inserted as Profile | null) ?? {
-          name: metaName,
-          avatar_url: metaAvatar,
-          current_streak: 0,
-          total_chapters_read: 0,
-          last_read_date: null,
-        };
-      } else if ((!p.name && metaName) || (!p.avatar_url && metaAvatar)) {
-        const patch: { name?: string; avatar_url?: string } = {};
-        if (!p.name && metaName) patch.name = metaName;
-        if (!p.avatar_url && metaAvatar) patch.avatar_url = metaAvatar;
-        const { data: updated } = await supabase
-          .from("profiles")
-          .update(patch)
-          .eq("id", user.id)
-          .select("name, avatar_url, current_streak, total_chapters_read, last_read_date")
-          .maybeSingle();
-        if (updated) p = updated as Profile;
-      }
-
-      const [{ data: logs }, { data: plans }] = await Promise.all([
-        supabase
-          .from("reading_logs")
-          .select("read_date")
-          .eq("user_id", user.id)
-          .order("read_date", { ascending: false })
-          .limit(365),
-        supabase
-          .from("reading_plans")
-          .select("id, title, books_today")
-          .eq("user_id", user.id)
-          .order("updated_at", { ascending: false })
-          .limit(1),
-      ]);
-
-      if (cancelled) return;
-      setProfile(p);
-      setLogDates(new Set((logs ?? []).map((l: { read_date: string }) => l.read_date)));
-      setActivePlan((plans?.[0] as ActivePlan | undefined) ?? null);
-      setDataLoading(false);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [user]);
-
-  // Daily reminder: if enabled and past reminder time with no reading today, notify once/day.
-  useEffect(() => {
-    if (!user || dataLoading) return;
-    try {
-      const enabled = localStorage.getItem("bh_reminder_enabled") === "1";
-      if (!enabled) return;
-      const time = localStorage.getItem("bh_reminder_time") || "20:00";
-      const [hh, mm] = time.split(":").map(Number);
-      const now = new Date();
-      const trigger = new Date();
-      trigger.setHours(hh || 20, mm || 0, 0, 0);
-      if (now < trigger) return;
-      if (registeredToday) return;
-      const key = `bh_reminded_${today}`;
-      if (localStorage.getItem(key) === "1") return;
-      localStorage.setItem(key, "1");
-      const msg = "Que tal registrar sua leitura de hoje? 📖";
-      if ("Notification" in window && Notification.permission === "granted") {
-        try { new Notification("Bible Habit", { body: msg }); } catch {}
-      }
-      toast(msg, { duration: 6000 });
-    } catch {}
-  }, [user, dataLoading, registeredToday, today]);
 
   const displayName =
     profile?.name?.split(" ")[0] ??
@@ -197,23 +59,11 @@ function HomePage() {
     setModalOpen(true);
   };
 
-  const refreshAfterLog = async () => {
-    if (!user) return;
-    const { data: p } = await supabase
-      .from("profiles")
-      .select("name, avatar_url, current_streak, total_chapters_read, last_read_date")
-      .eq("id", user.id)
-      .maybeSingle();
-    setProfile(p as Profile | null);
-    setLogDates((prev) => new Set(prev).add(today));
-  };
-
-
   return (
     <AppShell>
       {/* Greeting */}
       <div className="mb-6">
-        {authLoading || dataLoading ? (
+        {loading ? (
           <div className="space-y-2">
             <Skeleton className="h-4 w-32" />
             <Skeleton className="h-8 w-64" />
@@ -230,10 +80,8 @@ function HomePage() {
         )}
       </div>
 
-
-
       {/* Streak hero */}
-      {authLoading || dataLoading ? (
+      {loading ? (
         <Card className="mb-4 border-border/60 bg-card/70 p-6 shadow-card backdrop-blur-sm">
           <Skeleton className="h-4 w-24 mb-4" />
           <Skeleton className="h-16 w-32 mb-4" />
@@ -268,7 +116,7 @@ function HomePage() {
 
       {/* Secondary stats */}
       <div className="mb-6 grid grid-cols-2 gap-3">
-        {authLoading || dataLoading ? (
+        {loading ? (
           <>
             <Card className="border-border/60 bg-card/60 p-4 backdrop-blur-sm">
               <Skeleton className="h-3 w-20 mb-3" />
@@ -302,29 +150,33 @@ function HomePage() {
       </div>
 
       {/* CTA */}
-      <Button
-        size="lg"
-        className={`mb-8 h-14 w-full gap-2 rounded-2xl text-base font-semibold transition-all ${
-          registeredToday
-            ? "bg-success/15 text-success hover:bg-success/20"
-            : "gradient-primary text-primary-foreground shadow-glow hover:brightness-110"
-        }`}
-        disabled={registeredToday || authLoading || dataLoading}
-        onClick={openRegister}
-      >
-        {registeredToday ? (
-          <Check className="h-5 w-5" />
-        ) : (
-          <BookOpenCheck className="h-5 w-5" />
-        )}
-        {registeredToday
-          ? "Leitura de hoje concluída"
-          : user
-            ? "Registrar leitura de hoje"
-            : "Entrar para registrar"}
-      </Button>
+      {loading ? (
+        <Skeleton className="mb-8 h-14 w-full rounded-2xl" />
+      ) : (
+        <Button
+          size="lg"
+          className={`mb-8 h-14 w-full gap-2 rounded-2xl text-base font-semibold transition-all ${
+            registeredToday
+              ? "bg-success/15 text-success hover:bg-success/20"
+              : "gradient-primary text-primary-foreground shadow-glow hover:brightness-110"
+          }`}
+          disabled={registeredToday || loading}
+          onClick={openRegister}
+        >
+          {registeredToday ? (
+            <Check className="h-5 w-5" />
+          ) : (
+            <BookOpenCheck className="h-5 w-5" />
+          )}
+          {registeredToday
+            ? "Leitura de hoje concluída"
+            : user
+              ? "Registrar leitura de hoje"
+              : "Entrar para registrar"}
+        </Button>
+      )}
 
-      {authLoading || dataLoading ? (
+      {loading ? (
         <Card className="border-border/60 bg-card/60 p-6 backdrop-blur-sm">
           <Skeleton className="h-[200px] w-full" />
         </Card>
@@ -343,10 +195,9 @@ function HomePage() {
           onOpenChange={setModalOpen}
           userId={user.id}
           today={today}
-          onSaved={refreshAfterLog}
+          onSaved={refresh}
         />
       )}
-
     </AppShell>
   );
 }
