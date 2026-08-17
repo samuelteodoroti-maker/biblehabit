@@ -157,7 +157,7 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] max-w-lg overflow-y-auto border-border/60 bg-card/95 p-0 backdrop-blur-xl">
+      <DialogContent className="max-h-[95vh] max-w-lg overflow-y-auto border-border/60 bg-card/95 p-0 backdrop-blur-xl rounded-t-[2.5rem] sm:rounded-[2rem]">
         <div className="sticky top-0 z-10 bg-card/95 p-6 pb-2 backdrop-blur-xl">
           <DialogHeader>
             <DialogTitle className="font-display text-xl">Registrar Leitura</DialogTitle>
