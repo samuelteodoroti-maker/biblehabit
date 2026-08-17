@@ -224,11 +224,15 @@ export const manageSupportSession = createServerFn({ method: "POST" })
     if (!admin) throw new Error("Unauthorized");
 
     if (data.action === 'start') {
+      const expiresAt = new Date();
+      expiresAt.setMinutes(expiresAt.getMinutes() + 30);
+      
       const { error } = await supabase.from("support_sessions").insert({
         admin_id: admin.id,
-        user_id: data.userId,
+        target_user_id: data.userId,
         status: 'active',
-        notes: data.notes
+        reason: data.notes || 'Suporte técnico',
+        expires_at: expiresAt.toISOString()
       });
       if (error) throw new Error(error.message);
     } else {
@@ -236,9 +240,10 @@ export const manageSupportSession = createServerFn({ method: "POST" })
         .from("support_sessions")
         .update({ status: 'closed', closed_at: new Date().toISOString() })
         .eq("admin_id", admin.id)
-        .eq("user_id", data.userId)
+        .eq("target_user_id", data.userId)
         .eq("status", 'active');
-      if (error) throw new Error(error.error?.message || "Failed to close session");
+      
+      if (error) throw new Error(error.message);
     }
 
     const { data: roleData } = await supabase.from("user_roles").select("role").eq("user_id", admin.id).single();
