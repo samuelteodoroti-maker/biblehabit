@@ -71,9 +71,9 @@ function StatisticsPage() {
           <Skeleton className="h-48 w-full rounded-2xl" />
         </div>
       ) : (
-        <div className="space-y-6 pb-24">
+        <div className="space-y-6 pb-24 md:pb-8">
           {/* Overview Cards */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 xs:grid-cols-2 gap-3">
             <Card className="border-border/60 bg-card/60 p-4 backdrop-blur-sm">
               <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
                 <Flame className="h-3.5 w-3.5 text-orange-500" />
@@ -101,7 +101,7 @@ function StatisticsPage() {
             <TabsContent value="overview" className="mt-4 space-y-4">
               <Card className="border-border/60 bg-card/70 p-5 backdrop-blur-sm">
                 <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Progresso Mensal</h3>
-                <div className="h-64 w-full">
+                <div className="h-64 w-full md:h-80 lg:h-96">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={chartData}>
                       <XAxis 

@@ -11,8 +11,8 @@ const tabs = [
 
 export function BottomNav() {
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/90 backdrop-blur-xl md:hidden safe-bottom">
-      <ul className="mx-auto flex max-w-md items-stretch justify-around px-2 pt-2 pb-1">
+    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/90 backdrop-blur-xl md:hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom)', minHeight: 'calc(72px + env(safe-area-inset-bottom))' }}>
+      <ul className="mx-auto flex max-w-md items-stretch justify-around px-2 pt-2">
         {tabs.map(({ to, label, icon: Icon }) => (
           <li key={to} className="flex-1">
             <Link

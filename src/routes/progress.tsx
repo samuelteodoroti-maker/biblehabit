@@ -313,7 +313,7 @@ function ProgressPage() {
         </h2>
 
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 xs:grid-cols-2 gap-3">
           {insights.loading ? (
             <>
               <Skeleton className="h-[88px] rounded-2xl" />
@@ -351,7 +351,7 @@ function ProgressPage() {
             <p className="mb-2 text-[11px] font-medium text-muted-foreground">
               Últimos 7 dias
             </p>
-            <div className="h-32">
+            <div className="h-40 md:h-56">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={insights.last7} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                   <XAxis dataKey="day" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />

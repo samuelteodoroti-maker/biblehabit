@@ -2,6 +2,14 @@
 
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
+## [1.4.0] - 2026-08-17
+### Melhorado
+- **Responsividade Global**: Overhaul completo para telas mobile (320px+), tablets e desktop.
+- **Tipografia Fluida**: Implementação de escalas com `clamp()` para melhor legibilidade.
+- **Safe Area**: Navegação inferior agora respeita áreas seguras de dispositivos móveis.
+- **Cards**: Redesenhados para evitar cortes de texto e melhorar o uso de espaço.
+- **Gráficos**: Adaptados para diferentes larguras com melhor aproveitamento visual.
+
 ## [1.3.0] - 2026-08-17
 ### Adicionado
 - Sistema completo de Notas de Atualização (`/updates`).

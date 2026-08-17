@@ -36,7 +36,7 @@ export function BibleCard({
       <div className="pointer-events-none absolute -top-12 -right-12 h-24 w-24 rounded-full border border-primary/5 group-hover:scale-110 transition-transform duration-700" aria-hidden="true" />
       
       {(title || Icon) && (
-        <div className="flex items-center justify-between px-7 pt-7 pb-3">
+        <div className="flex items-center justify-between px-5 pt-5 pb-2 md:px-7 md:pt-7 md:pb-3">
           <div className="flex items-center gap-3.5">
             {Icon && (
               <div className={cn(
@@ -55,7 +55,7 @@ export function BibleCard({
         </div>
       )}
       
-      <div className={cn("relative z-10 p-7", (title || Icon) && "pt-0")}>
+      <div className={cn("relative z-10 p-5 md:p-7", (title || Icon) && "pt-0")}>
         {children}
       </div>
     </div>

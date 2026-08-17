@@ -106,7 +106,7 @@ function AchievementsPage() {
 
   return (
     <AppShell title="Conquistas" subtitle="Seus emblemas e recordes">
-      <div className="mb-6 grid grid-cols-3 gap-3">
+      <div className="mb-6 grid grid-cols-1 xs:grid-cols-3 gap-3">
         {loading ? (
           <>
             <Skeleton className="h-24 w-full rounded-2xl" />
@@ -143,7 +143,7 @@ function AchievementsPage() {
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-3 pb-6">
+      <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 pb-6">
         {loading ? (
           Array.from({ length: 8 }).map((_, i) => (
             <Card key={i} className="border-border/60 bg-card/70 p-5 text-center">
