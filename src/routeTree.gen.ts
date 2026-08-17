@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SupportRouteImport } from './routes/support'
 import { Route as StatisticsRouteImport } from './routes/statistics'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
@@ -20,6 +21,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as GroupsIndexRouteImport } from './routes/groups.index'
 import { Route as GroupsGroupIdRouteImport } from './routes/groups.$groupId'
 
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StatisticsRoute = StatisticsRouteImport.update({
   id: '/statistics',
   path: '/statistics',
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/statistics': typeof StatisticsRoute
+  '/support': typeof SupportRoute
   '/groups/$groupId': typeof GroupsGroupIdRoute
   '/groups/': typeof GroupsIndexRoute
 }
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/statistics': typeof StatisticsRoute
+  '/support': typeof SupportRoute
   '/groups/$groupId': typeof GroupsGroupIdRoute
   '/groups': typeof GroupsIndexRoute
 }
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/statistics': typeof StatisticsRoute
+  '/support': typeof SupportRoute
   '/groups/$groupId': typeof GroupsGroupIdRoute
   '/groups/': typeof GroupsIndexRoute
 }
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sitemap.xml'
     | '/statistics'
+    | '/support'
     | '/groups/$groupId'
     | '/groups/'
   fileRoutesByTo: FileRoutesByTo
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sitemap.xml'
     | '/statistics'
+    | '/support'
     | '/groups/$groupId'
     | '/groups'
   id:
@@ -141,6 +152,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sitemap.xml'
     | '/statistics'
+    | '/support'
     | '/groups/$groupId'
     | '/groups/'
   fileRoutesById: FileRoutesById
@@ -154,10 +166,18 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StatisticsRoute: typeof StatisticsRoute
+  SupportRoute: typeof SupportRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/statistics': {
       id: '/statistics'
       path: '/statistics'
@@ -253,6 +273,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StatisticsRoute: StatisticsRoute,
+  SupportRoute: SupportRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
