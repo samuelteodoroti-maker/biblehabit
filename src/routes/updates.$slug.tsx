@@ -46,7 +46,7 @@ function UpdateDetailPage() {
     const fetchUpdate = async () => {
       setLoading(true);
       try {
-        const data = await getUpdateBySlug({ slug });
+        const data = await getUpdateBySlug({ data: { slug } });
         if (!data) {
           toast.error("Atualização não encontrada");
           navigate({ to: "/updates" });

@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UpdatesRouteImport } from './routes/updates'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as StatisticsRouteImport } from './routes/statistics'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -19,8 +20,14 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AchievementsRouteImport } from './routes/achievements'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GroupsIndexRouteImport } from './routes/groups.index'
+import { Route as UpdatesSlugRouteImport } from './routes/updates.$slug'
 import { Route as GroupsGroupIdRouteImport } from './routes/groups.$groupId'
 
+const UpdatesRoute = UpdatesRouteImport.update({
+  id: '/updates',
+  path: '/updates',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SupportRoute = SupportRouteImport.update({
   id: '/support',
   path: '/support',
@@ -71,6 +78,11 @@ const GroupsIndexRoute = GroupsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => GroupsRoute,
 } as any)
+const UpdatesSlugRoute = UpdatesSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => UpdatesRoute,
+} as any)
 const GroupsGroupIdRoute = GroupsGroupIdRouteImport.update({
   id: '/$groupId',
   path: '/$groupId',
@@ -87,7 +99,9 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/statistics': typeof StatisticsRoute
   '/support': typeof SupportRoute
+  '/updates': typeof UpdatesRouteWithChildren
   '/groups/$groupId': typeof GroupsGroupIdRoute
+  '/updates/$slug': typeof UpdatesSlugRoute
   '/groups/': typeof GroupsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -99,7 +113,9 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/statistics': typeof StatisticsRoute
   '/support': typeof SupportRoute
+  '/updates': typeof UpdatesRouteWithChildren
   '/groups/$groupId': typeof GroupsGroupIdRoute
+  '/updates/$slug': typeof UpdatesSlugRoute
   '/groups': typeof GroupsIndexRoute
 }
 export interface FileRoutesById {
@@ -113,7 +129,9 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/statistics': typeof StatisticsRoute
   '/support': typeof SupportRoute
+  '/updates': typeof UpdatesRouteWithChildren
   '/groups/$groupId': typeof GroupsGroupIdRoute
+  '/updates/$slug': typeof UpdatesSlugRoute
   '/groups/': typeof GroupsIndexRoute
 }
 export interface FileRouteTypes {
@@ -128,7 +146,9 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/statistics'
     | '/support'
+    | '/updates'
     | '/groups/$groupId'
+    | '/updates/$slug'
     | '/groups/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -140,7 +160,9 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/statistics'
     | '/support'
+    | '/updates'
     | '/groups/$groupId'
+    | '/updates/$slug'
     | '/groups'
   id:
     | '__root__'
@@ -153,7 +175,9 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/statistics'
     | '/support'
+    | '/updates'
     | '/groups/$groupId'
+    | '/updates/$slug'
     | '/groups/'
   fileRoutesById: FileRoutesById
 }
@@ -167,10 +191,18 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StatisticsRoute: typeof StatisticsRoute
   SupportRoute: typeof SupportRoute
+  UpdatesRoute: typeof UpdatesRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/updates': {
+      id: '/updates'
+      path: '/updates'
+      fullPath: '/updates'
+      preLoaderRoute: typeof UpdatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/support': {
       id: '/support'
       path: '/support'
@@ -241,6 +273,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GroupsIndexRouteImport
       parentRoute: typeof GroupsRoute
     }
+    '/updates/$slug': {
+      id: '/updates/$slug'
+      path: '/$slug'
+      fullPath: '/updates/$slug'
+      preLoaderRoute: typeof UpdatesSlugRouteImport
+      parentRoute: typeof UpdatesRoute
+    }
     '/groups/$groupId': {
       id: '/groups/$groupId'
       path: '/$groupId'
@@ -264,6 +303,17 @@ const GroupsRouteChildren: GroupsRouteChildren = {
 const GroupsRouteWithChildren =
   GroupsRoute._addFileChildren(GroupsRouteChildren)
 
+interface UpdatesRouteChildren {
+  UpdatesSlugRoute: typeof UpdatesSlugRoute
+}
+
+const UpdatesRouteChildren: UpdatesRouteChildren = {
+  UpdatesSlugRoute: UpdatesSlugRoute,
+}
+
+const UpdatesRouteWithChildren =
+  UpdatesRoute._addFileChildren(UpdatesRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AchievementsRoute: AchievementsRoute,
@@ -274,6 +324,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StatisticsRoute: StatisticsRoute,
   SupportRoute: SupportRoute,
+  UpdatesRoute: UpdatesRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

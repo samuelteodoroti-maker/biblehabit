@@ -53,9 +53,11 @@ function UpdatesPage() {
     setLoading(true);
     try {
       const result = await getUpdates({
-        search: search || undefined,
-        category: category || undefined,
-        year: year || undefined,
+        data: {
+          search: search || undefined,
+          category: category || undefined,
+          year: year || undefined,
+        }
       });
       setUpdates(result.updates || []);
     } catch (e) {
@@ -160,7 +162,8 @@ function UpdatesPage() {
                   
                   <div className="mt-6 flex items-center gap-2">
                     <Link 
-                      to={`/updates/${update.slug}`}
+                      to="/updates/$slug"
+                      params={{ slug: update.slug }}
                       className="flex-1"
                     >
                       <Button className="w-full h-10 rounded-xl gradient-primary font-semibold text-primary-foreground shadow-glow">
