@@ -119,7 +119,7 @@ function HomePage() {
     <AppShell>
       {/* Update Notice Banner */}
       {showNotice && latestUpdate && (
-        <div className="mb-8 overflow-hidden rounded-[1.5rem] border border-primary/20 bg-primary/5 p-4 md:p-5 backdrop-blur-sm animate-in fade-in slide-in-from-top-4 duration-500">
+        <div className="mb-8 overflow-hidden rounded-[1.5rem] border border-primary/20 bg-primary/5 p-4 md:p-5 backdrop-blur-sm animate-in fade-in slide-in-from-top-4 duration-500 max-w-full">
            <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/20 text-primary">
@@ -300,7 +300,7 @@ function HomePage() {
           </div>
 
           {/* Active Journey Card */}
-          <BibleCard title="Jornada Atual" icon={Bookmark} variant="editorial">
+          <BibleCard title="Jornada Atual" icon={Bookmark} variant="editorial" className="overflow-visible">
              {activePlan ? (
                <div className="space-y-4">
                   <div>

@@ -71,7 +71,7 @@ function StatisticsPage() {
           <Skeleton className="h-48 w-full rounded-2xl" />
         </div>
       ) : (
-        <div className="space-y-6 pb-24">
+        <div className="space-y-6 pb-24 md:pb-8">
           {/* Overview Cards */}
           <div className="grid grid-cols-1 xs:grid-cols-2 gap-3">
             <Card className="border-border/60 bg-card/60 p-4 backdrop-blur-sm">
