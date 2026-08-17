@@ -50,9 +50,9 @@ export function useReadingData() {
       // Fetch logs
       const { data: logs } = await supabase
         .from("reading_logs")
-        .select("read_date")
+        .select("reading_date")
         .eq("user_id", user.id)
-        .order("read_date", { ascending: false })
+        .order("reading_date", { ascending: false })
         .limit(365);
         
       // Fetch plans to determine active one
@@ -65,7 +65,7 @@ export function useReadingData() {
       const finalPlan = allPlans?.find(p => (p.completed_days ?? 0) < (p.total_days ?? 0)) || allPlans?.[0];
       
       setProfile(p as Profile | null);
-      setLogDates(new Set((logs ?? []).map(l => l.read_date)));
+      setLogDates(new Set((logs ?? []).map(l => l.reading_date)));
       setActivePlan(finalPlan as ActivePlan | null);
     } catch (error) {
       console.error("Error fetching reading data:", error);

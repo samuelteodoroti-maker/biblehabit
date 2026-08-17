@@ -56,7 +56,7 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
     setSaving(true);
     const { error } = await supabase.from("reading_logs").insert({
       user_id: userId,
-      read_date: today,
+      reading_date: today,
       chapters_count: Math.max(1, chapters),
       plan_id: planId === FREE ? null : planId,
       notes: notes.trim() ? notes.trim() : null,

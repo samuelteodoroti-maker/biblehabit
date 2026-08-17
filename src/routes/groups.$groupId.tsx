@@ -48,7 +48,7 @@ type Activity = {
   id: string;
   user_id: string;
   created_at: string;
-  read_date: string;
+  reading_date: string;
   chapters_count: number;
   notes: string | null;
   plan_title: string | null;
@@ -143,7 +143,7 @@ function GroupDetail() {
         .from("reading_logs")
         .select("user_id, chapters_count")
         .in("user_id", ids)
-        .gte("read_date", wkStart);
+        .gte("reading_date", wkStart);
       const chapterMap = new Map<string, number>();
       (logs ?? []).forEach((l) => {
         chapterMap.set(l.user_id, (chapterMap.get(l.user_id) ?? 0) + (l.chapters_count ?? 0));
@@ -188,7 +188,7 @@ function GroupDetail() {
       const ids = members.map((m) => m.user_id);
       const { data: logs } = await supabase
         .from("reading_logs")
-        .select("id, user_id, created_at, read_date, chapters_count, notes, plan_id")
+        .select("id, user_id, created_at, reading_date, chapters_count, notes, plan_id")
         .in("user_id", ids)
         .order("created_at", { ascending: false })
         .limit(50);
