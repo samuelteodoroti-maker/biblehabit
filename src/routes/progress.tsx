@@ -440,7 +440,7 @@ function ProgressPage() {
                   variant="outline"
                   className="rounded-xl text-destructive hover:bg-destructive/10 hover:text-destructive"
                   onClick={() => remove(p.id)}
-                  aria-label="Remover"
+                  aria-label="Remover plano"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
@@ -449,8 +449,10 @@ function ProgressPage() {
           );
         })}
       </div>
+      )}
 
       <Dialog open={open} onOpenChange={setOpen}>
+
         <DialogContent className="rounded-2xl border-border/60 bg-card/95 backdrop-blur-xl">
           <DialogHeader>
             <DialogTitle className="font-display text-xl">
