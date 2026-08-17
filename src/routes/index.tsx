@@ -123,6 +123,29 @@ function HomePage() {
         </Card>
       )}
 
+      {/* Reading Suggestion */}
+      {!loading && activePlan && !registeredToday && (
+        <Card className="mb-6 border-primary/20 bg-primary/5 p-4 backdrop-blur-sm">
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/20 text-primary">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-primary/80">Sugestão de leitura</h3>
+              <p className="mt-1 font-display text-lg font-bold leading-tight">
+                {activePlan.books_today || `Continuar ${activePlan.title}`}
+              </p>
+              <button 
+                onClick={() => openRegister(today)}
+                className="mt-2 flex items-center gap-1 text-[11px] font-bold text-primary hover:underline"
+              >
+                Registrar agora <ChevronRight className="h-3 w-3" />
+              </button>
+            </div>
+          </div>
+        </Card>
+      )}
+
       {/* Secondary stats */}
       <div className="mb-6 grid grid-cols-2 gap-3">
         {loading ? (
@@ -147,16 +170,18 @@ function HomePage() {
             </Card>
             <Card className="border-border/60 bg-card/60 p-4 backdrop-blur-sm">
               <div className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                <Sparkles className="h-3.5 w-3.5" />
-                Hoje
+                <Book className="h-3.5 w-3.5" />
+                Plano ativo
               </div>
-              <p className="mt-2 truncate font-display text-base font-semibold">
-                {activePlan?.books_today ?? "Sem plano ativo"}
+              <p className="mt-2 truncate font-display text-[13px] font-semibold">
+                {activePlan?.title ?? "Nenhum plano"}
               </p>
             </Card>
           </>
         )}
       </div>
+
+import { ChevronRight, Book } from "lucide-react";
 
       {/* CTA */}
       {loading ? (
