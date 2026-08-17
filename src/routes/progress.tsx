@@ -466,8 +466,9 @@ function ProgressPage() {
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <Label className="text-xs">Título</Label>
+              <Label htmlFor="plan-title" className="text-xs">Título</Label>
               <Input
+                id="plan-title"
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
                 placeholder="Ex.: Novo Testamento em 90 dias"
@@ -476,8 +477,9 @@ function ProgressPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs">De</Label>
+                <Label htmlFor="plan-from" className="text-xs">De</Label>
                 <Select
+                  name="plan-from"
                   value={String(form.fromIdx)}
                   onValueChange={(v) => {
                     const from = Number(v);
@@ -495,8 +497,9 @@ function ProgressPage() {
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs">Até</Label>
+                <Label htmlFor="plan-to" className="text-xs">Até</Label>
                 <Select
+                  name="plan-to"
                   value={String(form.toIdx)}
                   onValueChange={(v) => setForm((f) => ({ ...f, toIdx: Number(v) }))}
                 >
