@@ -315,47 +315,61 @@ function ProgressPage() {
           </h2>
 
           <div className="grid grid-cols-2 gap-3">
-            <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
-              <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                <CalendarHeart className="h-3.5 w-3.5" /> Dia favorito
-              </div>
-              <p className="mt-2 font-display text-lg font-semibold">
-                {insights.favoriteDay ?? "—"}
-              </p>
-            </Card>
-            <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
-              <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                <TrendingUp className="h-3.5 w-3.5" /> Média por leitura
-              </div>
-              <p className="mt-2 font-display text-lg font-semibold">
-                {insights.avgChapters.toFixed(1)}{" "}
-                <span className="text-xs font-normal text-muted-foreground">caps</span>
-              </p>
-            </Card>
+            {!insights.hasData ? (
+              <>
+                <Skeleton className="h-[88px] rounded-2xl" />
+                <Skeleton className="h-[88px] rounded-2xl" />
+              </>
+            ) : (
+              <>
+                <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
+                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                    <CalendarHeart className="h-3.5 w-3.5" /> Dia favorito
+                  </div>
+                  <p className="mt-2 font-display text-lg font-semibold">
+                    {insights.favoriteDay ?? "—"}
+                  </p>
+                </Card>
+                <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
+                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                    <TrendingUp className="h-3.5 w-3.5" /> Média por leitura
+                  </div>
+                  <p className="mt-2 font-display text-lg font-semibold">
+                    {insights.avgChapters.toFixed(1)}{" "}
+                    <span className="text-xs font-normal text-muted-foreground">caps</span>
+                  </p>
+                </Card>
+              </>
+            )}
           </div>
-          <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
-            <p className="mb-2 text-[11px] font-medium text-muted-foreground">
-              Últimos 7 dias
-            </p>
-            <div className="h-32">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={insights.last7} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-                  <XAxis dataKey="day" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
-                  <Tooltip
-                    cursor={{ fill: "rgba(255,255,255,0.05)" }}
-                    contentStyle={{
-                      background: "rgba(20,20,30,0.9)",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      borderRadius: 12,
-                      fontSize: 12,
-                    }}
-                  />
-                  <Bar dataKey="chapters" fill="oklch(0.65 0.22 275)" radius={[6, 6, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
+          
+          {!insights.hasData ? (
+            <Skeleton className="h-[176px] rounded-2xl" />
+          ) : (
+            <Card className="border-border/60 bg-card/70 p-4 backdrop-blur-sm">
+              <p className="mb-2 text-[11px] font-medium text-muted-foreground">
+                Últimos 7 dias
+              </p>
+              <div className="h-32">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={insights.last7} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                    <XAxis dataKey="day" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                    <Tooltip
+                      cursor={{ fill: "rgba(255,255,255,0.05)" }}
+                      contentStyle={{
+                        background: "rgba(20,20,30,0.9)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        borderRadius: 12,
+                        fontSize: 12,
+                      }}
+                    />
+                    <Bar dataKey="chapters" fill="oklch(0.65 0.22 275)" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
+          )}
         </div>
       )}
 
