@@ -10,17 +10,23 @@ export const Route = createFileRoute("/admin/")({
 });
 
 function AdminDashboard() {
-  const { isAdmin, role, roleLoading } = useAuth();
+  const { role, roleLoading } = useAuth();
   
   if (roleLoading) return <div>Carregando...</div>;
-  if (role !== 'super_admin' && role !== 'admin' && role !== 'support' && role !== 'analyst') {
+  
+  if (!['super_admin', 'admin', 'support', 'analyst'].includes(role)) {
     return <div>Acesso negado.</div>;
   }
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold">Painel Administrativo</h1>
-      <p>Bem-vindo, {role}.</p>
-    </div>
+    <AdminLayout title="Dashboard Administrativo">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="p-6 rounded-2xl bg-white/5 border border-white/5">
+          <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">Total Usuários</p>
+          <div className="text-3xl font-bold mt-2">--</div>
+        </div>
+        {/* Adicione outros cards aqui */}
+      </div>
+    </AdminLayout>
   );
 }
