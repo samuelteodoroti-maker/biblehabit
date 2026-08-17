@@ -166,3 +166,91 @@ export const manageUserStatus = createServerFn({ method: "POST" })
 
     return { success: true };
   });
+
+export const performControlledCorrection = createServerFn({ method: "POST" })
+  .middleware([requireAdminRole(['super_admin', 'admin'])])
+  .validator((data: any) => z.object({
+    userId: z.string(),
+    action: z.enum(['reset_streak', 'correct_reading_count', 'sync_profile']),
+    details: z.any(),
+    reason: z.string()
+  }).parse(data))
+  .handler(async ({ data }) => {
+    const { data: { user: admin } } = await supabase.auth.getUser();
+    if (!admin) throw new Error("Unauthorized");
+
+    let result;
+    if (data.action === 'reset_streak') {
+      result = await supabase
+        .from("profiles")
+        .update({ current_streak: 0 })
+        .eq("id", data.userId);
+    } else if (data.action === 'sync_profile') {
+      // Logic to recount readings and update profile total
+      const { count } = await supabase.from("reading_logs").select("*", { count: "exact", head: true }).eq("user_id", data.userId);
+      result = await supabase
+        .from("profiles")
+        .update({ total_chapters_read: count || 0 })
+        .eq("id", data.userId);
+    }
+
+    if (result?.error) throw new Error(result.error.message);
+
+    const { data: roleData } = await supabase.from("user_roles").select("role").eq("user_id", admin.id).single();
+
+    await logAdminAction({
+      adminId: admin.id,
+      role: roleData?.role || 'admin',
+      action: `CORRECTION_${data.action.toUpperCase()}`,
+      resourceType: 'USER',
+      resourceId: data.userId,
+      affectedUserId: data.userId,
+      reason: data.reason,
+      details: data.details
+    });
+
+    return { success: true };
+  });
+
+export const manageSupportSession = createServerFn({ method: "POST" })
+  .middleware([requireAdminRole(['super_admin', 'support'])])
+  .validator((data: any) => z.object({
+    userId: z.string(),
+    action: z.enum(['start', 'end']),
+    notes: z.string().optional()
+  }).parse(data))
+  .handler(async ({ data }) => {
+    const { data: { user: admin } } = await supabase.auth.getUser();
+    if (!admin) throw new Error("Unauthorized");
+
+    if (data.action === 'start') {
+      const { error } = await supabase.from("support_sessions").insert({
+        admin_id: admin.id,
+        user_id: data.userId,
+        status: 'active',
+        notes: data.notes
+      });
+      if (error) throw new Error(error.message);
+    } else {
+      const { error } = await supabase
+        .from("support_sessions")
+        .update({ status: 'closed', closed_at: new Date().toISOString() })
+        .eq("admin_id", admin.id)
+        .eq("user_id", data.userId)
+        .eq("status", 'active');
+      if (error) throw new Error(error.error?.message || "Failed to close session");
+    }
+
+    const { data: roleData } = await supabase.from("user_roles").select("role").eq("user_id", admin.id).single();
+
+    await logAdminAction({
+      adminId: admin.id,
+      role: roleData?.role || 'support',
+      action: `SUPPORT_SESSION_${data.action.toUpperCase()}`,
+      resourceType: 'SUPPORT_SESSION',
+      affectedUserId: data.userId,
+      reason: data.notes
+    });
+
+    return { success: true };
+  });
