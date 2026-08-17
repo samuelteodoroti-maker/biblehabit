@@ -460,6 +460,9 @@ function ProgressPage() {
             <DialogTitle className="font-display text-xl">
               {editing ? "Editar plano" : "Novo plano"}
             </DialogTitle>
+            <DialogDescription>
+              Defina o título, a meta de dias e os livros que deseja ler.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-1.5">

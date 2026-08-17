@@ -189,6 +189,7 @@ function GroupsPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Novo grupo</DialogTitle>
+            <DialogDescription>Crie um grupo para ler a Bíblia com seus amigos e acompanhar o ranking.</DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
             <div className="space-y-1.5">
@@ -213,6 +214,7 @@ function GroupsPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Entrar em um grupo</DialogTitle>
+            <DialogDescription>Use o código de convite para participar de um grupo existente.</DialogDescription>
           </DialogHeader>
           <div className="space-y-1.5">
             <Label className="text-xs">Código de convite</Label>

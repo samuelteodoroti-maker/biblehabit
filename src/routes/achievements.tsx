@@ -2,7 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
+
   Trophy,
   Flame,
   CalendarDays,
@@ -137,7 +139,17 @@ function AchievementsPage() {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        {ACHIEVEMENTS.map((a) => {
+        {loading ? (
+          Array.from({ length: 8 }).map((_, i) => (
+            <Card key={i} className="border-border/60 bg-card/70 p-5 text-center">
+              <Skeleton className="mx-auto h-10 w-10 rounded-full" />
+              <Skeleton className="mt-3 h-4 w-20 mx-auto" />
+              <Skeleton className="mt-1 h-3 w-24 mx-auto" />
+            </Card>
+          ))
+        ) : (
+          ACHIEVEMENTS.map((a) => {
+
           const isUnlocked = a.unlocked(stats);
           const Icon = a.icon;
           return (
@@ -161,7 +173,8 @@ function AchievementsPage() {
               <p className="mt-1 text-[11px] leading-tight text-muted-foreground">{a.description}</p>
             </Card>
           );
-        })}
+        })
+        )}
       </div>
     </AppShell>
   );
