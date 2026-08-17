@@ -4,7 +4,21 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { Flame, BookOpenCheck, CalendarDays, Sparkles, Check, ChevronRight, Book, Bell, X, Bookmark } from "lucide-react";
+import { 
+  Flame, 
+  BookOpenCheck, 
+  CalendarDays, 
+  Sparkles, 
+  Check, 
+  ChevronRight, 
+  Book, 
+  Bell, 
+  X, 
+  Bookmark,
+  ArrowRight,
+  TrendingUp
+} from "lucide-react";
+
 
 import { ReadingCalendar } from "@/components/ReadingCalendar";
 import { LogReadingModal } from "@/components/LogReadingModal";
