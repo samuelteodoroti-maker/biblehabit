@@ -29,7 +29,7 @@ export const Route = createFileRoute("/settings")({
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mb-6">
-      <h2 className="mb-2.5 px-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+      <h2 className="mb-2.5 px-1 text-[11px] font-semibold tracking-[0.15em] text-muted-foreground">
         {title.charAt(0).toUpperCase() + title.slice(1).toLowerCase()}
       </h2>
       <Card className="divide-y divide-border/60 border-border/60 bg-card/70 backdrop-blur-sm">
@@ -189,7 +189,7 @@ function SettingsPage() {
       <Section title="Integrações">
         <div className="p-4">
           <div className="mb-3 flex items-center gap-3">
-            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent/60 text-lg">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent/60 text-lg" aria-hidden="true">
               📖
             </div>
             <div className="min-w-0 flex-1">
@@ -241,25 +241,35 @@ function SettingsPage() {
       </Section>
 
       <Section title="Preferências">
-        <Row>
-          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent/60">
-            <Bell className="h-4 w-4" />
+        <div className="p-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent/60">
+              <Bell className="h-4 w-4" aria-hidden="true" />
+            </div>
+            <div className="min-w-0">
+              <Label htmlFor="reminders-toggle" className="text-sm font-semibold cursor-pointer block truncate">
+                Lembretes diários
+              </Label>
+              <p id="reminders-description" className="text-xs text-muted-foreground truncate">
+                Avisamos se você ainda não leu hoje
+              </p>
+            </div>
           </div>
-          <div className="flex-1">
-            <p className="text-sm font-semibold">Lembretes diários</p>
-            <p className="text-xs text-muted-foreground">
-              Avisamos se você ainda não leu hoje
-            </p>
-          </div>
-          <Switch id="reminders-toggle" checked={reminderEnabled} onCheckedChange={toggleReminder} aria-checked={reminderEnabled} />
-        </Row>
+          <Switch 
+            id="reminders-toggle" 
+            checked={reminderEnabled} 
+            onCheckedChange={toggleReminder} 
+            aria-checked={reminderEnabled}
+            aria-describedby="reminders-description"
+          />
+        </div>
         {reminderEnabled && (
           <Row>
-            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent/60 text-xs font-semibold">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent/60 text-xs font-semibold" aria-hidden="true">
               🕗
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold">Hora do lembrete</p>
+              <Label htmlFor="reminder-time" className="text-sm font-semibold">Hora do lembrete</Label>
               <p className="text-xs text-muted-foreground">Escolha quando ser avisado</p>
             </div>
             <Input
@@ -276,7 +286,7 @@ function SettingsPage() {
 
       <Section title="Aparência">
         <Row>
-          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent/60">
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent/60" aria-hidden="true">
             {theme === "dark" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
           </div>
           <div className="flex-1">
@@ -296,6 +306,7 @@ function SettingsPage() {
         variant="outline"
         className="h-12 w-full gap-2 rounded-xl border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
         onClick={handleSignOut}
+        aria-label="Encerrar sessão"
       >
         <LogOut className="h-4 w-4" /> Sair
       </Button>
