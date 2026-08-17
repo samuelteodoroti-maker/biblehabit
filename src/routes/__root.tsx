@@ -119,7 +119,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
               "@type": "Organization",
               name: "Bible Habit",
               url: "https://biblehabit.lovable.app",
-              logo: "https://biblehabit.lovable.app/favicon.ico",
+              logo: "https://biblehabit.lovable.app/favicon.png",
             },
             {
               "@type": "WebSite",
