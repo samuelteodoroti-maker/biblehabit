@@ -4,7 +4,7 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Flame, BookOpenCheck, CalendarDays, Sparkles, Check } from "lucide-react";
+import { Flame, BookOpenCheck, CalendarDays, Sparkles, Check, ChevronRight, Book } from "lucide-react";
 import { ReadingCalendar } from "@/components/ReadingCalendar";
 import { LogReadingModal } from "@/components/LogReadingModal";
 import { toast } from "sonner";
