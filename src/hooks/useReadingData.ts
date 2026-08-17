@@ -39,48 +39,39 @@ export function useReadingData() {
     
     setLoading(true);
     
-    // Fetch profile
-    const { data: p } = await supabase
-      .from("profiles")
-      .select("name, avatar_url, current_streak, total_chapters_read, last_read_date")
-      .eq("id", user.id)
-      .maybeSingle();
-      
-    // Fetch logs
-    const { data: logs } = await supabase
-      .from("reading_logs")
-      .select("read_date")
-      .eq("user_id", user.id)
-      .order("read_date", { ascending: false })
-      .limit(365);
-      
-    // Fetch active plan:
-    // 1. Plan marked as active (if we had a field, but we don't yet in current schema)
-    // 2. Most recently updated plan that is NOT completed
-    const { data: plans } = await supabase
-      .from("reading_plans")
-      .select("id, title, books_today, completed_days, total_days")
-      .eq("user_id", user.id)
-      .lt("completed_days", supabase.raw("total_days")) // Not completed
-      .order("updated_at", { ascending: false })
-      .limit(1);
-      
-    // If no uncompleted plans, try most recent plan overall
-    let finalPlan = plans?.[0];
-    if (!finalPlan) {
-      const { data: lastPlan } = await supabase
+    try {
+      // Fetch profile
+      const { data: p } = await supabase
+        .from("profiles")
+        .select("name, avatar_url, current_streak, total_chapters_read, last_read_date")
+        .eq("id", user.id)
+        .maybeSingle();
+        
+      // Fetch logs
+      const { data: logs } = await supabase
+        .from("reading_logs")
+        .select("read_date")
+        .eq("user_id", user.id)
+        .order("read_date", { ascending: false })
+        .limit(365);
+        
+      // Fetch plans to determine active one
+      const { data: allPlans } = await supabase
         .from("reading_plans")
         .select("id, title, books_today, completed_days, total_days")
         .eq("user_id", user.id)
-        .order("updated_at", { ascending: false })
-        .limit(1);
-      finalPlan = lastPlan?.[0];
+        .order("updated_at", { ascending: false });
+
+      const finalPlan = allPlans?.find(p => (p.completed_days ?? 0) < (p.total_days ?? 0)) || allPlans?.[0];
+      
+      setProfile(p as Profile | null);
+      setLogDates(new Set((logs ?? []).map(l => l.read_date)));
+      setActivePlan(finalPlan as ActivePlan | null);
+    } catch (error) {
+      console.error("Error fetching reading data:", error);
+    } finally {
+      setLoading(false);
     }
-    
-    setProfile(p as Profile | null);
-    setLogDates(new Set((logs ?? []).map(l => l.read_date)));
-    setActivePlan(finalPlan as ActivePlan | null);
-    setLoading(false);
   };
 
   useEffect(() => {
