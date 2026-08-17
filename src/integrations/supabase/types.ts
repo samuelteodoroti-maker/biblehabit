@@ -184,33 +184,86 @@ export type Database = {
           chapters_count: number
           chapters_text: string | null
           created_at: string
+          duration_minutes: number | null
           id: string
           notes: string | null
           plan_id: string | null
-          read_date: string
+          reading_date: string
+          updated_at: string | null
           user_id: string
         }
         Insert: {
           chapters_count?: number
           chapters_text?: string | null
           created_at?: string
+          duration_minutes?: number | null
           id?: string
           notes?: string | null
           plan_id?: string | null
-          read_date?: string
+          reading_date?: string
+          updated_at?: string | null
           user_id: string
         }
         Update: {
           chapters_count?: number
           chapters_text?: string | null
           created_at?: string
+          duration_minutes?: number | null
           id?: string
           notes?: string | null
           plan_id?: string | null
-          read_date?: string
+          reading_date?: string
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
+      }
+      reading_passages: {
+        Row: {
+          book_id: string
+          created_at: string | null
+          end_chapter: number | null
+          end_verse: number | null
+          id: string
+          is_full_chapter: boolean | null
+          reading_log_id: string
+          start_chapter: number
+          start_verse: number | null
+          user_id: string
+        }
+        Insert: {
+          book_id: string
+          created_at?: string | null
+          end_chapter?: number | null
+          end_verse?: number | null
+          id?: string
+          is_full_chapter?: boolean | null
+          reading_log_id: string
+          start_chapter: number
+          start_verse?: number | null
+          user_id: string
+        }
+        Update: {
+          book_id?: string
+          created_at?: string | null
+          end_chapter?: number | null
+          end_verse?: number | null
+          id?: string
+          is_full_chapter?: boolean | null
+          reading_log_id?: string
+          start_chapter?: number
+          start_verse?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reading_passages_reading_log_id_fkey"
+            columns: ["reading_log_id"]
+            isOneToOne: false
+            referencedRelation: "reading_logs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reading_plans: {
         Row: {
@@ -291,6 +344,13 @@ export type Database = {
       }
     }
     Functions: {
+      calculate_user_streak: {
+        Args: { _user_id: string }
+        Returns: {
+          current_streak: number
+          longest_streak: number
+        }[]
+      }
       is_group_member: {
         Args: { _group_id: string; _user_id: string }
         Returns: boolean

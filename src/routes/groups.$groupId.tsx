@@ -48,7 +48,7 @@ type Activity = {
   id: string;
   user_id: string;
   created_at: string;
-  read_date: string;
+  reading_date: string;
   chapters_count: number;
   notes: string | null;
   plan_title: string | null;
@@ -143,7 +143,7 @@ function GroupDetail() {
         .from("reading_logs")
         .select("user_id, chapters_count")
         .in("user_id", ids)
-        .gte("read_date", wkStart);
+        .gte("reading_date", wkStart);
       const chapterMap = new Map<string, number>();
       (logs ?? []).forEach((l) => {
         chapterMap.set(l.user_id, (chapterMap.get(l.user_id) ?? 0) + (l.chapters_count ?? 0));
@@ -156,8 +156,12 @@ function GroupDetail() {
         streak: p.current_streak ?? 0,
       }));
       
-      // Ranking logic with ties
-      stats.sort((a, b) => b.chapters - a.chapters || b.streak - a.streak || a.user_id.localeCompare(b.user_id));
+      // Enhanced ranking logic with streak and activity timestamp as tie-breakers
+      stats.sort((a, b) => {
+        if (b.chapters !== a.chapters) return b.chapters - a.chapters;
+        if (b.streak !== a.streak) return b.streak - a.streak;
+        return a.user_id.localeCompare(b.user_id);
+      });
       
       const rankedStats = stats.map((s, idx) => {
         let rank = idx + 1;
@@ -188,7 +192,7 @@ function GroupDetail() {
       const ids = members.map((m) => m.user_id);
       const { data: logs } = await supabase
         .from("reading_logs")
-        .select("id, user_id, created_at, read_date, chapters_count, notes, plan_id")
+        .select("id, user_id, created_at, reading_date, chapters_count, notes, plan_id")
         .in("user_id", ids)
         .order("created_at", { ascending: false })
         .limit(50);
@@ -209,7 +213,7 @@ function GroupDetail() {
         id: l.id,
         user_id: l.user_id,
         created_at: l.created_at,
-        read_date: l.read_date,
+        reading_date: l.reading_date,
         chapters_count: l.chapters_count,
         notes: l.notes,
         plan_title: l.plan_id ? planMap.get(l.plan_id) ?? null : null,

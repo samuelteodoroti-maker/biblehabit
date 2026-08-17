@@ -43,7 +43,7 @@ function Row({ children }: { children: React.ReactNode }) {
   return <div className="flex items-center gap-3 p-4">{children}</div>;
 }
 
-type ActivityLog = { id: string; read_date: string; chapters_count: number; chapters_text: string | null };
+type ActivityLog = { id: string; reading_date: string; chapters_count: number; notes: string | null };
 
 function SettingsPage() {
   const navigate = useNavigate();
@@ -107,9 +107,9 @@ function SettingsPage() {
           .maybeSingle(),
         supabase
           .from("reading_logs")
-          .select("id, read_date, chapters_count, chapters_text")
+          .select("id, reading_date, chapters_count, notes")
           .eq("user_id", user.id)
-          .order("read_date", { ascending: false })
+          .order("reading_date", { ascending: false })
           .limit(10),
       ]);
       if (cancelled) return;
@@ -231,9 +231,9 @@ function SettingsPage() {
             <div key={l.id} className="p-4">
               <div className="flex justify-between text-sm">
                 <span className="font-semibold">
-                  {l.chapters_text ?? `${l.chapters_count} ${l.chapters_count === 1 ? "capítulo" : "capítulos"}`}
+                  {l.notes ?? `${l.chapters_count} ${l.chapters_count === 1 ? "capítulo" : "capítulos"}`}
                 </span>
-                <span className="text-xs text-muted-foreground">{l.read_date}</span>
+                <span className="text-xs text-muted-foreground">{l.reading_date}</span>
               </div>
             </div>
           ))
