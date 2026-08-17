@@ -388,9 +388,9 @@ function ProgressPage() {
             Crie o primeiro para começar sua jornada.
           </p>
         </Card>
-      )}
+      ) : (
+        <div className="space-y-3">
 
-      <div className="space-y-3">
         {plans.map((p) => {
           const pct = p.total_days > 0 ? (p.completed_days / p.total_days) * 100 : 0;
           return (
