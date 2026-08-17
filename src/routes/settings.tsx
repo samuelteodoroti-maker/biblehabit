@@ -30,7 +30,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   return (
     <div className="mb-6">
       <h2 className="mb-2.5 px-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
-        {title}
+        {title.charAt(0).toUpperCase() + title.slice(1).toLowerCase()}
       </h2>
       <Card className="divide-y divide-border/60 border-border/60 bg-card/70 backdrop-blur-sm">
         {children}
@@ -157,7 +157,7 @@ function SettingsPage() {
       <Section title="Minha conta">
         <Row>
           <Avatar className="h-14 w-14 ring-2 ring-primary/30">
-            {effectiveAvatar && <AvatarImage src={effectiveAvatar} />}
+            {effectiveAvatar && <AvatarImage src={effectiveAvatar} alt={`Foto de perfil de ${displayName}`} />}
             <AvatarFallback className="gradient-primary text-primary-foreground">
               {initial}
             </AvatarFallback>
@@ -169,12 +169,12 @@ function SettingsPage() {
         </Row>
         <div className="space-y-3 p-4">
           <div className="space-y-1.5">
-            <Label className="text-xs">Nome</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} className="h-10 rounded-xl" placeholder="Seu nome" />
+            <Label htmlFor="settings-name" className="text-xs">Nome</Label>
+            <Input id="settings-name" value={name} onChange={(e) => setName(e.target.value)} className="h-10 rounded-xl" placeholder="Seu nome" />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs">E-mail</Label>
-            <Input value={email} disabled className="h-10 rounded-xl" />
+            <Label htmlFor="settings-email" className="text-xs">E-mail</Label>
+            <Input id="settings-email" value={email} disabled className="h-10 rounded-xl" />
           </div>
           <Button
             className="h-11 w-full rounded-xl gradient-primary font-semibold text-primary-foreground shadow-glow hover:brightness-110"
@@ -199,10 +199,12 @@ function SettingsPage() {
           </div>
           <div className="flex gap-2">
             <Input
+              id="youversion-link"
               placeholder="https://bible.com/users/..."
               value={youVersion}
               onChange={(e) => setYouVersion(e.target.value)}
               className="h-10 rounded-xl"
+              aria-label="Link do perfil YouVersion"
             />
             <Button className="h-10 rounded-xl" onClick={handleSave} disabled={saving}>
               Salvar
@@ -249,7 +251,7 @@ function SettingsPage() {
               Avisamos se você ainda não leu hoje
             </p>
           </div>
-          <Switch checked={reminderEnabled} onCheckedChange={toggleReminder} />
+          <Switch id="reminders-toggle" checked={reminderEnabled} onCheckedChange={toggleReminder} aria-checked={reminderEnabled} />
         </Row>
         {reminderEnabled && (
           <Row>
@@ -261,10 +263,12 @@ function SettingsPage() {
               <p className="text-xs text-muted-foreground">Escolha quando ser avisado</p>
             </div>
             <Input
+              id="reminder-time"
               type="time"
               value={reminderTime}
               onChange={(e) => updateReminderTime(e.target.value)}
               className="h-10 w-28 rounded-xl"
+              aria-label="Hora do lembrete diário"
             />
           </Row>
         )}
@@ -281,7 +285,7 @@ function SettingsPage() {
             </p>
             <p className="text-xs text-muted-foreground">Alternar entre claro e escuro</p>
           </div>
-          <Button size="sm" variant="outline" onClick={toggle}>
+          <Button size="sm" variant="outline" onClick={toggle} aria-label={`Alternar para tema ${theme === 'dark' ? 'claro' : 'escuro'}`}>
             Alternar
           </Button>
         </Row>

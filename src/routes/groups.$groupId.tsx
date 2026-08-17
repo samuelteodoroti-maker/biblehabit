@@ -155,9 +155,17 @@ function GroupDetail() {
         chapters: chapterMap.get(p.id) ?? 0,
         streak: p.current_streak ?? 0,
       }));
-      stats.sort((a, b) => b.chapters - a.chapters || b.streak - a.streak);
+      stats.sort((a, b) => b.chapters - a.chapters || b.streak - a.streak || a.user_id.localeCompare(b.user_id));
+      
+      const rankedStats = stats.map((s, idx) => {
+        const rank = idx > 0 && stats[idx-1].chapters === s.chapters && stats[idx-1].streak === s.streak
+          ? (stats as any)[idx-1].rank
+          : idx + 1;
+        return { ...s, rank };
+      });
+      
       if (cancelled) return;
-      setMembers(stats);
+      setMembers(rankedStats as any);
       setLoading(false);
     })();
     return () => {
@@ -398,7 +406,7 @@ function GroupDetail() {
           <TabsTrigger value="leaderboard" className="rounded-xl gap-1.5 text-xs">
             <Trophy className="h-3.5 w-3.5" /> Ranking
           </TabsTrigger>
-          <TabsTrigger value="invite" className="rounded-xl gap-1.5 text-xs">
+          <TabsTrigger value="invite" className="rounded-xl gap-1.5 text-xs" aria-label="Gerar código de convite">
             <Copy className="h-3.5 w-3.5" /> Convite
           </TabsTrigger>
         </TabsList>

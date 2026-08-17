@@ -115,10 +115,11 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
                 className="h-10 w-10 rounded-full"
                 onClick={() => setChapters((c) => Math.max(1, c - 1))}
                 disabled={chapters <= 1}
+                aria-label="Diminuir quantidade de capítulos"
               >
                 <Minus className="h-4 w-4" />
               </Button>
-              <span className="min-w-16 text-center font-display text-4xl font-bold gradient-text">
+              <span className="min-w-16 text-center font-display text-4xl font-bold gradient-text" aria-live="polite">
                 {chapters}
               </span>
               <Button
@@ -127,6 +128,7 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
                 variant="outline"
                 className="h-10 w-10 rounded-full"
                 onClick={() => setChapters((c) => c + 1)}
+                aria-label="Aumentar quantidade de capítulos"
               >
                 <Plus className="h-4 w-4" />
               </Button>
@@ -156,7 +158,7 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
             onClick={save}
           >
             {saving ? <Loader2 className="h-5 w-5 animate-spin" /> : <BookOpenCheck className="h-5 w-5" />}
-            Salvar leitura
+            {saving ? "Salvando..." : "Salvar leitura"}
           </Button>
         </div>
       </DialogContent>

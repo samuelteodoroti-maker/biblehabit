@@ -202,8 +202,8 @@ function GroupsPage() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCreateOpen(false)}>Cancelar</Button>
-            <Button onClick={handleCreate} disabled={busy || !newName.trim()}>
+            <Button variant="outline" onClick={() => setCreateOpen(false)} disabled={busy} aria-label="Cancelar criação de grupo">Cancelar</Button>
+            <Button onClick={handleCreate} disabled={busy || !newName.trim()} aria-label="Criar novo grupo">
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Criar"}
             </Button>
           </DialogFooter>
