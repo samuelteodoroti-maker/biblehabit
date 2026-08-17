@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
-import { UserRole } from "./useAuth";
+
+export type UserRole = "admin" | "moderator" | "user";
 
 export async function checkIsAdmin(): Promise<boolean> {
   const { data: { user } } = await supabase.auth.getUser();

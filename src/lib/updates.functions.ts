@@ -3,14 +3,14 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 
 export const getUpdates = createServerFn({ method: "GET" })
-  .input(z.object({
+  .validator((data: any) => z.object({
     status: z.enum(['draft', 'scheduled', 'published', 'archived']).optional(),
     limit: z.number().optional().default(20),
     offset: z.number().optional().default(0),
     category: z.string().optional(),
     year: z.number().optional(),
     search: z.string().optional(),
-  }))
+  }).parse(data))
   .handler(async ({ data }) => {
     let query = supabase
       .from("app_updates")
@@ -45,7 +45,7 @@ export const getUpdates = createServerFn({ method: "GET" })
   });
 
 export const getUpdateBySlug = createServerFn({ method: "GET" })
-  .input(z.object({ slug: z.string() }))
+  .validator((data: any) => z.object({ slug: z.string() }).parse(data))
   .handler(async ({ data }) => {
     const { data: update, error } = await supabase
       .from("app_updates")
