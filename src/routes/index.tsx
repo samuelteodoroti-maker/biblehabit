@@ -37,6 +37,7 @@ function HomePage() {
   const { user } = useAuth();
   const { profile, activePlan, logDates, loading, today, refresh } = useReadingData();
   const [modalOpen, setModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(today);
 
   const registeredToday = logDates.has(today);
   const now = useMemo(() => new Date(), []);
@@ -49,13 +50,21 @@ function HomePage() {
   const streak = profile?.current_streak ?? 0;
   const total = profile?.total_chapters_read ?? 0;
 
-  const openRegister = () => {
+  const openRegister = (date?: string) => {
     if (!user) {
       toast.info("Entre para registrar sua leitura");
       navigate({ to: "/auth" });
       return;
     }
-    if (registeredToday) return;
+    const targetDate = date || today;
+    
+    // Prevent future dates
+    if (new Date(targetDate + "T12:00:00") > new Date()) {
+      toast.error("Não é possível registrar leituras em datas futuras.");
+      return;
+    }
+
+    setSelectedDate(targetDate);
     setModalOpen(true);
   };
 
@@ -160,8 +169,8 @@ function HomePage() {
               ? "bg-success/15 text-success hover:bg-success/20"
               : "gradient-primary text-primary-foreground shadow-glow hover:brightness-110"
           }`}
-          disabled={registeredToday || loading}
-          onClick={openRegister}
+          disabled={loading}
+          onClick={() => openRegister(today)}
         >
           {registeredToday ? (
             <Check className="h-5 w-5" />
@@ -186,6 +195,7 @@ function HomePage() {
           month={currentMonth}
           today={today}
           readDates={logDates}
+          onDateClick={openRegister}
         />
       )}
 
@@ -194,7 +204,7 @@ function HomePage() {
           open={modalOpen}
           onOpenChange={setModalOpen}
           userId={user.id}
-          today={today}
+          today={selectedDate}
           onSaved={refresh}
         />
       )}

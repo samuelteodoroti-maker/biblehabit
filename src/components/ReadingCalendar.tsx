@@ -9,6 +9,7 @@ interface ReadingCalendarProps {
   readDates: Set<string>;
   today?: string;
   className?: string;
+  onDateClick?: (date: string) => void;
 }
 
 export function ReadingCalendar({
@@ -17,6 +18,7 @@ export function ReadingCalendar({
   readDates,
   today,
   className,
+  onDateClick,
 }: ReadingCalendarProps) {
   const monthLabel = new Date(Date.UTC(year, month, 1)).toLocaleDateString("pt-BR", {
     month: "long",
@@ -66,26 +68,27 @@ export function ReadingCalendar({
           const isToday = !isEmpty && today === key;
 
           return (
-            <div
+            <button
               key={key}
+              type="button"
+              onClick={() => !isEmpty && onDateClick?.(key)}
+              disabled={isEmpty}
               className={cn(
-                "relative flex aspect-square items-center justify-center rounded-xl text-[13px] font-medium transition-all",
+                "relative flex aspect-square items-center justify-center rounded-xl text-[13px] font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                 isEmpty && "invisible",
                 isRead
-                  ? "text-primary-foreground shadow-glow gradient-primary"
-                  : "border border-border/50 bg-background/40 text-foreground/80",
+                  ? "text-primary-foreground shadow-glow gradient-primary hover:brightness-110"
+                  : "border border-border/50 bg-background/40 text-foreground/80 hover:bg-background/60",
                 isToday && !isRead && "ring-2 ring-primary/70 ring-offset-2 ring-offset-background",
               )}
-              title={
+              aria-label={
                 isEmpty
                   ? undefined
-                  : isRead
-                    ? `${key}: leitura registrada`
-                    : `${key}: sem leitura`
+                  : `${dayNumber} de ${monthLabel}${isRead ? ", leitura registrada" : ", sem leitura"}`
               }
             >
               {isEmpty ? null : dayNumber}
-            </div>
+            </button>
           );
         })}
       </div>
