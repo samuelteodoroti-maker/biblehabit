@@ -53,7 +53,7 @@ function greeting() {
 
 function HomePage() {
   const navigate = useNavigate();
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, role } = useAuth();
   const { profile, activePlan, logDates, loading, today, refresh } = useReadingData();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(today);
