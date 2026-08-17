@@ -1,11 +1,24 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
+import { AdminLayout } from "@/components/AdminLayout";
+import { useServerFn } from "@tanstack/react-start";
+import { getAdminDashboardStats } from "@/lib/admin.functions";
+import { useQuery } from "@tanstack/react-query";
+import { 
+  Users, 
+  BookOpen, 
+  Flame, 
+  AlertCircle,
+  TrendingUp,
+  Activity,
+  ShieldAlert,
+  History
+} from "lucide-react";
+import { BibleCard } from "@/components/BibleUI";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/admin/")({
-  beforeLoad: async ({ context }) => {
-    // We check the admin status from the client/hook context if available
-    // But since this is a route, we could add a server check or just rely on AdminGuard component
-  },
+export const Route = createFileRoute("/")({
   component: AdminDashboard,
 });
 
