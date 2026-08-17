@@ -19,11 +19,25 @@ export type ActivePlan = {
   total_days: number;
 };
 
+export type DetailedLog = {
+  id: string;
+  reading_date: string;
+  chapters_count: number;
+  notes: string | null;
+  duration_minutes: number | null;
+  reading_passages: {
+    book_id: string;
+    start_chapter: number;
+    end_chapter: number;
+  }[];
+};
+
 export function useReadingData() {
   const { user, loading: authLoading } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [activePlan, setActivePlan] = useState<ActivePlan | null>(null);
   const [logDates, setLogDates] = useState<Set<string>>(new Set());
+  const [recentLogs, setRecentLogs] = useState<DetailedLog[]>([]);
   const [loading, setLoading] = useState(true);
 
   const pad = (n: number) => String(n).padStart(2, "0");
@@ -51,7 +65,7 @@ export function useReadingData() {
       // Fetch logs
       const { data: logs } = await supabase
         .from("reading_logs")
-        .select("reading_date")
+        .select("id, reading_date, chapters_count, notes, duration_minutes, reading_passages(book_id, start_chapter, end_chapter)")
         .eq("user_id", user.id)
         .order("reading_date", { ascending: false })
         .limit(365);
@@ -67,6 +81,7 @@ export function useReadingData() {
       const finalPlan = allPlans?.find(p => (p.completed_days ?? 0) < (p.total_days ?? 0)) || allPlans?.[0];
       
       setProfile(p as Profile | null);
+      setRecentLogs((logs as any) ?? []);
       setLogDates(new Set((logs ?? []).map(l => l.reading_date)));
       setActivePlan(finalPlan as ActivePlan | null);
     } catch (error) {
@@ -87,6 +102,7 @@ export function useReadingData() {
     profile,
     activePlan,
     logDates,
+    recentLogs,
     loading: authLoading || loading,
     today,
     refresh: fetchData
