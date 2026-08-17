@@ -209,7 +209,7 @@ function GroupDetail() {
         id: l.id,
         user_id: l.user_id,
         created_at: l.created_at,
-        read_date: l.read_date,
+        reading_date: l.reading_date,
         chapters_count: l.chapters_count,
         notes: l.notes,
         plan_title: l.plan_id ? planMap.get(l.plan_id) ?? null : null,
