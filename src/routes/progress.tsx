@@ -310,7 +310,7 @@ function ProgressPage() {
     <AppShell title="Planos de leitura" subtitle="Crie e acompanhe suas jornadas">
       {insights.hasData && (
         <div className="mb-6 space-y-3">
-          <h2 className="px-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+          <h2 className="px-1 text-[11px] font-semibold tracking-[0.15em] text-muted-foreground">
             Insights pessoais
           </h2>
 
@@ -525,8 +525,9 @@ function ProgressPage() {
               </div>
             )}
             <div className="space-y-1.5">
-              <Label className="text-xs">Dias</Label>
+              <Label htmlFor="plan-days" className="text-xs">Dias</Label>
               <Input
+                id="plan-days"
                 type="number"
                 min={1}
                 value={form.totalDays}
