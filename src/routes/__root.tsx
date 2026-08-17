@@ -119,7 +119,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
               "@type": "Organization",
               name: "Bible Habit",
               url: "https://biblehabit.lovable.app",
-              logo: "https://biblehabit.lovable.app/favicon.ico",
+              logo: "https://biblehabit.lovable.app/favicon.png",
             },
             {
               "@type": "WebSite",
@@ -140,6 +140,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Figtree:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap",
       },
       { rel: "stylesheet", href: appCss },
+      { rel: "icon", type: "image/png", href: "/favicon.png" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
     ],
   }),
 
