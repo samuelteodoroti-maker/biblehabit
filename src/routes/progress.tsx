@@ -345,8 +345,8 @@ function ProgressPage() {
         {insights.loading ? (
           <Skeleton className="h-[176px] rounded-2xl" />
         ) : insights.hasData ? (
-          <Card className="border-border/60 bg-card/70 p-6 backdrop-blur-sm rounded-3xl">
-            <p className="mb-2 text-[11px] font-medium text-muted-foreground">
+          <Card className="border-border/50 bg-card/80 p-8 backdrop-blur-xl rounded-[2.5rem] shadow-card">
+            <p className="mb-4 small-label text-muted-foreground/60">
               Últimos 7 dias
             </p>
             <div className="h-40 md:h-56">
@@ -377,11 +377,11 @@ function ProgressPage() {
 
       <Button
         onClick={openNew}
-        className="mb-8 h-14 w-full gap-2 rounded-2xl gradient-primary font-bold text-primary-foreground shadow-glow hover:brightness-110"
+        className="mb-10 h-16 w-full gap-3 rounded-[1.5rem] gradient-primary text-lg font-bold text-primary-foreground shadow-glow-lg hover:brightness-110 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300"
         disabled={!user || loading}
         aria-label="Criar novo plano de leitura"
       >
-        <Plus className="h-4 w-4" /> Novo plano
+        <Plus className="h-6 w-6" /> Novo plano
       </Button>
 
       {loading ? (
@@ -417,7 +417,7 @@ function ProgressPage() {
             return (
               <Card
                 key={p.id}
-                className="paper-texture flex flex-col justify-between border-border/60 bg-card/70 p-6 backdrop-blur-sm transition-all hover:-translate-y-1 hover:shadow-card rounded-[2rem]"
+                className="paper-texture flex flex-col justify-between border-border/50 bg-card/80 p-8 backdrop-blur-xl transition-all duration-500 ease-out hover:-translate-y-2 hover:shadow-2xl hover:border-primary/20 rounded-[2.5rem]"
               >
                 <div>
                   <div className="mb-4 flex items-center justify-between">
