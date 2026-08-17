@@ -20,9 +20,17 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AchievementsRouteImport } from './routes/achievements'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GroupsIndexRouteImport } from './routes/groups.index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as UpdatesSlugRouteImport } from './routes/updates.$slug'
 import { Route as GroupsGroupIdRouteImport } from './routes/groups.$groupId'
+import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminUpdatesRouteImport } from './routes/admin.updates'
+import { Route as AdminSupportRouteImport } from './routes/admin/support'
+import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
+import { Route as AdminSecurityRouteImport } from './routes/admin/security'
+import { Route as AdminAuditRouteImport } from './routes/admin/audit'
+import { Route as AdminAccessRouteImport } from './routes/admin/access'
+import { Route as AdminUsersUserIdRouteImport } from './routes/admin/users.$userId'
 
 const UpdatesRoute = UpdatesRouteImport.update({
   id: '/updates',
@@ -79,6 +87,11 @@ const GroupsIndexRoute = GroupsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => GroupsRoute,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UpdatesSlugRoute = UpdatesSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -89,10 +102,45 @@ const GroupsGroupIdRoute = GroupsGroupIdRouteImport.update({
   path: '/$groupId',
   getParentRoute: () => GroupsRoute,
 } as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminUpdatesRoute = AdminUpdatesRouteImport.update({
   id: '/admin/updates',
   path: '/admin/updates',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminSupportRoute = AdminSupportRouteImport.update({
+  id: '/admin/support',
+  path: '/admin/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/admin/settings',
+  path: '/admin/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminSecurityRoute = AdminSecurityRouteImport.update({
+  id: '/admin/security',
+  path: '/admin/security',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAuditRoute = AdminAuditRouteImport.update({
+  id: '/admin/audit',
+  path: '/admin/audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAccessRoute = AdminAccessRouteImport.update({
+  id: '/admin/access',
+  path: '/admin/access',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminUsersUserIdRoute = AdminUsersUserIdRouteImport.update({
+  id: '/$userId',
+  path: '/$userId',
+  getParentRoute: () => AdminUsersRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -106,10 +154,18 @@ export interface FileRoutesByFullPath {
   '/statistics': typeof StatisticsRoute
   '/support': typeof SupportRoute
   '/updates': typeof UpdatesRouteWithChildren
+  '/admin/access': typeof AdminAccessRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/security': typeof AdminSecurityRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/support': typeof AdminSupportRoute
   '/admin/updates': typeof AdminUpdatesRoute
+  '/admin/users': typeof AdminUsersRouteWithChildren
   '/groups/$groupId': typeof GroupsGroupIdRoute
   '/updates/$slug': typeof UpdatesSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/groups/': typeof GroupsIndexRoute
+  '/admin/users/$userId': typeof AdminUsersUserIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -121,10 +177,18 @@ export interface FileRoutesByTo {
   '/statistics': typeof StatisticsRoute
   '/support': typeof SupportRoute
   '/updates': typeof UpdatesRouteWithChildren
+  '/admin/access': typeof AdminAccessRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/security': typeof AdminSecurityRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/support': typeof AdminSupportRoute
   '/admin/updates': typeof AdminUpdatesRoute
+  '/admin/users': typeof AdminUsersRouteWithChildren
   '/groups/$groupId': typeof GroupsGroupIdRoute
   '/updates/$slug': typeof UpdatesSlugRoute
+  '/admin': typeof AdminIndexRoute
   '/groups': typeof GroupsIndexRoute
+  '/admin/users/$userId': typeof AdminUsersUserIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -138,10 +202,18 @@ export interface FileRoutesById {
   '/statistics': typeof StatisticsRoute
   '/support': typeof SupportRoute
   '/updates': typeof UpdatesRouteWithChildren
+  '/admin/access': typeof AdminAccessRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/security': typeof AdminSecurityRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/support': typeof AdminSupportRoute
   '/admin/updates': typeof AdminUpdatesRoute
+  '/admin/users': typeof AdminUsersRouteWithChildren
   '/groups/$groupId': typeof GroupsGroupIdRoute
   '/updates/$slug': typeof UpdatesSlugRoute
+  '/admin/': typeof AdminIndexRoute
   '/groups/': typeof GroupsIndexRoute
+  '/admin/users/$userId': typeof AdminUsersUserIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -156,10 +228,18 @@ export interface FileRouteTypes {
     | '/statistics'
     | '/support'
     | '/updates'
+    | '/admin/access'
+    | '/admin/audit'
+    | '/admin/security'
+    | '/admin/settings'
+    | '/admin/support'
     | '/admin/updates'
+    | '/admin/users'
     | '/groups/$groupId'
     | '/updates/$slug'
+    | '/admin/'
     | '/groups/'
+    | '/admin/users/$userId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -171,10 +251,18 @@ export interface FileRouteTypes {
     | '/statistics'
     | '/support'
     | '/updates'
+    | '/admin/access'
+    | '/admin/audit'
+    | '/admin/security'
+    | '/admin/settings'
+    | '/admin/support'
     | '/admin/updates'
+    | '/admin/users'
     | '/groups/$groupId'
     | '/updates/$slug'
+    | '/admin'
     | '/groups'
+    | '/admin/users/$userId'
   id:
     | '__root__'
     | '/'
@@ -187,10 +275,18 @@ export interface FileRouteTypes {
     | '/statistics'
     | '/support'
     | '/updates'
+    | '/admin/access'
+    | '/admin/audit'
+    | '/admin/security'
+    | '/admin/settings'
+    | '/admin/support'
     | '/admin/updates'
+    | '/admin/users'
     | '/groups/$groupId'
     | '/updates/$slug'
+    | '/admin/'
     | '/groups/'
+    | '/admin/users/$userId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -204,7 +300,14 @@ export interface RootRouteChildren {
   StatisticsRoute: typeof StatisticsRoute
   SupportRoute: typeof SupportRoute
   UpdatesRoute: typeof UpdatesRouteWithChildren
+  AdminAccessRoute: typeof AdminAccessRoute
+  AdminAuditRoute: typeof AdminAuditRoute
+  AdminSecurityRoute: typeof AdminSecurityRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminSupportRoute: typeof AdminSupportRoute
   AdminUpdatesRoute: typeof AdminUpdatesRoute
+  AdminUsersRoute: typeof AdminUsersRouteWithChildren
+  AdminIndexRoute: typeof AdminIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -286,6 +389,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GroupsIndexRouteImport
       parentRoute: typeof GroupsRoute
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/updates/$slug': {
       id: '/updates/$slug'
       path: '/$slug'
@@ -300,12 +410,61 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GroupsGroupIdRouteImport
       parentRoute: typeof GroupsRoute
     }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/admin/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/updates': {
       id: '/admin/updates'
       path: '/admin/updates'
       fullPath: '/admin/updates'
       preLoaderRoute: typeof AdminUpdatesRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/support': {
+      id: '/admin/support'
+      path: '/admin/support'
+      fullPath: '/admin/support'
+      preLoaderRoute: typeof AdminSupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/admin/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/security': {
+      id: '/admin/security'
+      path: '/admin/security'
+      fullPath: '/admin/security'
+      preLoaderRoute: typeof AdminSecurityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/audit': {
+      id: '/admin/audit'
+      path: '/admin/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AdminAuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/access': {
+      id: '/admin/access'
+      path: '/admin/access'
+      fullPath: '/admin/access'
+      preLoaderRoute: typeof AdminAccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/users/$userId': {
+      id: '/admin/users/$userId'
+      path: '/$userId'
+      fullPath: '/admin/users/$userId'
+      preLoaderRoute: typeof AdminUsersUserIdRouteImport
+      parentRoute: typeof AdminUsersRoute
     }
   }
 }
@@ -334,6 +493,18 @@ const UpdatesRouteChildren: UpdatesRouteChildren = {
 const UpdatesRouteWithChildren =
   UpdatesRoute._addFileChildren(UpdatesRouteChildren)
 
+interface AdminUsersRouteChildren {
+  AdminUsersUserIdRoute: typeof AdminUsersUserIdRoute
+}
+
+const AdminUsersRouteChildren: AdminUsersRouteChildren = {
+  AdminUsersUserIdRoute: AdminUsersUserIdRoute,
+}
+
+const AdminUsersRouteWithChildren = AdminUsersRoute._addFileChildren(
+  AdminUsersRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AchievementsRoute: AchievementsRoute,
@@ -345,7 +516,14 @@ const rootRouteChildren: RootRouteChildren = {
   StatisticsRoute: StatisticsRoute,
   SupportRoute: SupportRoute,
   UpdatesRoute: UpdatesRouteWithChildren,
+  AdminAccessRoute: AdminAccessRoute,
+  AdminAuditRoute: AdminAuditRoute,
+  AdminSecurityRoute: AdminSecurityRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminSupportRoute: AdminSupportRoute,
   AdminUpdatesRoute: AdminUpdatesRoute,
+  AdminUsersRoute: AdminUsersRouteWithChildren,
+  AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_logs: {
+        Row: {
+          action: string
+          admin_id: string
+          affected_user_id: string | null
+          created_at: string | null
+          details: Json | null
+          id: string
+          reason: string | null
+          resource_id: string | null
+          resource_type: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          affected_user_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          reason?: string | null
+          resource_id?: string | null
+          resource_type: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          affected_user_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          reason?: string | null
+          resource_id?: string | null
+          resource_type?: string
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: []
+      }
       app_updates: {
         Row: {
           accessibility_changes: string[] | null
@@ -175,6 +214,8 @@ export type Database = {
           last_read_date: string | null
           longest_streak: number
           name: string | null
+          status: string | null
+          suspension_reason: string | null
           total_chapters_read: number
           updated_at: string
           youversion_link: string | null
@@ -188,6 +229,8 @@ export type Database = {
           last_read_date?: string | null
           longest_streak?: number
           name?: string | null
+          status?: string | null
+          suspension_reason?: string | null
           total_chapters_read?: number
           updated_at?: string
           youversion_link?: string | null
@@ -201,6 +244,8 @@ export type Database = {
           last_read_date?: string | null
           longest_streak?: number
           name?: string | null
+          status?: string | null
+          suspension_reason?: string | null
           total_chapters_read?: number
           updated_at?: string
           youversion_link?: string | null
@@ -373,20 +418,86 @@ export type Database = {
         }
         Relationships: []
       }
-      user_roles: {
+      support_sessions: {
         Row: {
+          admin_id: string
+          closed_at: string | null
+          created_at: string | null
+          expires_at: string
           id: string
-          role: Database["public"]["Enums"]["app_role"]
+          reason: string
+          status: string | null
+          target_user_id: string
+        }
+        Insert: {
+          admin_id: string
+          closed_at?: string | null
+          created_at?: string | null
+          expires_at: string
+          id?: string
+          reason: string
+          status?: string | null
+          target_user_id: string
+        }
+        Update: {
+          admin_id?: string
+          closed_at?: string | null
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          reason?: string
+          status?: string | null
+          target_user_id?: string
+        }
+        Relationships: []
+      }
+      user_access_events: {
+        Row: {
+          created_at: string | null
+          event_type: string
+          id: string
+          metadata: Json | null
           user_id: string
         }
         Insert: {
+          created_at?: string | null
+          event_type: string
           id?: string
-          role: Database["public"]["Enums"]["app_role"]
+          metadata?: Json | null
           user_id: string
         }
         Update: {
+          created_at?: string | null
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
@@ -429,6 +540,7 @@ export type Database = {
           longest_streak: number
         }[]
       }
+      has_any_admin_role: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -443,7 +555,13 @@ export type Database = {
       join_group_by_code: { Args: { _code: string }; Returns: string }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user"
+      app_role:
+        | "admin"
+        | "moderator"
+        | "user"
+        | "super_admin"
+        | "support"
+        | "analyst"
       update_status: "draft" | "scheduled" | "published" | "archived"
     }
     CompositeTypes: {
@@ -572,7 +690,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user"],
+      app_role: [
+        "admin",
+        "moderator",
+        "user",
+        "super_admin",
+        "support",
+        "analyst",
+      ],
       update_status: ["draft", "scheduled", "published", "archived"],
     },
   },
