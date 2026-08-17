@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { Sun, Moon, LogOut, ChevronRight, Loader2, Bell } from "lucide-react";
+import { Sun, Moon, LogOut, ChevronRight, Loader2, Bell, HelpCircle } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
@@ -283,6 +283,34 @@ function SettingsPage() {
           </Row>
         )}
       </Section>
+
+      <Section title="Informações">
+        <Link to="/updates" className="flex items-center justify-between p-4 transition-colors hover:bg-accent/50">
+          <div className="flex items-center gap-3">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent/60">
+              <Bell className="h-4 w-4" aria-hidden="true" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold">Novidades</p>
+              <p className="text-xs text-muted-foreground">Notas de atualização e mudanças</p>
+            </div>
+          </div>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        </Link>
+        <Link to="/support" className="flex items-center justify-between p-4 transition-colors hover:bg-accent/50">
+          <div className="flex items-center gap-3">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent/60">
+              <HelpCircle className="h-4 w-4" aria-hidden="true" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold">Suporte</p>
+              <p className="text-xs text-muted-foreground">Precisa de ajuda com o app?</p>
+            </div>
+          </div>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        </Link>
+      </Section>
+
 
       <Section title="Aparência">
         <Row>

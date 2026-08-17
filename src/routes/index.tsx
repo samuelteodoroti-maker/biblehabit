@@ -1,15 +1,18 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { useMemo, useState, useEffect } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Flame, BookOpenCheck, CalendarDays, Sparkles, Check, ChevronRight, Book } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Flame, BookOpenCheck, CalendarDays, Sparkles, Check, ChevronRight, Book, Bell, X } from "lucide-react";
 import { ReadingCalendar } from "@/components/ReadingCalendar";
 import { LogReadingModal } from "@/components/LogReadingModal";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useReadingData } from "@/hooks/useReadingData";
+import { getUpdates } from "@/lib/updates.functions";
+import { APP_VERSION } from "@/lib/app-utils";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -34,10 +37,38 @@ function greeting() {
 
 function HomePage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { profile, activePlan, logDates, loading, today, refresh } = useReadingData();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(today);
+  const [latestUpdate, setLatestUpdate] = useState<any>(null);
+  const [showNotice, setShowNotice] = useState(false);
+
+  useEffect(() => {
+    const checkUpdates = async () => {
+      try {
+        const { updates } = await getUpdates({ data: { limit: 1 } });
+        if (updates && updates.length > 0) {
+          const update = updates[0];
+          const lastSeen = localStorage.getItem("bh_last_update_seen");
+          if (lastSeen !== update.version) {
+            setLatestUpdate(update);
+            setShowNotice(true);
+          }
+        }
+      } catch (e) {
+        console.error("Update check failed", e);
+      }
+    };
+    checkUpdates();
+  }, []);
+
+  const dismissNotice = () => {
+    if (latestUpdate) {
+      localStorage.setItem("bh_last_update_seen", latestUpdate.version);
+    }
+    setShowNotice(false);
+  };
 
   const registeredToday = logDates.has(today);
   const now = useMemo(() => new Date(), []);
@@ -70,6 +101,65 @@ function HomePage() {
 
   return (
     <AppShell>
+      {/* Update Notice */}
+      {showNotice && latestUpdate && (
+        <Card className="mb-6 relative overflow-hidden border-primary/30 bg-primary/5 p-4 backdrop-blur-sm ring-1 ring-primary/20 animate-in fade-in slide-in-from-top-4 duration-500">
+          <button 
+            onClick={dismissNotice}
+            className="absolute right-2 top-2 rounded-full p-1 text-muted-foreground hover:bg-primary/10 hover:text-foreground"
+            aria-label="Fechar aviso"
+          >
+            <X className="h-4 w-4" />
+          </button>
+          
+          <div className="flex items-start gap-3 pr-6">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/20 text-primary">
+              <Bell className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-[10px] font-bold uppercase tracking-wider text-primary">Novidade v{latestUpdate.version}</h3>
+                <Badge variant="secondary" className="h-4 bg-primary/20 text-[8px] font-bold text-primary">Novo</Badge>
+              </div>
+              <p className="mt-1 font-display text-base font-bold leading-tight">
+                {latestUpdate.title}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
+                {latestUpdate.summary}
+              </p>
+              <div className="mt-3 flex items-center gap-3">
+                <Link 
+                  to="/updates/$slug" 
+                  params={{ slug: latestUpdate.slug }}
+                  onClick={dismissNotice}
+                >
+                  <Button size="sm" className="h-8 rounded-lg gradient-primary px-4 text-[10px] font-bold">
+                    Ver novidades
+                  </Button>
+                </Link>
+                <button 
+                  onClick={dismissNotice}
+                  className="text-[10px] font-bold text-muted-foreground hover:text-foreground"
+                >
+                  Agora não
+                </button>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {/* Version info for admins */}
+      {isAdmin && (
+        <div className="mb-4 flex items-center justify-end">
+          <Link to="/admin/updates">
+            <Badge variant="outline" className="text-[9px] font-bold opacity-50 hover:opacity-100">
+              Painel Admin v{APP_VERSION}
+            </Badge>
+          </Link>
+        </div>
+      )}
+
       {/* Greeting */}
       <div className="mb-6">
         {loading ? (
