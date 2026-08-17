@@ -3,12 +3,14 @@ import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Flame, BookOpenCheck, CalendarDays, Sparkles, Check } from "lucide-react";
 import { ReadingCalendar } from "@/components/ReadingCalendar";
 import { LogReadingModal } from "@/components/LogReadingModal";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+
 
 
 export const Route = createFileRoute("/")({
