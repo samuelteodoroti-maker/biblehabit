@@ -478,7 +478,7 @@ function GroupDetail() {
                               aria-label={r.myAmen ? "Remover reação de amém" : "Reagir com amém"}
                               className={`flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs transition ${
                                 r.myAmen
-                                  ? "border-transparent bg-rose-500/20 text-rose-300"
+                                  ? "border-transparent bg-primary/20 text-primary-glow"
                                   : "border-border/60 bg-background/40 text-muted-foreground hover:text-foreground"
                               }`}
                             >
