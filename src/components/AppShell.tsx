@@ -27,12 +27,12 @@ export function AppShell({
 
       <div className="relative z-10 flex min-h-screen flex-col md:pl-64 lg:pl-72">
         {/* Top Header for Mobile & Tablet/Desktop context */}
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border/60 bg-background/80 px-6 backdrop-blur-xl md:h-20 lg:px-10">
+        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-border/40 bg-background/70 px-6 backdrop-blur-2xl md:h-24 lg:px-12 transition-all duration-300">
           <div className="flex flex-col">
             {title ? (
               <>
-                <h1 className="font-serif-title text-xl font-bold tracking-tight md:text-2xl">{title}</h1>
-                {subtitle && <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground md:text-xs">{subtitle}</p>}
+                <h1 className="font-serif-title text-2xl font-bold tracking-tight md:text-3xl lg:text-4xl">{title}</h1>
+                {subtitle && <p className="small-label mt-1 text-muted-foreground/60">{subtitle}</p>}
               </>
             ) : (
               <div className="flex items-center gap-2.5 md:hidden">

@@ -119,7 +119,7 @@ function HomePage() {
     <AppShell>
       {/* Update Notice Banner */}
       {showNotice && latestUpdate && (
-        <div className="mb-8 overflow-hidden rounded-[1.5rem] border border-primary/20 bg-primary/5 p-4 md:p-5 backdrop-blur-sm animate-in fade-in slide-in-from-top-4 duration-500 max-w-full">
+        <div className="mb-10 overflow-hidden rounded-[2rem] border border-primary/20 bg-primary/5 p-5 md:p-6 backdrop-blur-xl animate-in fade-in slide-in-from-top-6 duration-700 max-w-full shadow-lg shadow-primary/5">
            <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/20 text-primary">
@@ -184,22 +184,22 @@ function HomePage() {
             title="Constância na Palavra"
             subtitle="Ofensiva Diária"
             action={
-              <Badge variant="secondary" className="bg-biblical-gold/10 text-biblical-gold font-bold text-[10px] tracking-wider px-2 border-biblical-gold/20">
+              <Badge variant="secondary" className="bg-biblical-gold/10 text-biblical-gold font-bold text-[10px] tracking-widest px-3 py-1 border-biblical-gold/20 rounded-full">
                 Recorde: {profile?.longest_streak ?? 0}
               </Badge>
             }
           >
-            <div className="flex flex-col items-center py-4 md:flex-row md:justify-around md:py-6 gap-6">
+            <div className="flex flex-col items-center py-6 md:flex-row md:justify-around md:py-10 gap-8">
               <div className="text-center md:text-left">
-                <div className="flex items-baseline justify-center gap-2 md:justify-start">
-                  <span className="font-display text-7xl font-bold leading-none tracking-tighter text-foreground md:text-8xl">
+                <div className="flex items-baseline justify-center gap-2.5 md:justify-start">
+                  <span className="stat-number font-display font-bold leading-none tracking-tighter text-foreground">
                     {streak}
                   </span>
-                  <span className="font-serif-title text-xl font-bold italic text-muted-foreground">
+                  <span className="font-serif-title text-2xl font-bold italic text-muted-foreground/60">
                     {streak === 1 ? "dia" : "dias"}
                   </span>
                 </div>
-                <p className="mt-4 text-sm text-muted-foreground max-w-[280px]">
+                <p className="mt-5 text-base leading-relaxed text-muted-foreground max-w-[320px]">
                   {registeredToday
                     ? "Você já alimentou seu espírito hoje. Continue firme na caminhada!"
                     : streak === 0
@@ -211,10 +211,10 @@ function HomePage() {
               <div className="mt-8 flex w-full flex-col gap-3 md:mt-0 md:w-auto">
                 <Button
                   size="lg"
-                  className={`h-14 md:h-16 w-full gap-3 rounded-2xl text-base font-bold transition-all px-6 md:px-8 md:w-auto ${
+                  className={`h-16 md:h-20 w-full gap-4 rounded-3xl text-lg font-bold transition-all duration-300 px-8 md:w-auto hover:scale-[1.02] active:scale-[0.98] ${
                     registeredToday
-                      ? "bg-success/15 text-success hover:bg-success/20 border border-success/20"
-                      : "gradient-primary text-primary-foreground shadow-glow hover:brightness-110"
+                      ? "bg-success/15 text-success hover:bg-success/20 border border-success/20 shadow-lg shadow-success/10"
+                      : "gradient-primary text-primary-foreground shadow-glow hover:brightness-110 shadow-xl"
                   }`}
                   disabled={loading}
                   onClick={() => openRegister(today)}

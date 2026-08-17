@@ -24,11 +24,11 @@ export function BibleCard({
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-[2rem] border transition-all duration-300",
-        variant === "default" && "border-border bg-card shadow-card",
-        variant === "editorial" && "paper-texture border-border bg-card shadow-card",
-        variant === "gold" && "border-biblical-gold/20 bg-card shadow-card ring-1 ring-biblical-gold/5",
-        variant === "glass" && "border-white/10 bg-white/5 backdrop-blur-xl dark:border-white/5 dark:bg-white/5",
+        "group relative overflow-hidden rounded-[2.5rem] border transition-all duration-500 ease-out",
+        variant === "default" && "border-border/50 bg-card shadow-card hover:shadow-xl hover:border-primary/20",
+        variant === "editorial" && "paper-texture border-border bg-card shadow-card hover:shadow-xl hover:-translate-y-1",
+        variant === "gold" && "border-biblical-gold/30 bg-card shadow-card ring-1 ring-biblical-gold/10 hover:shadow-gold/20 hover:-translate-y-1",
+        variant === "glass" && "border-white/10 bg-white/5 backdrop-blur-2xl dark:border-white/5 dark:bg-white/5 hover:bg-white/10",
         className
       )}
     >
