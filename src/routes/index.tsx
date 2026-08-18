@@ -54,13 +54,11 @@ export const Route = createFileRoute("/")({
     ],
     links: [{ rel: "canonical", href: "https://biblehabit.lovable.app/" }],
   }),
-  loader: ({ context }) => {
-    // Prefetch critical content on layout routes or deep links
-    return context.queryClient.ensureQueryData({
-      queryKey: ["reading-data", context.queryClient.getQueryData(["auth-user"])?.id],
-      // The heavy work happens in the hook, but we can seed the cache here if we had a server function
-      // For now, we rely on the component's internal prefetch via router.
-    });
+  loader: () => {
+    // Note: useReadingData uses useQuery which handles fetching.
+    // We don't prefetch here to avoid "Missing queryFn" errors
+    // since the query logic is encapsulated in the hook.
+    return {};
   },
   component: HomePage,
 });
