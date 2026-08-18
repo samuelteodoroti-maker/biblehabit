@@ -117,9 +117,10 @@ export function LogReadingModal({ open, onOpenChange, userId, today, initialDate
         p_user_id: userId,
         p_reading_date: readingDate,
         p_chapters_count: totalChapters,
-        p_plan_id: planId === FREE ? null : planId,
-        p_notes: notes.trim() || null,
+        p_plan_id: (planId === FREE ? null : planId) as any,
+        p_notes: (notes.trim() || null) as any,
         p_duration_minutes: duration,
+
         p_passages: passages.map(p => ({
           book_id: p.bookId,
           start_chapter: p.startChapter,
