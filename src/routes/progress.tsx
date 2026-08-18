@@ -380,6 +380,7 @@ function ProgressPage() {
         className="mb-10 h-16 w-full gap-3 rounded-[1.5rem] gradient-primary text-lg font-bold text-primary-foreground shadow-glow-lg hover:brightness-110 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300"
         disabled={!user || loading}
         aria-label="Criar novo plano de leitura"
+        aria-haspopup="dialog"
       >
         <Plus className="h-6 w-6" /> Novo plano
       </Button>
