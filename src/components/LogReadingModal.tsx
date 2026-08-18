@@ -31,18 +31,20 @@ type Props = {
   onOpenChange: (v: boolean) => void;
   userId: string;
   today: string;
+  initialDate?: string;
   onSaved?: () => void;
 };
 
-export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: Props) {
+export function LogReadingModal({ open, onOpenChange, userId, today, initialDate, onSaved }: Props) {
   const { activePlan, refresh } = useReadingData();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [planId, setPlanId] = useState<string>(FREE);
-  const [readingDate, setReadingDate] = useState(today);
+  const [readingDate, setReadingDate] = useState(initialDate || today);
   const [duration, setDuration] = useState(15);
   const [passages, setPassages] = useState<PassageEntry[]>([
-    { id: crypto.randomUUID(), bookId: "GEN", startChapter: 1, startVerse: 1, endChapter: 1, endVerse: 0, isFullChapters: false }
+    { id: crypto.randomUUID(), bookId: "GEN", startChapter: 1, startVerse: 1, endChapter: 1, endVerse: 1, isFullChapters: false }
   ]);
+
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
 
