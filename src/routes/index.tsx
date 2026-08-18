@@ -32,15 +32,29 @@ import { BibleCard, BibleReference } from "@/components/BibleUI";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Bible Habit" },
-      { name: "description", content: "Bible Habit é o seu companheiro para criar e manter o hábito da leitura bíblica diária." },
-      { property: "og:title", content: "Bible Habit" },
-      { property: "og:description", content: "Bible Habit é o seu companheiro para criar e manter o hábito da leitura bíblica diária." },
+      { title: "Bible Habit — Sua jornada diária na Palavra" },
+      { name: "description", content: "Crie constância na Palavra. Registre suas leituras, acompanhe seu progresso e fortaleça sua jornada bíblica todos os dias." },
       { property: "og:type", content: "website" },
+      { property: "og:locale", content: "pt_BR" },
+      { property: "og:site_name", content: "Bible Habit" },
       { property: "og:url", content: "https://biblehabit.lovable.app/" },
+      { property: "og:title", content: "Bible Habit — Sua jornada diária na Palavra" },
+      { property: "og:description", content: "Crie constância na Palavra. Registre suas leituras, acompanhe seu progresso e fortaleça sua jornada bíblica todos os dias." },
+      { property: "og:image", content: "https://biblehabit.lovable.app/bible-habit-og-v2.png" },
+      { property: "og:image:secure_url", content: "https://biblehabit.lovable.app/bible-habit-og-v2.png" },
+      { property: "og:image:type", content: "image/png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: "Bible Habit — Sua jornada diária na Palavra" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Bible Habit — Sua jornada diária na Palavra" },
+      { name: "twitter:description", content: "Crie constância na Palavra. Registre suas leituras, acompanhe seu progresso e fortaleça sua jornada bíblica todos os dias." },
+      { name: "twitter:image", content: "https://biblehabit.lovable.app/bible-habit-og-v2.png" },
+      { name: "twitter:image:alt", content: "Bible Habit — Sua jornada diária na Palavra" },
     ],
     links: [{ rel: "canonical", href: "https://biblehabit.lovable.app/" }],
   }),
+
   component: HomePage,
 });
 
