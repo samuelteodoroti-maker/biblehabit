@@ -119,8 +119,11 @@ function HomePage() {
     }
     const targetDate = date || today;
     
-    // Prevent future dates
-    if (new Date(targetDate + "T12:00:00") > new Date()) {
+    const targetDate = new Date(targetDateStr + "T12:00:00");
+    const todayDate = new Date();
+    todayDate.setHours(23, 59, 59, 999);
+
+    if (targetDate > todayDate) {
       toast.error("Não é possível registrar leituras em datas futuras.");
       return;
     }
