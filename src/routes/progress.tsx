@@ -70,9 +70,10 @@ function buildLast7(dayMap: Map<string, number>) {
 
 function ProgressPage() {
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
+  const { user, profile, coverage, loading: dataLoading, loading: authLoading } = useReadingData();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
+
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState<Plan | null>(null);
@@ -375,11 +376,14 @@ function ProgressPage() {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {plans.map((p) => {
             const pct = p.total_days > 0 ? (p.completed_days / p.total_days) * 100 : 0;
+            const biblePct = coverage?.percentage || 0;
+            
             return (
               <Card
                 key={p.id}
                 className="paper-texture flex flex-col justify-between border-border/50 bg-card/80 p-8 backdrop-blur-xl transition-all duration-500 ease-out hover:-translate-y-2 hover:shadow-2xl hover:border-primary/20 rounded-[2.5rem]"
               >
+
                 <div>
                   <div className="mb-4 flex items-center justify-between">
                     <h2 className="font-serif-title text-xl font-bold tracking-tight">{p.title}</h2>
@@ -408,10 +412,26 @@ function ProgressPage() {
                 </div>
 
                 <div className="mt-6 space-y-4">
-                  <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                    <span>{p.completed_days} de {p.total_days} dias</span>
-                    <span>{Math.round(pct)}%</span>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                      <span>Progresso do Plano</span>
+                      <span>{p.completed_days} de {p.total_days} dias</span>
+                    </div>
+                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary/30">
+                      <div className="h-full bg-primary" style={{ width: `${pct}%` }} />
+                    </div>
                   </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-primary/70">
+                      <span>Progresso Bíblico</span>
+                      <span>{biblePct.toLocaleString('pt-BR', { maximumFractionDigits: 2 })}%</span>
+                    </div>
+                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-primary/10">
+                      <div className="h-full bg-primary/50" style={{ width: `${biblePct}%` }} />
+                    </div>
+                  </div>
+
                   
                   <div className="flex gap-2">
                     <Button
