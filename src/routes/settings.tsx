@@ -159,36 +159,25 @@ function SettingsPage() {
   return (
     <AppShell title="Ajustes" subtitle="Conta, integrações e preferências">
       <Section title="Minha conta">
-        <Row>
-          <Avatar className="h-14 w-14 ring-2 ring-primary/30">
+        <div className="p-4 flex items-center gap-4">
+          <Avatar className="h-16 w-16 ring-2 ring-primary/30">
             {effectiveAvatar && <AvatarImage src={effectiveAvatar} alt={`Foto de perfil de ${displayName}`} />}
-            <AvatarFallback className="gradient-primary text-primary-foreground">
+            <AvatarFallback className="gradient-primary text-primary-foreground text-xl">
               {initial}
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <p className="truncate font-display font-semibold">{displayName}</p>
-            <p className="truncate text-xs text-muted-foreground">{email}</p>
+            <p className="truncate font-display font-semibold text-lg">{displayName}</p>
+            <p className="truncate text-sm text-muted-foreground">{email}</p>
           </div>
-        </Row>
-        <div className="space-y-3 p-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="settings-name" className="text-xs">Nome</Label>
-            <Input id="settings-name" value={name} onChange={(e) => setName(e.target.value)} className="h-10 rounded-xl" placeholder="Seu nome" />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="settings-email" className="text-xs">E-mail</Label>
-            <Input id="settings-email" value={email} disabled className="h-10 rounded-xl" />
-          </div>
-          <Button
-            className="h-11 w-full rounded-xl gradient-primary font-semibold text-primary-foreground shadow-glow hover:brightness-110"
-            onClick={handleSave}
-            disabled={saving}
-          >
-            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Salvar alterações"}
-          </Button>
+          <Link to="/profile/edit">
+            <Button variant="outline" size="sm" className="rounded-xl gap-2">
+              <ChevronRight className="h-4 w-4" /> Editar
+            </Button>
+          </Link>
         </div>
       </Section>
+
 
       <Section title="Integrações">
         <div className="p-4">
