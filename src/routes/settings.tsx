@@ -13,6 +13,9 @@ import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useReadingData } from "@/hooks/useReadingData";
+import { Skeleton } from "@/components/ui/skeleton";
+
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -49,11 +52,10 @@ function SettingsPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { theme, toggle } = useTheme();
-  const [name, setName] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const { profile, recentLogs, loading, refresh } = useReadingData();
   const [youVersion, setYouVersion] = useState("");
-  const [logs, setLogs] = useState<ActivityLog[]>([]);
   const [saving, setSaving] = useState(false);
+
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [reminderTime, setReminderTime] = useState("20:00");
   const email = user?.email ?? "";
@@ -96,41 +98,18 @@ function SettingsPage() {
   };
 
   useEffect(() => {
-    if (!user) return;
-    let cancelled = false;
-    (async () => {
-      const [{ data: p }, { data: ls }] = await Promise.all([
-        supabase
-          .from("profiles")
-          .select("name, avatar_url, youversion_link")
-          .eq("id", user.id)
-          .maybeSingle(),
-        supabase
-          .from("reading_logs")
-          .select("id, reading_date, chapters_count, notes")
-          .eq("user_id", user.id)
-          .order("reading_date", { ascending: false })
-          .limit(10),
-      ]);
-      if (cancelled) return;
-      if (p) {
-        setName(p.name ?? "");
-        setAvatarUrl(p.avatar_url ?? null);
-        setYouVersion(p.youversion_link ?? "");
-      }
-      setLogs((ls ?? []) as ActivityLog[]);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [user]);
+    if (profile?.youversion_link) {
+      setYouVersion(profile.youversion_link);
+    }
+  }, [profile]);
+
 
   const handleSave = async () => {
     if (!user) return;
     setSaving(true);
     const { error } = await supabase
       .from("profiles")
-      .update({ name: name.trim() || null, youversion_link: youVersion.trim() || null })
+      .update({ youversion_link: youVersion.trim() || null })
       .eq("id", user.id);
     setSaving(false);
     if (error) return toast.error(error.message);
@@ -145,48 +124,48 @@ function SettingsPage() {
     navigate({ to: "/auth" });
   };
 
+  const logs = recentLogs;
   const metaName =
     (user?.user_metadata?.full_name as string | undefined) ??
     (user?.user_metadata?.name as string | undefined) ??
     "";
   const metaAvatar = (user?.user_metadata?.avatar_url as string | undefined) ?? null;
-  const effectiveAvatar = avatarUrl || metaAvatar;
-  const displayName = name || metaName || email.split("@")[0] || "Você";
+  const effectiveAvatar = profile?.avatar_url || metaAvatar;
+  const displayName = profile?.name || metaName || email.split("@")[0] || "Você";
   const initial = (displayName || email || "?")[0]?.toUpperCase();
+
+  if (loading) return (
+    <AppShell title="Ajustes" subtitle="Conta, integrações e preferências">
+      <div className="space-y-6">
+        <Skeleton className="h-32 w-full rounded-2xl" />
+        <Skeleton className="h-48 w-full rounded-2xl" />
+      </div>
+    </AppShell>
+  );
+
 
   return (
     <AppShell title="Ajustes" subtitle="Conta, integrações e preferências">
       <Section title="Minha conta">
-        <Row>
-          <Avatar className="h-14 w-14 ring-2 ring-primary/30">
+        <div className="p-4 flex items-center gap-4">
+          <Avatar className="h-16 w-16 ring-2 ring-primary/30">
             {effectiveAvatar && <AvatarImage src={effectiveAvatar} alt={`Foto de perfil de ${displayName}`} />}
-            <AvatarFallback className="gradient-primary text-primary-foreground">
+            <AvatarFallback className="gradient-primary text-primary-foreground text-xl">
               {initial}
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <p className="truncate font-display font-semibold">{displayName}</p>
-            <p className="truncate text-xs text-muted-foreground">{email}</p>
+            <p className="truncate font-display font-semibold text-lg">{displayName}</p>
+            <p className="truncate text-sm text-muted-foreground">{email}</p>
           </div>
-        </Row>
-        <div className="space-y-3 p-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="settings-name" className="text-xs">Nome</Label>
-            <Input id="settings-name" value={name} onChange={(e) => setName(e.target.value)} className="h-10 rounded-xl" placeholder="Seu nome" />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="settings-email" className="text-xs">E-mail</Label>
-            <Input id="settings-email" value={email} disabled className="h-10 rounded-xl" />
-          </div>
-          <Button
-            className="h-11 w-full rounded-xl gradient-primary font-semibold text-primary-foreground shadow-glow hover:brightness-110"
-            onClick={handleSave}
-            disabled={saving}
-          >
-            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Salvar alterações"}
-          </Button>
+          <Link to="/profile/edit">
+            <Button variant="outline" size="sm" className="rounded-xl gap-2">
+              <ChevronRight className="h-4 w-4" /> Editar
+            </Button>
+          </Link>
         </div>
       </Section>
+
 
       <Section title="Integrações">
         <div className="p-4">
