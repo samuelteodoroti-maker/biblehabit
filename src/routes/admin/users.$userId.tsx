@@ -71,7 +71,7 @@ function AdminUserDetailPage() {
   });
 
   if (roleLoading || isLoading) return <div className="p-10 text-white">Carregando...</div>;
-  if (!role || !['super_admin', 'admin', 'support'].includes(role)) {
+  if (!role || !['super_admin', 'admin', 'support', 'analyst'].includes(role)) {
     return <div className="p-10 text-center text-white">Acesso negado.</div>;
   }
 

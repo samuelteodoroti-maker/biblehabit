@@ -287,7 +287,6 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
                       <div className="col-span-2 flex items-end justify-center pb-2">
                         <ChevronRight className="h-4 w-4 text-muted-foreground/40" />
                       </div>
-
                       <div className="col-span-5 flex items-center gap-2">
                         <div className="flex-1 space-y-1">
                           <Label className="text-[9px] text-muted-foreground">Cap. Final</Label>
@@ -300,6 +299,17 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
                             className="h-9 rounded-lg bg-background/60 text-center"
                           />
                         </div>
+                        {passages.length > 1 && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setPassages(prev => prev.filter(x => x.id !== p.id))}
+                            className="mt-4 h-8 w-8 rounded-lg text-destructive hover:bg-destructive/10"
+                            aria-label="Remover passagem"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>
