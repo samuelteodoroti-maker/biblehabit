@@ -13,6 +13,9 @@ import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useReadingData } from "@/hooks/useReadingData";
+import { Skeleton } from "@/components/ui/skeleton";
+
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
@@ -49,12 +52,10 @@ function SettingsPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { theme, toggle } = useTheme();
-  const [name, setName] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const { profile, recentLogs, loading, refresh } = useReadingData();
   const [youVersion, setYouVersion] = useState("");
-  const [logs, setLogs] = useState<ActivityLog[]>([]);
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [reminderTime, setReminderTime] = useState("20:00");
   const email = user?.email ?? "";
@@ -132,7 +133,7 @@ function SettingsPage() {
     setSaving(true);
     const { error } = await supabase
       .from("profiles")
-      .update({ name: name.trim() || null, youversion_link: youVersion.trim() || null })
+      .update({ youversion_link: youVersion.trim() || null })
       .eq("id", user.id);
     setSaving(false);
     if (error) return toast.error(error.message);
@@ -147,14 +148,25 @@ function SettingsPage() {
     navigate({ to: "/auth" });
   };
 
+  const logs = recentLogs;
   const metaName =
     (user?.user_metadata?.full_name as string | undefined) ??
     (user?.user_metadata?.name as string | undefined) ??
     "";
   const metaAvatar = (user?.user_metadata?.avatar_url as string | undefined) ?? null;
-  const effectiveAvatar = avatarUrl || metaAvatar;
-  const displayName = name || metaName || email.split("@")[0] || "Você";
+  const effectiveAvatar = profile?.avatar_url || metaAvatar;
+  const displayName = profile?.name || metaName || email.split("@")[0] || "Você";
   const initial = (displayName || email || "?")[0]?.toUpperCase();
+
+  if (loading) return (
+    <AppShell title="Ajustes" subtitle="Conta, integrações e preferências">
+      <div className="space-y-6">
+        <Skeleton className="h-32 w-full rounded-2xl" />
+        <Skeleton className="h-48 w-full rounded-2xl" />
+      </div>
+    </AppShell>
+  );
+
 
   return (
     <AppShell title="Ajustes" subtitle="Conta, integrações e preferências">
