@@ -48,7 +48,7 @@ export function useReadingData() {
   }, []);
 
   const readingQuery = useQuery({
-    queryKey: ["reading-data", user?.id],
+    queryKey: ["reading-data", user?.id || null],
     queryFn: async () => {
       if (!user) return null;
       
