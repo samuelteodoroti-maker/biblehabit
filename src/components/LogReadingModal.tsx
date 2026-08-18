@@ -41,7 +41,7 @@ type Props = {
   onSaved?: () => void;
 };
 
-export function LogReadingModal({ open, onOpenChange, userId, today, initialDate, onSaved }: Props) {
+export function LogReadingModal({ open, onOpenChange, userId, today, initialDate, initialPassage, onSaved }: Props) {
   const { activePlan, refresh } = useReadingData();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [planId, setPlanId] = useState<string>(FREE);
