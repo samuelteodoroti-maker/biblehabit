@@ -98,35 +98,11 @@ function SettingsPage() {
   };
 
   useEffect(() => {
-    if (!user) return;
-    let cancelled = false;
-    (async () => {
-      const [{ data: p }, { data: ls }] = await Promise.all([
-        supabase
-          .from("profiles")
-          .select("name, avatar_url, youversion_link")
-          .eq("id", user.id)
-          .maybeSingle(),
-        supabase
-          .from("reading_logs")
-          .select("id, reading_date, chapters_count, notes")
-          .eq("user_id", user.id)
-          .order("reading_date", { ascending: false })
-          .limit(10),
-      ]);
-      if (cancelled) return;
-      if (p) {
-        setName(p.name ?? "");
-        setAvatarUrl(p.avatar_url ?? null);
-        setYouVersion(p.youversion_link ?? "");
-      }
-      setLogs((ls ?? []) as ActivityLog[]);
-      setLoading(false);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [user]);
+    if (profile?.youversion_link) {
+      setYouVersion(profile.youversion_link);
+    }
+  }, [profile]);
+
 
   const handleSave = async () => {
     if (!user) return;
