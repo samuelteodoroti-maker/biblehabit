@@ -74,7 +74,8 @@ function HomePage() {
   const { user, isAdmin, role } = useAuth();
   const { profile, activePlan, logDates, loading, today, refresh } = useReadingData();
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(today);
+  const [initialModalDate, setInitialModalDate] = useState(today);
+
   const [latestUpdate, setLatestUpdate] = useState<any>(null);
   const [showNotice, setShowNotice] = useState(false);
 
@@ -132,9 +133,10 @@ function HomePage() {
       return;
     }
 
-    setSelectedDate(targetDateStr);
+    setInitialModalDate(targetDateStr);
     setModalOpen(true);
   };
+
 
   return (
     <AppShell>

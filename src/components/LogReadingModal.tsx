@@ -50,9 +50,10 @@ export function LogReadingModal({ open, onOpenChange, userId, today, initialDate
 
   useEffect(() => {
     if (!open) return;
-    setReadingDate(today);
+    setReadingDate(initialDate || today);
     setNotes("");
     setDuration(15);
+
     
     if (activePlan) {
       setPlanId(activePlan.id);
@@ -68,7 +69,7 @@ export function LogReadingModal({ open, onOpenChange, userId, today, initialDate
         .order("updated_at", { ascending: false });
       setPlans((data as Plan[]) ?? []);
     })();
-  }, [open, userId, activePlan, today]);
+  }, [open, userId, activePlan, today, initialDate]);
 
   const addPassage = () => {
     const last = passages[passages.length - 1];
@@ -76,9 +77,9 @@ export function LogReadingModal({ open, onOpenChange, userId, today, initialDate
       id: crypto.randomUUID(),
       bookId: last?.bookId || "GEN",
       startChapter: (last?.endChapter || 1),
-      startVerse: (last?.endVerse || 0) + 1,
+      startVerse: 1,
       endChapter: (last?.endChapter || 1),
-      endVerse: (last?.endVerse || 0) + 1,
+      endVerse: 1,
       isFullChapters: false
     }]);
   };
