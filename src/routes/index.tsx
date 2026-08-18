@@ -54,13 +54,10 @@ export const Route = createFileRoute("/")({
     ],
     links: [{ rel: "canonical", href: "https://biblehabit.lovable.app/" }],
   }),
-  loader: ({ context }) => {
-    // Prefetch critical content on layout routes or deep links
-    return context.queryClient.ensureQueryData({
-      queryKey: ["reading-data"],
-      // The heavy work happens in the hook, but we can seed the cache here if we had a server function
-      // For now, we rely on the component's internal prefetch via router.
-    });
+  loader: async ({ context }) => {
+    // If not authenticated, we don't prefetch but we need to return a safe object
+    // The AuthGate handles the redirect for protected logic
+    return {};
   },
   component: HomePage,
 });
@@ -84,9 +81,9 @@ function HomePage() {
   useEffect(() => {
     const checkUpdates = async () => {
       try {
-        const { updates } = await getUpdates({ data: { limit: 1 } });
-        if (updates && updates.length > 0) {
-          const update = updates[0];
+        const res = await getUpdates({ data: { limit: 1 } });
+        if (res?.updates && res.updates.length > 0) {
+          const update = res.updates[0];
           const lastSeen = localStorage.getItem("bh_last_update_seen");
           if (lastSeen !== update.version) {
             setLatestUpdate(update);

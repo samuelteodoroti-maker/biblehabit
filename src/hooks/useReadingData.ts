@@ -48,7 +48,7 @@ export function useReadingData() {
   }, []);
 
   const readingQuery = useQuery({
-    queryKey: ["reading-data", user?.id],
+    queryKey: ["reading-data", user?.id || null],
     queryFn: async () => {
       if (!user) return null;
       
@@ -99,6 +99,6 @@ export function useReadingData() {
     loading: authLoading || readingQuery.isLoading,
     error: readingQuery.error,
     today,
-    refresh: () => queryClient.invalidateQueries({ queryKey: ["reading-data", user?.id] })
+    refresh: () => queryClient.invalidateQueries({ queryKey: ["reading-data", user?.id || null] })
   };
 }
