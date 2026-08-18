@@ -53,6 +53,7 @@ function SettingsPage() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [youVersion, setYouVersion] = useState("");
   const [logs, setLogs] = useState<ActivityLog[]>([]);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [reminderTime, setReminderTime] = useState("20:00");
@@ -119,6 +120,7 @@ function SettingsPage() {
         setYouVersion(p.youversion_link ?? "");
       }
       setLogs((ls ?? []) as ActivityLog[]);
+      setLoading(false);
     })();
     return () => {
       cancelled = true;

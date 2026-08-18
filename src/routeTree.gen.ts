@@ -22,6 +22,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as GroupsIndexRouteImport } from './routes/groups.index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as UpdatesSlugRouteImport } from './routes/updates.$slug'
+import { Route as ProfileEditRouteImport } from './routes/profile.edit'
 import { Route as GroupsGroupIdRouteImport } from './routes/groups.$groupId'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminUpdatesRouteImport } from './routes/admin.updates'
@@ -98,6 +99,11 @@ const UpdatesSlugRoute = UpdatesSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => UpdatesRoute,
 } as any)
+const ProfileEditRoute = ProfileEditRouteImport.update({
+  id: '/profile/edit',
+  path: '/profile/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GroupsGroupIdRoute = GroupsGroupIdRouteImport.update({
   id: '/$groupId',
   path: '/$groupId',
@@ -169,6 +175,7 @@ export interface FileRoutesByFullPath {
   '/admin/updates': typeof AdminUpdatesRoute
   '/admin/users': typeof AdminUsersRouteWithChildren
   '/groups/$groupId': typeof GroupsGroupIdRoute
+  '/profile/edit': typeof ProfileEditRoute
   '/updates/$slug': typeof UpdatesSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/groups/': typeof GroupsIndexRoute
@@ -193,6 +200,7 @@ export interface FileRoutesByTo {
   '/admin/updates': typeof AdminUpdatesRoute
   '/admin/users': typeof AdminUsersRouteWithChildren
   '/groups/$groupId': typeof GroupsGroupIdRoute
+  '/profile/edit': typeof ProfileEditRoute
   '/updates/$slug': typeof UpdatesSlugRoute
   '/admin': typeof AdminIndexRoute
   '/groups': typeof GroupsIndexRoute
@@ -219,6 +227,7 @@ export interface FileRoutesById {
   '/admin/updates': typeof AdminUpdatesRoute
   '/admin/users': typeof AdminUsersRouteWithChildren
   '/groups/$groupId': typeof GroupsGroupIdRoute
+  '/profile/edit': typeof ProfileEditRoute
   '/updates/$slug': typeof UpdatesSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/groups/': typeof GroupsIndexRoute
@@ -246,6 +255,7 @@ export interface FileRouteTypes {
     | '/admin/updates'
     | '/admin/users'
     | '/groups/$groupId'
+    | '/profile/edit'
     | '/updates/$slug'
     | '/admin/'
     | '/groups/'
@@ -270,6 +280,7 @@ export interface FileRouteTypes {
     | '/admin/updates'
     | '/admin/users'
     | '/groups/$groupId'
+    | '/profile/edit'
     | '/updates/$slug'
     | '/admin'
     | '/groups'
@@ -295,6 +306,7 @@ export interface FileRouteTypes {
     | '/admin/updates'
     | '/admin/users'
     | '/groups/$groupId'
+    | '/profile/edit'
     | '/updates/$slug'
     | '/admin/'
     | '/groups/'
@@ -320,6 +332,7 @@ export interface RootRouteChildren {
   AdminSupportRoute: typeof AdminSupportRoute
   AdminUpdatesRoute: typeof AdminUpdatesRoute
   AdminUsersRoute: typeof AdminUsersRouteWithChildren
+  ProfileEditRoute: typeof ProfileEditRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -415,6 +428,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/updates/$slug'
       preLoaderRoute: typeof UpdatesSlugRouteImport
       parentRoute: typeof UpdatesRoute
+    }
+    '/profile/edit': {
+      id: '/profile/edit'
+      path: '/profile/edit'
+      fullPath: '/profile/edit'
+      preLoaderRoute: typeof ProfileEditRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/groups/$groupId': {
       id: '/groups/$groupId'
@@ -544,6 +564,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminSupportRoute: AdminSupportRoute,
   AdminUpdatesRoute: AdminUpdatesRoute,
   AdminUsersRoute: AdminUsersRouteWithChildren,
+  ProfileEditRoute: ProfileEditRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport
