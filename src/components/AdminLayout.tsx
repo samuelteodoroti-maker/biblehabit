@@ -29,6 +29,8 @@ const NAV_ITEMS = [
   { label: "Usuários", icon: Users, path: "/admin/users", roles: ["super_admin", "admin", "support"] },
   { label: "Auditoria", icon: History, path: "/admin/audit", roles: ["super_admin", "admin", "analyst"] },
   { label: "Segurança", icon: ShieldAlert, path: "/admin/security", roles: ["super_admin", "analyst"] },
+  { label: "Erros", icon: ShieldAlert, path: "/admin/errors", roles: ["super_admin", "analyst"] },
+
   { label: "Suporte", icon: LifeBuoy, path: "/admin/support", roles: ["super_admin", "support", "admin"] },
   { label: "Configurações", icon: Settings, path: "/admin/settings", roles: ["super_admin", "admin"] },
 ];
