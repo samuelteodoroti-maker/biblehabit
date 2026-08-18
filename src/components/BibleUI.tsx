@@ -24,7 +24,7 @@ export function BibleCard({
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-[2.5rem] border transition-all duration-500 ease-out",
+        "group relative overflow-hidden rounded-[2.5rem] border transition-all duration-500 ease-out transform-gpu",
         variant === "default" && "border-border/50 bg-card shadow-card hover:shadow-xl hover:border-primary/20",
         variant === "editorial" && "paper-texture border-border bg-card shadow-card hover:shadow-xl hover:-translate-y-1",
         variant === "gold" && "border-biblical-gold/30 bg-card shadow-card ring-1 ring-biblical-gold/10 hover:shadow-gold/20 hover:-translate-y-1",

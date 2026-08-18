@@ -227,9 +227,10 @@
     color: var(--color-primary);
   }
 
-  /* Smooth Transitions for interactions */
+  /* Smooth Transitions for interactions - Optimized with will-change and transform */
   button, a, input, select, textarea {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, opacity;
   }
 }
 
