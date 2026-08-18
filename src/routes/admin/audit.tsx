@@ -14,8 +14,8 @@ function AdminAuditPage() {
   const navigate = useNavigate();
 
   if (roleLoading) return <div className="p-10 text-white">Carregando...</div>;
-  if (role !== 'super_admin') {
-    return <div className="p-10 text-center text-white">Acesso negado. Apenas o Super Administrador pode visualizar logs de auditoria.</div>;
+  if (role !== 'super_admin' && role !== 'analyst') {
+    return <div className="p-10 text-center text-white">Acesso negado. Apenas o Super Administrador ou Analista podem visualizar logs de auditoria.</div>;
   }
 
   return (
