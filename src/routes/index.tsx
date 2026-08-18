@@ -509,12 +509,15 @@ function HomePage() {
       {user && (
         <LogReadingModal
           open={modalOpen}
-          onOpenChange={setModalOpen}
+          onOpenChange={(v) => {
+            setModalOpen(v);
+            if (!v) setInitialPassage(null);
+          }}
           userId={user.id}
           today={today}
           initialDate={initialModalDate}
+          initialPassage={initialPassage}
           onSaved={refresh}
-
         />
       )}
     </AppShell>
