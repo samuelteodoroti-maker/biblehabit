@@ -181,9 +181,6 @@ function GroupDetail() {
     fetchGroupData();
   }, [fetchGroupData]);
 
-  useEffect(() => {
-    if (!user || members.length === 0) return;
-    let cancelled = false;
   const fetchActivities = useCallback(async () => {
     if (!user || members.length === 0) return;
     setLoadingActivities(true);
