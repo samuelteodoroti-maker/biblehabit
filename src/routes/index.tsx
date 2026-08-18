@@ -117,18 +117,18 @@ function HomePage() {
       navigate({ to: "/auth" });
       return;
     }
-    const targetDate = date || today;
+    const targetDateStr = date || today;
     
-    const targetDate = new Date(targetDateStr + "T12:00:00");
-    const todayDate = new Date();
-    todayDate.setHours(23, 59, 59, 999);
+    const targetDateObj = new Date(targetDateStr + "T12:00:00");
+    const todayDateObj = new Date();
+    todayDateObj.setHours(23, 59, 59, 999);
 
-    if (targetDate > todayDate) {
+    if (targetDateObj > todayDateObj) {
       toast.error("Não é possível registrar leituras em datas futuras.");
       return;
     }
 
-    setSelectedDate(targetDate);
+    setSelectedDate(targetDateStr);
     setModalOpen(true);
   };
 
