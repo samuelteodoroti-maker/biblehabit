@@ -57,7 +57,7 @@ export const Route = createFileRoute("/")({
   loader: ({ context }) => {
     // Prefetch critical content on layout routes or deep links
     return context.queryClient.ensureQueryData({
-      queryKey: ["reading-data"],
+      queryKey: ["reading-data", context.queryClient.getQueryData(["auth-user"])?.id],
       // The heavy work happens in the hook, but we can seed the cache here if we had a server function
       // For now, we rely on the component's internal prefetch via router.
     });
