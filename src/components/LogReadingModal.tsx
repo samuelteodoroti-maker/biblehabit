@@ -123,7 +123,7 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
         start_verse: p.startVerse || 1,
         end_chapter: p.endChapter,
         end_verse: p.endVerse || 0,
-        is_full_chapter: p.isFullChapters
+        is_full_chapter: p.isFullChapters || false
       }));
 
       const { error: passErr } = await supabase
