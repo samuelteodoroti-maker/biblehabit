@@ -31,6 +31,8 @@ import { useDailyVerse } from "@/hooks/useDailyVerse";
 import { getUpdates } from "@/lib/updates.functions";
 import { APP_VERSION } from "@/lib/app-utils";
 import { BibleCard, BibleReference } from "@/components/BibleUI";
+import { buildYouVersionContextUrl, getCurrentAppLocale } from "@/lib/youversion-utils";
+import { BIBLE_CANON } from "@/lib/bible-canon";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -323,14 +325,21 @@ function HomePage() {
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="rounded-xl text-xs font-bold border-primary/20 hover:bg-primary/5"
-                  onClick={() => {
-                    const url = `https://www.bible.com/pt/bible/127/${dailyVerse.book.toUpperCase().substring(0,3)}.${dailyVerse.chapter}`;
-                    window.open(url, "_blank", "noopener,noreferrer");
-                  }}
-                  aria-label={`Ler o contexto de ${dailyVerse.reference} na YouVersion`}
+                  asChild
+                  className="rounded-xl text-xs font-bold border-primary/20 hover:bg-primary/5 cursor-pointer"
                 >
-                  Ler o contexto
+                  <a
+                    href={buildYouVersionContextUrl({
+                      appLocale: getCurrentAppLocale(profile?.name ? "pt-BR" : null), // Fallback to pt-BR if profile or local settings fail
+                      bookId: BIBLE_CANON.find(b => b.name === dailyVerse.book)?.id || "JHN",
+                      chapter: dailyVerse.chapter
+                    })}
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    aria-label={`Ler o contexto de ${dailyVerse.reference} na YouVersion`}
+                  >
+                    Ver o contexto
+                  </a>
                 </Button>
                 <Button 
                   variant="ghost" 
@@ -339,7 +348,7 @@ function HomePage() {
                   onClick={() => {
                     setInitialModalDate(today);
                     setInitialPassage({
-                      bookId: dailyVerse.book.toUpperCase().substring(0,3), // Basic mapping, should ideally use stable bookId from dataset
+                      bookId: BIBLE_CANON.find(b => b.name === dailyVerse.book)?.id || "JHN",
                       chapter: dailyVerse.chapter,
                       startVerse: dailyVerse.verse,
                       endVerse: dailyVerse.verse
