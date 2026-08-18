@@ -16,7 +16,9 @@ import {
   X, 
   Bookmark,
   ArrowRight,
-  TrendingUp
+  TrendingUp,
+  Copy,
+  Share2
 } from "lucide-react";
 
 
@@ -25,6 +27,7 @@ import { LogReadingModal } from "@/components/LogReadingModal";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useReadingData } from "@/hooks/useReadingData";
+import { useDailyVerse } from "@/hooks/useDailyVerse";
 import { getUpdates } from "@/lib/updates.functions";
 import { APP_VERSION } from "@/lib/app-utils";
 import { BibleCard, BibleReference } from "@/components/BibleUI";
@@ -73,6 +76,7 @@ function HomePage() {
   const navigate = useNavigate();
   const { user, isAdmin, role } = useAuth();
   const { profile, activePlan, logDates, loading, today, refresh } = useReadingData();
+  const { verse: dailyVerse } = useDailyVerse();
   const [modalOpen, setModalOpen] = useState(false);
   const [initialModalDate, setInitialModalDate] = useState(today);
 
@@ -199,6 +203,59 @@ function HomePage() {
               )}
             </div>
           </div>
+
+          {/* Daily Verse Card */}
+          <BibleCard
+            variant="glass"
+            icon={Sparkles}
+            title="Versículo do Dia"
+            subtitle="Alimento Diário"
+            className="border-primary/10 bg-primary/5 backdrop-blur-md"
+          >
+            <div className="py-2">
+              <p className="font-serif-title text-xl md:text-2xl font-medium leading-relaxed italic text-foreground/90">
+                "{dailyVerse.text}"
+              </p>
+              <div className="mt-5 flex items-center justify-between">
+                <BibleReference book={dailyVerse.book} reference={`${dailyVerse.chapter}:${dailyVerse.verse}`} />
+                <div className="flex gap-2">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-8 w-8 rounded-full text-primary hover:bg-primary/10"
+                    onClick={() => {
+                      navigator.clipboard.writeText(`"${dailyVerse.text}" - ${dailyVerse.reference}`);
+                      toast.success("Versículo copiado!");
+                    }}
+                    title="Copiar versículo"
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-8 w-8 rounded-full text-primary hover:bg-primary/10"
+                    onClick={() => {
+                      const shareText = `"${dailyVerse.text}" - ${dailyVerse.reference}\nLeia mais no Bible Habit!`;
+                      if (navigator.share) {
+                        navigator.share({
+                          title: 'Versículo do Dia - Bible Habit',
+                          text: shareText,
+                          url: window.location.origin
+                        }).catch(() => {});
+                      } else {
+                        navigator.clipboard.writeText(shareText);
+                        toast.success("Link para compartilhar copiado!");
+                      }
+                    }}
+                    title="Compartilhar"
+                  >
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </BibleCard>
 
           {/* Main Streak Card */}
           <BibleCard 
