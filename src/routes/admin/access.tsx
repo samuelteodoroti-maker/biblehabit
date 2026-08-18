@@ -1,7 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { AdminLayout } from "@/components/AdminLayout";
-import { Activity, ShieldAlert, AlertCircle, Terminal } from "lucide-react";
+import { Activity, ShieldAlert, AlertCircle, Terminal, ChevronLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { BibleCard } from "@/components/BibleUI";
 
 export const Route = createFileRoute("/admin/access")({
@@ -10,6 +11,7 @@ export const Route = createFileRoute("/admin/access")({
 
 function AdminAccessPage() {
   const { role, roleLoading } = useAuth();
+  const navigate = useNavigate();
 
   if (roleLoading) return <div className="p-10 text-white">Carregando...</div>;
   if (role !== 'super_admin') {
@@ -17,7 +19,20 @@ function AdminAccessPage() {
   }
 
   return (
-    <AdminLayout title="Acessos e Tentativas">
+    <AdminLayout 
+      title="Acessos e Tentativas"
+      actions={
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => navigate({ to: "/admin" })}
+          className="text-slate-400 hover:text-white"
+        >
+          <ChevronLeft className="h-4 w-4 mr-2" />
+          Voltar
+        </Button>
+      }
+    >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
           <div className="rounded-3xl border border-white/5 bg-white/5 overflow-hidden">

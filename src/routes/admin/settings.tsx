@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { AdminLayout } from "@/components/AdminLayout";
 import { Settings as SettingsIcon, Database, Bell, Layout, Cpu, ChevronLeft } from "lucide-react";
 import { BibleCard } from "@/components/BibleUI";
+import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
