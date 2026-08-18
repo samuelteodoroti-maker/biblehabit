@@ -101,151 +101,150 @@ function GroupDetail() {
   >(new Map());
   const chatEndRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
+  const fetchGroupData = useCallback(async () => {
     if (!user) return;
-    let cancelled = false;
-    (async () => {
-      setLoading(true);
-      const { data: g } = await supabase
-        .from("groups")
-        .select("id, name, description, avatar, invite_code")
-        .eq("id", groupId)
-        .maybeSingle();
-      
-      if (cancelled) return;
-      if (!g) {
-        setNotFound(true);
-        setLoading(false);
-        return;
-      }
-      setGroup(g as Group);
-
-      const { data: mems } = await supabase
-        .from("group_members")
-        .select("user_id")
-        .eq("group_id", groupId);
-      const ids = (mems ?? []).map((m) => m.user_id);
-      if (ids.length === 0) {
-        setMembers([]);
-        setLoading(false);
-        return;
-      }
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, name, avatar_url, current_streak")
-        .in("id", ids);
-      const pmap = new Map<string, ProfileLite>();
-      (profiles ?? []).forEach((p) => pmap.set(p.id, p as ProfileLite));
-      setProfilesMap(pmap);
-
-      const wkStart = weekStart();
-      const { data: logs } = await supabase
-        .from("reading_logs")
-        .select("user_id, chapters_count")
-        .in("user_id", ids)
-        .gte("reading_date", wkStart);
-      const chapterMap = new Map<string, number>();
-      (logs ?? []).forEach((l) => {
-        chapterMap.set(l.user_id, (chapterMap.get(l.user_id) ?? 0) + (l.chapters_count ?? 0));
-      });
-      const stats: MemberStat[] = (profiles ?? []).map((p) => ({
-        user_id: p.id,
-        name: p.name,
-        avatar_url: p.avatar_url,
-        chapters: chapterMap.get(p.id) ?? 0,
-        streak: p.current_streak ?? 0,
-      }));
-      
-      // Enhanced ranking logic with streak and activity timestamp as tie-breakers
-      stats.sort((a, b) => {
-        if (b.chapters !== a.chapters) return b.chapters - a.chapters;
-        if (b.streak !== a.streak) return b.streak - a.streak;
-        return a.user_id.localeCompare(b.user_id);
-      });
-      
-      const rankedStats = stats.map((s, idx) => {
-        let rank = idx + 1;
-        if (idx > 0) {
-          const prev = stats[idx - 1];
-          if (prev.chapters === s.chapters) {
-            rank = (stats as any)[idx - 1].rank;
-          }
-        }
-        (s as any).rank = rank;
-        return s;
-      });
-      
-      if (cancelled) return;
-      setMembers(rankedStats);
+    setLoading(true);
+    const { data: g } = await supabase
+      .from("groups")
+      .select("id, name, description, avatar, invite_code")
+      .eq("id", groupId)
+      .maybeSingle();
+    
+    if (!g) {
+      setNotFound(true);
       setLoading(false);
-    })();
-    return () => {
-      cancelled = true;
-    };
+      return;
+    }
+    setGroup(g as Group);
+
+    const { data: mems } = await supabase
+      .from("group_members")
+      .select("user_id")
+      .eq("group_id", groupId);
+    const ids = (mems ?? []).map((m) => m.user_id);
+    if (ids.length === 0) {
+      setMembers([]);
+      setLoading(false);
+      return;
+    }
+    
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id, name, avatar_url, current_streak")
+      .in("id", ids);
+    const pmap = new Map<string, ProfileLite>();
+    (profiles ?? []).forEach((p) => pmap.set(p.id, p as ProfileLite));
+    setProfilesMap(pmap);
+
+    const wkStart = weekStart();
+    const { data: logs } = await supabase
+      .from("reading_logs")
+      .select("user_id, chapters_count")
+      .in("user_id", ids)
+      .gte("reading_date", wkStart);
+      
+    const chapterMap = new Map<string, number>();
+    (logs ?? []).forEach((l) => {
+      chapterMap.set(l.user_id, (chapterMap.get(l.user_id) ?? 0) + (l.chapters_count ?? 0));
+    });
+    const stats: MemberStat[] = (profiles ?? []).map((p) => ({
+      user_id: p.id,
+      name: p.name,
+      avatar_url: p.avatar_url,
+      chapters: chapterMap.get(p.id) ?? 0,
+      streak: p.current_streak ?? 0,
+    }));
+    
+    stats.sort((a, b) => {
+      if (b.chapters !== a.chapters) return b.chapters - a.chapters;
+      if (b.streak !== a.streak) return b.streak - a.streak;
+      return a.user_id.localeCompare(b.user_id);
+    });
+    
+    const rankedStats = stats.map((s, idx) => {
+      let rank = idx + 1;
+      if (idx > 0) {
+        const prev = stats[idx - 1];
+        if (prev.chapters === s.chapters) {
+          rank = (stats as any)[idx - 1].rank;
+        }
+      }
+      (s as any).rank = rank;
+      return s;
+    });
+    
+    setMembers(rankedStats);
+    setLoading(false);
   }, [groupId, user]);
+
+  useEffect(() => {
+    fetchGroupData();
+  }, [fetchGroupData]);
 
   useEffect(() => {
     if (!user || members.length === 0) return;
     let cancelled = false;
-    (async () => {
-      setLoadingActivities(true);
-      const ids = members.map((m) => m.user_id);
-      const { data: logs } = await supabase
-        .from("reading_logs")
-        .select("id, user_id, created_at, reading_date, chapters_count, notes, plan_id")
-        .in("user_id", ids)
-        .order("created_at", { ascending: false })
-        .limit(50);
+  const fetchActivities = useCallback(async () => {
+    if (!user || members.length === 0) return;
+    setLoadingActivities(true);
+    const ids = members.map((m) => m.user_id);
+    const { data: logs } = await supabase
+      .from("reading_logs")
+      .select("id, user_id, created_at, reading_date, chapters_count, notes, plan_id")
+      .in("user_id", ids)
+      .order("created_at", { ascending: false })
+      .limit(50);
 
-      const planIds = Array.from(
-        new Set(((logs ?? []) as any[]).map((l) => l.plan_id).filter((x): x is string => !!x)),
-      );
-      const planMap = new Map<string, string>();
-      if (planIds.length > 0) {
-        const { data: plans } = await supabase
-          .from("reading_plans")
-          .select("id, title")
-          .in("id", planIds);
-        (plans ?? []).forEach((p) => planMap.set(p.id, p.title));
-      }
+    const planIds = Array.from(
+      new Set(((logs ?? []) as any[]).map((l) => l.plan_id).filter((x): x is string => !!x)),
+    );
+    const planMap = new Map<string, string>();
+    if (planIds.length > 0) {
+      const { data: plans } = await supabase
+        .from("reading_plans")
+        .select("id, title")
+        .in("id", planIds);
+      (plans ?? []).forEach((p) => planMap.set(p.id, p.title));
+    }
 
-      const feed: Activity[] = ((logs ?? []) as any[]).map((l) => ({
-        id: l.id,
-        user_id: l.user_id,
-        created_at: l.created_at,
-        reading_date: l.reading_date,
-        chapters_count: l.chapters_count,
-        notes: l.notes,
-        plan_title: l.plan_id ? planMap.get(l.plan_id) ?? null : null,
-      }));
-      if (cancelled) return;
-      setActivities(feed);
-      setLoadingActivities(false);
+    const feed: Activity[] = ((logs ?? []) as any[]).map((l) => ({
+      id: l.id,
+      user_id: l.user_id,
+      created_at: l.created_at,
+      reading_date: l.reading_date,
+      chapters_count: l.chapters_count,
+      notes: l.notes,
+      plan_title: l.plan_id ? planMap.get(l.plan_id) ?? null : null,
+    }));
+    
+    setActivities(feed);
+    setLoadingActivities(false);
 
-      const logIds = feed.map((f) => f.id);
-      if (logIds.length > 0) {
-        const { data: rx } = await supabase
-          .from("reactions")
-          .select("log_id, type, user_id")
-          .in("log_id", logIds);
-        if (cancelled) return;
-        const map = new Map<string, { fire: number; amen: number; myFire: boolean; myAmen: boolean }>();
-        (rx ?? []).forEach((r: any) => {
-          const cur = map.get(r.log_id) ?? { fire: 0, amen: 0, myFire: false, myAmen: false };
-          if (r.type === "fire") {
-            cur.fire++;
-            if (r.user_id === user.id) cur.myFire = true;
-          } else if (r.type === "amen") {
-            cur.amen++;
-            if (r.user_id === user.id) cur.myAmen = true;
-          }
-          map.set(r.log_id, cur);
-        });
-        setReactions(map);
-      }
-    })();
-    return () => { cancelled = true; };
+    const logIds = feed.map((f) => f.id);
+    if (logIds.length > 0) {
+      const { data: rx } = await supabase
+        .from("reactions")
+        .select("log_id, type, user_id")
+        .in("log_id", logIds);
+      const map = new Map<string, { fire: number; amen: number; myFire: boolean; myAmen: boolean }>();
+      (rx ?? []).forEach((r: any) => {
+        const cur = map.get(r.log_id) ?? { fire: 0, amen: 0, myFire: false, myAmen: false };
+        if (r.type === "fire") {
+          cur.fire++;
+          if (r.user_id === user.id) cur.myFire = true;
+        } else if (r.type === "amen") {
+          cur.amen++;
+          if (r.user_id === user.id) cur.myAmen = true;
+        }
+        map.set(r.log_id, cur);
+      });
+      setReactions(map);
+    }
   }, [members, user]);
+
+  useEffect(() => {
+    fetchActivities();
+  }, [fetchActivities]);
 
   useEffect(() => {
     if (!user) return;

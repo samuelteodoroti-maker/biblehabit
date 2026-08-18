@@ -54,7 +54,14 @@ export const Route = createFileRoute("/")({
     ],
     links: [{ rel: "canonical", href: "https://biblehabit.lovable.app/" }],
   }),
-
+  loader: ({ context }) => {
+    // Prefetch critical content on layout routes or deep links
+    return context.queryClient.ensureQueryData({
+      queryKey: ["reading-data"],
+      // The heavy work happens in the hook, but we can seed the cache here if we had a server function
+      // For now, we rely on the component's internal prefetch via router.
+    });
+  },
   component: HomePage,
 });
 
