@@ -111,50 +111,25 @@ export function LogReadingModal({ open, onOpenChange, userId, today, initialDate
 
     setSaving(true);
     try {
-      // 1. Insert Log
-      const { data: log, error: logErr } = await supabase
-        .from("reading_logs")
-        .insert({
-          user_id: userId,
-          reading_date: readingDate,
-          chapters_count: totalChapters,
-          plan_id: planId === FREE ? null : planId,
-          notes: notes.trim() || null,
-          duration_minutes: duration
-        })
-        .select()
-        .single();
+      // Use RPC for atomic saving
+      const { data: log, error: logErr } = await supabase.rpc('log_reading_atomic', {
+        p_user_id: userId,
+        p_reading_date: readingDate,
+        p_chapters_count: totalChapters,
+        p_plan_id: planId === FREE ? null : planId,
+        p_notes: notes.trim() || null,
+        p_duration_minutes: duration,
+        p_passages: passages.map(p => ({
+          book_id: p.bookId,
+          start_chapter: p.startChapter,
+          start_verse: p.startVerse || 1,
+          end_chapter: p.endChapter,
+          end_verse: p.endVerse || 0,
+          is_full_chapter: p.isFullChapters || false
+        }))
+      });
 
       if (logErr) throw logErr;
-
-      // 2. Insert Passages
-      const passageData = passages.map(p => ({
-        reading_log_id: log.id,
-        user_id: userId,
-        book_id: p.bookId,
-        start_chapter: p.startChapter,
-        start_verse: p.startVerse || 1,
-        end_chapter: p.endChapter,
-        end_verse: p.endVerse || 0,
-        is_full_chapter: p.isFullChapters || false
-      }));
-
-      const { error: passErr } = await supabase
-        .from("reading_passages")
-        .insert(passageData);
-
-      if (passErr) throw passErr;
-
-      // 3. Update Plan Progress if applicable
-      if (planId !== FREE) {
-        const plan = plans.find(p => p.id === planId);
-        if (plan) {
-          await supabase
-            .from("reading_plans")
-            .update({ completed_days: (plan.completed_days ?? 0) + 1 })
-            .eq("id", planId);
-        }
-      }
 
       toast.success("Leitura registrada com sucesso! 🔥");
       refresh();
@@ -166,6 +141,7 @@ export function LogReadingModal({ open, onOpenChange, userId, today, initialDate
     } finally {
       setSaving(false);
     }
+
   };
 
   return (
