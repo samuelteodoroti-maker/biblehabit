@@ -54,12 +54,7 @@ export const Route = createFileRoute("/")({
     ],
     links: [{ rel: "canonical", href: "https://biblehabit.lovable.app/" }],
   }),
-  loader: () => {
-    // Note: useReadingData uses useQuery which handles fetching.
-    // We don't prefetch here to avoid "Missing queryFn" errors
-    // since the query logic is encapsulated in the hook.
-    return {};
-  },
+  loader: () => ({}),
   component: HomePage,
 });
 
