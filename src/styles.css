@@ -268,3 +268,24 @@
 #lovable-badge {
   display: none !important;
 }
+
+/* Fluid Typography Utilities */
+@utility text-clamp-sm {
+  font-size: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+}
+
+@utility text-clamp-base {
+  font-size: clamp(0.875rem, 0.825rem + 0.25vw, 1rem);
+}
+
+@utility text-clamp-lg {
+  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.25rem);
+}
+
+@utility text-clamp-xl {
+  font-size: clamp(1.25rem, 1.1rem + 0.75vw, 1.75rem);
+}
+
+@utility text-clamp-2xl {
+  font-size: clamp(1.5rem, 1.3rem + 1vw, 2.25rem);
+}
