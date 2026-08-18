@@ -97,8 +97,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Bible Habit — Rastreador de Leitura Bíblica" },
       { name: "twitter:description", content: "Crie o hábito da leitura bíblica: ofensiva diária, planos personalizados, grupos com ranking semanal e conquistas." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/e43ca74d-8381-4cd6-9aa4-d643178f57fe" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/e43ca74d-8381-4cd6-9aa4-d643178f57fe" },
+      { property: "og:image", content: "https://biblehabit.lovable.app/__l5e/assets-v1/453863f4-6635-4807-8f56-7a83b3ebc615/bible-habit-cover.png" },
+      { property: "og:image:width", content: "1730" },
+      { property: "og:image:height", content: "909" },
+      { name: "twitter:image", content: "https://biblehabit.lovable.app/__l5e/assets-v1/453863f4-6635-4807-8f56-7a83b3ebc615/bible-habit-cover.png" },
       // Security Headers
       { "http-equiv": "Content-Security-Policy", content: "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' https://*.lovable.app; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://mntomcjsbbhveliauopg.supabase.co wss://mntomcjsbbhveliauopg.supabase.co; frame-src 'self' blob:; worker-src 'self' blob:; manifest-src 'self'; upgrade-insecure-requests;" },
       { "http-equiv": "X-Frame-Options", content: "DENY" },
