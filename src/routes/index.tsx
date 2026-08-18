@@ -32,10 +32,10 @@ import { BibleCard, BibleReference } from "@/components/BibleUI";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Bible Habit — Sua jornada diária na Palavra" },
+      { title: "Bible Habit" },
       { name: "description", content: "Bible Habit é o seu companheiro para criar e manter o hábito da leitura bíblica diária." },
-      { property: "og:title", content: "Bible Habit — Sua jornada diária na Palavra" },
-      { property: "og:description", content: "Crie constância na Palavra com planos personalizados, grupos e conquistas." },
+      { property: "og:title", content: "Bible Habit" },
+      { property: "og:description", content: "Bible Habit é o seu companheiro para criar e manter o hábito da leitura bíblica diária." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://biblehabit.lovable.app/" },
     ],
