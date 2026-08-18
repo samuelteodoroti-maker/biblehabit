@@ -67,7 +67,15 @@ function AdminDashboard() {
   );
 
   return (
-    <AdminLayout title="Visão Geral">
+    <AdminLayout 
+      title="Visão Geral"
+      actions={
+        <div className="flex items-center gap-2">
+          <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+          <span className="text-[10px] font-bold uppercase tracking-widest text-green-500/80">Sistema Estável</span>
+        </div>
+      }
+    >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         <StatCard 
           title="Total Usuários" 
