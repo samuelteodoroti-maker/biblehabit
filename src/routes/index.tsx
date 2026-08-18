@@ -121,7 +121,7 @@ function HomePage() {
   const streak = profile?.current_streak ?? 0;
   const total = profile?.total_chapters_read ?? 0;
 
-  const openRegister = (date?: string) => {
+  const openRegister = (date?: string, passage?: any) => {
     if (!user) {
       toast.info("Entre para registrar sua leitura");
       navigate({ to: "/auth" });
@@ -139,6 +139,7 @@ function HomePage() {
     }
 
     setInitialModalDate(targetDateStr);
+    setInitialPassage(passage || null);
     setModalOpen(true);
   };
 
@@ -337,7 +338,12 @@ function HomePage() {
                   className="rounded-xl text-xs font-bold text-primary hover:bg-primary/5"
                   onClick={() => {
                     setInitialModalDate(today);
-                    // Pass specific passage info if modal supports it
+                    setInitialPassage({
+                      bookId: dailyVerse.book.toUpperCase().substring(0,3), // Basic mapping, should ideally use stable bookId from dataset
+                      chapter: dailyVerse.chapter,
+                      startVerse: dailyVerse.verse,
+                      endVerse: dailyVerse.verse
+                    });
                     setModalOpen(true);
                   }}
                 >
