@@ -4,10 +4,9 @@ import { ptBR } from "date-fns/locale";
 
 export const generateUpdatePDF = async (update: any) => {
   const doc = new jsPDF();
-  const primaryColor = [16, 185, 129]; // Emerald 500
   
   // Header
-  doc.setFillColor(20, 20, 20);
+  doc.setFillColor(15, 23, 42); // Midnight Indigo
   doc.rect(0, 0, 210, 40, "F");
   
   doc.setTextColor(255, 255, 255);
@@ -26,7 +25,7 @@ export const generateUpdatePDF = async (update: any) => {
 
   // Title
   let y = 55;
-  doc.setTextColor(20, 20, 20);
+  doc.setTextColor(15, 23, 42);
   doc.setFontSize(18);
   doc.setFont("helvetica", "bold");
   const titleLines = doc.splitTextToSize(update.title, 170);
@@ -45,7 +44,6 @@ export const generateUpdatePDF = async (update: any) => {
   const renderSection = (title: string, items: string[], color: number[]) => {
     if (!items || items.length === 0) return;
     
-    // Check page break
     if (y > 250) {
       doc.addPage();
       y = 20;
@@ -75,10 +73,10 @@ export const generateUpdatePDF = async (update: any) => {
     y += 10;
   };
 
-  renderSection("Novidades", update.highlights || [], [16, 185, 129]);
-  renderSection("Melhorias", update.improvements || [], [59, 130, 246]);
-  renderSection("Correções", update.fixes || [], [245, 158, 11]);
-  renderSection("Acessibilidade", update.accessibility_changes || [], [139, 92, 246]);
+  renderSection("Novidades", update.highlights || [], [99, 102, 241]); // Indigo
+  renderSection("Melhorias", update.improvements || [], [16, 185, 129]); // Emerald
+  renderSection("Correções", update.fixes || [], [245, 158, 11]); // Amber
+  renderSection("Acessibilidade", update.accessibility_changes || [], [139, 92, 246]); // Violet
 
   // Footer
   const pageCount = (doc as any).internal.getNumberOfPages();

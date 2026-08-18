@@ -26,49 +26,26 @@ export function calculateBibleCoverage(passages: Passage[]): DetailedCoverage {
     const book = BIBLE_CANON.find(b => b.id === p.book_id);
     if (!book) return;
 
-    if (p.is_full_chapter) {
-      const ch = book.chapters.find(c => c.chapter === p.start_chapter);
-      if (ch) {
-        for (let v = 1; v <= ch.verses; v++) {
-          uniqueVerses.add(`${p.book_id}:${p.start_chapter}:${v}`);
-          totalActivity++;
-        }
-      }
-    } else {
-      // Intervalo
-      // Validar capítulos e versículos
-      const startChapter = p.start_chapter;
-      const endChapter = p.end_chapter;
-      const startVerse = p.start_verse;
-      const endVerse = p.end_verse;
-
-      if (startChapter === endChapter) {
-        const ch = book.chapters.find(c => c.chapter === startChapter);
-        if (ch) {
-          const maxV = ch.verses;
-          const ev = endVerse === 0 ? maxV : Math.min(endVerse, maxV);
-          for (let v = startVerse; v <= ev; v++) {
-            uniqueVerses.add(`${p.book_id}:${startChapter}:${v}`);
-            totalActivity++;
-          }
-        }
+    const startChapter = p.start_chapter;
+    const endChapter = p.end_chapter;
+    
+    for (let c = startChapter; c <= endChapter; c++) {
+      const ch = book.chapters.find(chapter => chapter.chapter === c);
+      if (!ch) continue;
+      
+      let sv = 1;
+      let ev = ch.verses;
+      
+      if (p.is_full_chapter) {
+        // Already defaults to 1 and ch.verses
       } else {
-        // Múltiplos capítulos
-        for (let c = startChapter; c <= endChapter; c++) {
-          const ch = book.chapters.find(chapter => chapter.chapter === c);
-          if (!ch) continue;
-          
-          let sv = 1;
-          let ev = ch.verses;
-          
-          if (c === startChapter) sv = startVerse;
-          if (c === endChapter) ev = endVerse === 0 ? ch.verses : Math.min(endVerse, ch.verses);
-          
-          for (let v = sv; v <= ev; v++) {
-            uniqueVerses.add(`${p.book_id}:${c}:${v}`);
-            totalActivity++;
-          }
-        }
+        if (c === startChapter) sv = p.start_verse || 1;
+        if (c === endChapter) ev = p.end_verse === 0 ? ch.verses : Math.min(p.end_verse, ch.verses);
+      }
+      
+      for (let v = sv; v <= ev; v++) {
+        uniqueVerses.add(`${p.book_id}:${c}:${v}`);
+        totalActivity++;
       }
     }
   });
@@ -82,23 +59,25 @@ export function calculateBibleCoverage(passages: Passage[]): DetailedCoverage {
     byBook: {}
   };
 
-  // Inicializar totais canônicos
+  // Inicializar totais canônicos e divisões específicas solicitadas
+  const divisions = [
+    "Pentateuco", "Históricos", "Poéticos", "Profetas Maiores", "Profetas Menores",
+    "Evangelhos", "Histórico", "Cartas Paulinas", "Cartas Gerais", "Revelação"
+  ];
+
   BIBLE_CANON.forEach(book => {
     const bookTotal = book.chapters.reduce((acc, c) => acc + c.verses, 0);
     
-    // Testamento
     if (!stats.byTestament[book.testament]) {
       stats.byTestament[book.testament] = { unique: 0, total: 0, percent: 0 };
     }
     stats.byTestament[book.testament].total += bookTotal;
 
-    // Divisão
     if (!stats.byDivision[book.division]) {
       stats.byDivision[book.division] = { unique: 0, total: 0, percent: 0 };
     }
     stats.byDivision[book.division].total += bookTotal;
 
-    // Livro
     stats.byBook[book.id] = { unique: 0, total: bookTotal, percent: 0, chaptersCompleted: 0 };
   });
 
@@ -112,7 +91,7 @@ export function calculateBibleCoverage(passages: Passage[]): DetailedCoverage {
     stats.byDivision[book.division].unique++;
   });
 
-  // Calcular porcentagens finais
+  // Calcular porcentagens e capítulos completados
   Object.keys(stats.byTestament).forEach(k => {
     stats.byTestament[k].percent = (stats.byTestament[k].unique / stats.byTestament[k].total) * 100;
   });
@@ -123,7 +102,6 @@ export function calculateBibleCoverage(passages: Passage[]): DetailedCoverage {
     const bStats = stats.byBook[id];
     bStats.percent = (bStats.unique / bStats.total) * 100;
     
-    // Capítulos completados
     const book = BIBLE_CANON.find(b => b.id === id)!;
     book.chapters.forEach(ch => {
       let allVersesRead = true;
