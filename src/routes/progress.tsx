@@ -13,7 +13,9 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Plus, Share2, Pencil, Trash2, Loader2, BookOpen, CalendarHeart, TrendingUp, BookOpenCheck } from "lucide-react";
+import { useReadingData } from "@/hooks/useReadingData";
 import { bibleBooks, getChaptersBetween } from "@/lib/bibleBooks";
+
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -70,7 +72,9 @@ function buildLast7(dayMap: Map<string, number>) {
 
 function ProgressPage() {
   const navigate = useNavigate();
-  const { user, profile, coverage, loading: dataLoading, loading: authLoading } = useReadingData();
+  const { user, profile, coverage, loading: dataLoading } = useReadingData();
+  const authLoading = dataLoading;
+
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
 
