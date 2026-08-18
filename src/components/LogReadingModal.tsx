@@ -96,6 +96,16 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
   }, [passages]);
 
   const save = async () => {
+    // Prevent future dates
+    const targetDateObj = new Date(readingDate + "T12:00:00");
+    const todayDateObj = new Date();
+    todayDateObj.setHours(23, 59, 59, 999);
+
+    if (targetDateObj > todayDateObj) {
+      toast.error("Não é possível registrar leituras em datas futuras.");
+      return;
+    }
+
     setSaving(true);
     try {
       // 1. Insert Log
