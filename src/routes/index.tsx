@@ -79,6 +79,7 @@ function HomePage() {
   const { verse: dailyVerse } = useDailyVerse();
   const [modalOpen, setModalOpen] = useState(false);
   const [initialModalDate, setInitialModalDate] = useState(today);
+  const [initialPassage, setInitialPassage] = useState<any>(null);
 
   const [latestUpdate, setLatestUpdate] = useState<any>(null);
   const [showNotice, setShowNotice] = useState(false);
