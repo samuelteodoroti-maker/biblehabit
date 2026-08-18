@@ -60,11 +60,12 @@ function StatisticsPage() {
   const divisionStats = useMemo(() => {
     const divisions = [
       { label: "Pentateuco", color: "bg-blue-500", books: ["GEN", "EXO", "LEV", "NUM", "DEU"] },
-      { label: "Históricos", color: "bg-emerald-500", books: ["JOS", "JDG", "RUT", "1SA", "2SA", "1KI", "2KI", "1CH", "2CH", "EZR", "NEH", "EST"] },
+      { label: "Históricos", color: "bg-emerald-500", books: ["JOS", "JDG", "RUT", "1SA", "2SA", "1KI", "2KI", "1CH", "2CH", "EZR", "NEH", "EST", "ACT"] },
       { label: "Poéticos", color: "bg-amber-500", books: ["JOB", "PSA", "PRO", "ECC", "SNG"] },
-      { label: "Profetas", color: "bg-purple-500", books: ["ISA", "JER", "LAM", "EZE", "DAN", "HOS", "JOE", "AMO", "OBA", "JON", "MIC", "NAH", "HAB", "ZEP", "HAG", "ZEC", "MAL"] },
-      { label: "NT", color: "bg-rose-500", books: ["MAT", "MRK", "LUK", "JHN", "ACT", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TH", "2TH", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD", "REV"] },
+      { label: "Profetas", color: "bg-purple-500", books: ["ISA", "JER", "LAM", "EZK", "DAN", "HOS", "JOL", "AMO", "OBA", "JON", "MIC", "NAM", "HAB", "ZEP", "HAG", "ZEC", "MAL"] },
+      { label: "NT", color: "bg-rose-500", books: ["MAT", "MRK", "LUK", "JHN", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TS", "2TS", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD", "REV"] },
     ];
+
 
     const bookLogs = recentLogs.flatMap(l => l.reading_passages.map(p => p.book_id));
     const totalLogs = bookLogs.length || 1;
