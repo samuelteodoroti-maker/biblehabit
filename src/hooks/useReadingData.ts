@@ -31,15 +31,20 @@ export type DetailedLog = {
   reading_passages: {
     book_id: string;
     start_chapter: number;
+    start_verse: number;
     end_chapter: number;
+    end_verse: number;
     is_full_chapter: boolean;
   }[];
 };
 
 
+
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { calculateBibleCoverage } from "@/lib/bible-calculations";
 
 export function useReadingData() {
+
   const { user, loading: authLoading } = useAuth();
   const queryClient = useQueryClient();
 
@@ -62,9 +67,10 @@ export function useReadingData() {
           .maybeSingle(),
         supabase
           .from("reading_logs")
-          .select("id, reading_date, chapters_count, notes, duration_minutes, plan_id, reading_passages(book_id, start_chapter, end_chapter, is_full_chapter)")
+          .select("id, reading_date, chapters_count, notes, duration_minutes, plan_id, reading_passages(book_id, start_chapter, start_verse, end_chapter, end_verse, is_full_chapter)")
           .eq("user_id", user.id)
           .order("reading_date", { ascending: false }),
+
 
         supabase
           .from("reading_plans")
@@ -80,12 +86,18 @@ export function useReadingData() {
       const allPlans = plansRes.data || [];
       const activePlan = allPlans.find(p => (p.completed_days ?? 0) < (p.total_days ?? 0)) || allPlans[0];
       
+      const recentLogs = (logsRes.data as any) as DetailedLog[];
+      const passages = recentLogs.flatMap(l => l.reading_passages);
+      const coverage = calculateBibleCoverage(passages);
+
       return {
         profile: profileRes.data as Profile,
-        recentLogs: (logsRes.data as any) as DetailedLog[],
+        recentLogs,
         logDates: new Set((logsRes.data ?? []).map(l => l.reading_date)),
         activePlan: activePlan as ActivePlan,
+        coverage
       };
+
     },
     enabled: !!user && !authLoading,
     staleTime: 1000 * 60 * 5, // 5 minutes
@@ -96,9 +108,11 @@ export function useReadingData() {
     user,
     profile: readingQuery.data?.profile ?? null,
     activePlan: readingQuery.data?.activePlan ?? null,
+    coverage: readingQuery.data?.coverage ?? null,
     logDates: readingQuery.data?.logDates ?? new Set<string>(),
     recentLogs: readingQuery.data?.recentLogs ?? [],
     loading: authLoading || readingQuery.isLoading,
+
     error: readingQuery.error,
     today,
     refresh: () => queryClient.invalidateQueries({ queryKey: ["reading-data", user?.id || null] })

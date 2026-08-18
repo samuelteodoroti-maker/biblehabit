@@ -4,15 +4,17 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { BarChart3, TrendingUp, BookOpen, Clock, Calendar, Flame, ChevronRight } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { BarChart3, TrendingUp, BookOpen, Clock, Calendar, Flame, ChevronRight, CheckCircle2 } from "lucide-react";
 import { useReadingData } from "@/hooks/useReadingData";
 import { useMemo } from "react";
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
-  Cell
 } from "recharts";
 import { getBibleBook } from "@/lib/bibleBooks";
+import { BIBLE_CANON } from "@/lib/bible-canon";
 import { cn } from "@/lib/utils";
+
 
 export const Route = createFileRoute("/statistics")({
   head: () => ({
@@ -25,7 +27,7 @@ export const Route = createFileRoute("/statistics")({
 });
 
 function StatisticsPage() {
-  const { profile, recentLogs, loading } = useReadingData();
+  const { profile, recentLogs, coverage, loading } = useReadingData();
 
   const chartData = useMemo(() => {
     if (!recentLogs.length) return [];
@@ -58,24 +60,53 @@ function StatisticsPage() {
   }, [recentLogs]);
 
   const divisionStats = useMemo(() => {
+    if (!coverage) return [];
+    
     const divisions = [
-      { label: "Pentateuco", color: "bg-blue-500", books: ["GEN", "EXO", "LEV", "NUM", "DEU"] },
-      { label: "Históricos", color: "bg-emerald-500", books: ["JOS", "JDG", "RUT", "1SA", "2SA", "1KI", "2KI", "1CH", "2CH", "EZR", "NEH", "EST", "ACT"] },
-      { label: "Poéticos", color: "bg-amber-500", books: ["JOB", "PSA", "PRO", "ECC", "SNG"] },
-      { label: "Profetas", color: "bg-purple-500", books: ["ISA", "JER", "LAM", "EZK", "DAN", "HOS", "JOL", "AMO", "OBA", "JON", "MIC", "NAM", "HAB", "ZEP", "HAG", "ZEC", "MAL"] },
-      { label: "NT", color: "bg-rose-500", books: ["MAT", "MRK", "LUK", "JHN", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TS", "2TS", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD", "REV"] },
+      { label: "Pentateuco", color: "bg-blue-500", type: "AT" },
+      { label: "Históricos", color: "bg-emerald-500", type: "AT" },
+      { label: "Poéticos", color: "bg-amber-500", type: "AT" },
+      { label: "Profetas Maiores", color: "bg-purple-500", type: "AT" },
+      { label: "Profetas Menores", color: "bg-indigo-500", type: "AT" },
+      { label: "Evangelhos", color: "bg-rose-500", type: "NT" },
+      { label: "Histórico", color: "bg-orange-500", type: "NT" },
+      { label: "Cartas Paulinas", color: "bg-pink-500", type: "NT" },
+      { label: "Cartas Gerais", color: "bg-cyan-500", type: "NT" },
+      { label: "Revelação", color: "bg-violet-500", type: "NT" },
     ];
 
-
-    const bookLogs = recentLogs.flatMap(l => l.reading_passages.map(p => p.book_id));
-    const totalLogs = bookLogs.length || 1;
-
     return divisions.map(div => {
-      const count = bookLogs.filter(b => div.books.includes(b)).length;
-      const percent = Math.round((count / totalLogs) * 100);
-      return { ...div, percent };
+      const stats = coverage.byDivision[div.label] || { unique: 0, total: 0, percent: 0 };
+      const booksInDivision = BIBLE_CANON.filter(b => b.division === div.label);
+      const booksCompleted = booksInDivision.filter(b => (coverage.byBook[b.id]?.chaptersCompleted || 0) === b.chapters.length).length;
+
+      return { 
+        ...div, 
+        percent: stats.percent,
+        unique: stats.unique,
+        total: stats.total,
+        booksCompleted,
+        totalBooks: booksInDivision.length,
+        books: booksInDivision.map(b => ({
+          id: b.id,
+          name: b.name,
+          unique: coverage.byBook[b.id]?.unique || 0,
+          total: coverage.byBook[b.id]?.total || 0,
+          percent: coverage.byBook[b.id]?.percent || 0,
+          chaptersCompleted: coverage.byBook[b.id]?.chaptersCompleted || 0,
+          totalChapters: b.chapters.length
+        }))
+      };
     });
-  }, [recentLogs]);
+  }, [coverage]);
+
+  const formatPercent = (val: number) => {
+    if (val > 0 && val < 0.01) return "< 0,01%";
+    return val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "%";
+  };
+
+  const formatNumber = (val: number) => val.toLocaleString('pt-BR');
+
 
 
   return (
@@ -105,12 +136,34 @@ function StatisticsPage() {
             </Card>
             <Card className="border-border/60 bg-card/60 p-4 backdrop-blur-sm">
               <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-                <BookOpen className="h-3.5 w-3.5 text-blue-500" />
-                Capítulos
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                Progresso Bíblico
               </div>
-              <p className="mt-2 font-display text-2xl font-bold">{profile?.total_chapters_read ?? 0}</p>
-              <p className="text-[10px] text-muted-foreground">Total lido</p>
+              <p className="mt-2 font-display text-2xl font-bold">{formatPercent(coverage?.percentage || 0)}</p>
+              <p className="text-[10px] text-muted-foreground">{formatNumber(coverage?.totalUnique || 0)} de {formatNumber(31102)} versículos</p>
             </Card>
+          </div>
+
+          <div className="grid grid-cols-1 xs:grid-cols-2 gap-3">
+            <Card className="border-border/60 bg-card/60 p-4 backdrop-blur-sm">
+              <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                Antigo Testamento
+              </div>
+              <p className="mt-1 font-display text-lg font-bold">{formatPercent(coverage?.byTestament["AT"]?.percent || 0)}</p>
+              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-secondary/30">
+                <div className="h-full bg-blue-500/70" style={{ width: `${coverage?.byTestament["AT"]?.percent || 0}%` }} />
+              </div>
+            </Card>
+            <Card className="border-border/60 bg-card/60 p-4 backdrop-blur-sm">
+              <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                Novo Testamento
+              </div>
+              <p className="mt-1 font-display text-lg font-bold">{formatPercent(coverage?.byTestament["NT"]?.percent || 0)}</p>
+              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-secondary/30">
+                <div className="h-full bg-rose-500/70" style={{ width: `${coverage?.byTestament["NT"]?.percent || 0}%` }} />
+              </div>
+            </Card>
+
           </div>
 
           <Tabs defaultValue="overview" className="w-full">
@@ -151,22 +204,48 @@ function StatisticsPage() {
               </Card>
 
               <Card className="border-border/60 bg-card/70 p-5 backdrop-blur-sm">
-                <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Distribuição por Divisão</h3>
-                <div className="space-y-4">
+                <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Progresso por Divisão</h3>
+                <Accordion type="single" collapsible className="space-y-4">
                   {divisionStats.map((div) => (
-
-                    <div key={div.label} className="space-y-1.5">
-                      <div className="flex justify-between text-[11px] font-medium">
-                        <span className="text-muted-foreground">{div.label}</span>
-                        <span>{div.percent}%</span>
+                    <AccordionItem key={div.label} value={div.label} className="border-none">
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between text-[11px] font-medium">
+                          <span className="text-muted-foreground">{div.label}</span>
+                          <span>{formatPercent(div.percent)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-secondary/30">
+                            <div className={cn("h-full opacity-70", div.color)} style={{ width: `${div.percent}%` }} />
+                          </div>
+                          <AccordionTrigger className="py-0 hover:no-underline" />
+                        </div>
+                        <div className="flex justify-between text-[9px] text-muted-foreground/60">
+                          <span>{formatNumber(div.unique)} de {formatNumber(div.total)} versículos</span>
+                          <span>{div.booksCompleted} de {div.totalBooks} livros</span>
+                        </div>
                       </div>
-                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary/30">
-                        <div className={cn("h-full opacity-70", div.color)} style={{ width: `${div.percent}%` }} />
-                      </div>
-                    </div>
+                      <AccordionContent className="mt-3 space-y-3 pl-2 border-l border-border/20">
+                        {div.books.map(book => (
+                          <div key={book.id} className="space-y-1">
+                            <div className="flex justify-between text-[10px] font-medium">
+                              <span className="text-foreground/80">{book.name}</span>
+                              <span className="text-muted-foreground">{formatPercent(book.percent)}</span>
+                            </div>
+                            <div className="h-1 w-full overflow-hidden rounded-full bg-secondary/20">
+                              <div className={cn("h-full opacity-50", div.color)} style={{ width: `${book.percent}%` }} />
+                            </div>
+                            <div className="flex justify-between text-[8px] text-muted-foreground/50">
+                              <span>{formatNumber(book.unique)} / {formatNumber(book.total)} versículos</span>
+                              <span>{book.chaptersCompleted} / {book.totalChapters} caps</span>
+                            </div>
+                          </div>
+                        ))}
+                      </AccordionContent>
+                    </AccordionItem>
                   ))}
-                </div>
+                </Accordion>
               </Card>
+
             </TabsContent>
 
             <TabsContent value="history" className="mt-4 space-y-3">
