@@ -32,6 +32,12 @@ type Props = {
   userId: string;
   today: string;
   initialDate?: string;
+  initialPassage?: {
+    bookId: string;
+    chapter: number;
+    startVerse?: number;
+    endVerse?: number;
+  };
   onSaved?: () => void;
 };
 
