@@ -41,7 +41,7 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
   const [readingDate, setReadingDate] = useState(today);
   const [duration, setDuration] = useState(15);
   const [passages, setPassages] = useState<PassageEntry[]>([
-    { id: crypto.randomUUID(), bookId: "GEN", startChapter: 1, startVerse: 1, endChapter: 1, endVerse: 0, isFullChapters: true }
+    { id: crypto.randomUUID(), bookId: "GEN", startChapter: 1, startVerse: 1, endChapter: 1, endVerse: 0, isFullChapters: false }
   ]);
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
@@ -73,11 +73,11 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
     setPassages([...passages, {
       id: crypto.randomUUID(),
       bookId: last?.bookId || "GEN",
-      startChapter: (last?.endChapter || 1) + 1,
-      startVerse: 1,
-      endChapter: (last?.endChapter || 1) + 1,
-      endVerse: 0,
-      isFullChapters: true
+      startChapter: (last?.endChapter || 1),
+      startVerse: (last?.endVerse || 0) + 1,
+      endChapter: (last?.endChapter || 1),
+      endVerse: (last?.endVerse || 0) + 1,
+      isFullChapters: false
     }]);
   };
 
@@ -270,46 +270,55 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
                         </Select>
                       </div>
 
-                      <div className="col-span-5 flex items-center gap-2">
-                        <div className="flex-1 space-y-1">
-                          <Label className="text-[9px] text-muted-foreground">Cap. Inicial</Label>
+                      <div className="col-span-12 space-y-3">
+                        <div className="flex items-center gap-2">
+                          <Label className="flex-1 text-[9px] text-muted-foreground uppercase">Capítulo</Label>
+                          <Label className="w-20 text-[9px] text-muted-foreground uppercase">Versículos</Label>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
                           <Input 
                             type="number" 
                             min={1} 
                             max={book?.chapters || 150}
                             value={p.startChapter}
                             onChange={(e) => updatePassage(p.id, { startChapter: Number(e.target.value), endChapter: Number(e.target.value) })}
-                            className="h-9 rounded-lg bg-background/60 text-center"
+                            className="h-9 flex-1 rounded-lg bg-background/60 text-center"
+                            placeholder="Cap."
                           />
+                          <div className="flex w-24 items-center gap-1">
+                            <Input 
+                              type="number" 
+                              min={1}
+                              value={p.startVerse}
+                              onChange={(e) => updatePassage(p.id, { startVerse: Number(e.target.value) })}
+                              className="h-9 w-11 rounded-lg bg-background/60 text-center text-[10px]"
+                              placeholder="Início"
+                            />
+                            <span className="text-muted-foreground/40">-</span>
+                            <Input 
+                              type="number" 
+                              min={0}
+                              value={p.endVerse}
+                              onChange={(e) => updatePassage(p.id, { endVerse: Number(e.target.value) })}
+                              className="h-9 w-11 rounded-lg bg-background/60 text-center text-[10px]"
+                              placeholder="Fim"
+                            />
+                          </div>
                         </div>
-                      </div>
 
-                      <div className="col-span-2 flex items-end justify-center pb-2">
-                        <ChevronRight className="h-4 w-4 text-muted-foreground/40" />
-                      </div>
-                      <div className="col-span-5 flex items-center gap-2">
-                        <div className="flex-1 space-y-1">
-                          <Label className="text-[9px] text-muted-foreground">Cap. Final</Label>
-                          <Input 
-                            type="number" 
-                            min={p.startChapter}
-                            max={book?.chapters || 150}
-                            value={p.endChapter}
-                            onChange={(e) => updatePassage(p.id, { endChapter: Number(e.target.value) })}
-                            className="h-9 rounded-lg bg-background/60 text-center"
+                        <div className="flex items-center gap-2 pt-1">
+                          <input 
+                            type="checkbox" 
+                            id={`full-chapter-${p.id}`}
+                            checked={p.isFullChapters}
+                            onChange={(e) => updatePassage(p.id, { isFullChapters: e.target.checked })}
+                            className="h-3 w-3 rounded border-border/40"
                           />
+                          <Label htmlFor={`full-chapter-${p.id}`} className="text-[10px] text-muted-foreground cursor-pointer">
+                            Li o capítulo inteiro
+                          </Label>
                         </div>
-                        {passages.length > 1 && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setPassages(prev => prev.filter(x => x.id !== p.id))}
-                            className="mt-4 h-8 w-8 rounded-lg text-destructive hover:bg-destructive/10"
-                            aria-label="Remover passagem"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        )}
                       </div>
                     </div>
                   </div>
