@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { AdminLayout } from "@/components/AdminLayout";
 import { useServerFn } from "@tanstack/react-start";
@@ -11,7 +11,8 @@ import {
   AlertCircle,
   User as UserIcon,
   ChevronRight,
-  Shield
+  Shield,
+  ChevronLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +27,7 @@ export const Route = createFileRoute("/admin/users")({
 
 function AdminUsersPage() {
   const { role, roleLoading } = useAuth();
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const fetchUsers = useServerFn(listAdminUsers);
 
@@ -49,7 +51,20 @@ function AdminUsersPage() {
   }
 
   return (
-    <AdminLayout title="Gestão de Usuários">
+    <AdminLayout 
+      title="Gestão de Usuários"
+      actions={
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => navigate({ to: "/admin" })}
+          className="text-slate-400 hover:text-white"
+        >
+          <ChevronLeft className="h-4 w-4 mr-2" />
+          Voltar
+        </Button>
+      }
+    >
       <div className="mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
         <div className="relative w-full md:w-96">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
@@ -102,7 +117,9 @@ function AdminUsersPage() {
                         {user.avatar_url ? <img src={user.avatar_url} alt="" /> : (user.name?.charAt(0) || user.email?.charAt(0))}
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-sm font-bold text-white group-hover:text-primary transition-colors">{user.name || "Sem nome"}</span>
+                        <Link to="/admin/users/$userId" params={{ userId: user.id }} className="text-sm font-bold text-white hover:text-primary transition-colors cursor-pointer">
+                          {user.name || "Sem nome"}
+                        </Link>
                         <span className="text-xs text-slate-500">{user.email}</span>
                       </div>
                     </div>
