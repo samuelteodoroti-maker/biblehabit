@@ -54,7 +54,11 @@ export const Route = createFileRoute("/")({
     ],
     links: [{ rel: "canonical", href: "https://biblehabit.lovable.app/" }],
   }),
-  loader: () => ({}),
+  loader: async ({ context }) => {
+    // If not authenticated, we don't prefetch but we need to return a safe object
+    // The AuthGate handles the redirect for protected logic
+    return {};
+  },
   component: HomePage,
 });
 
