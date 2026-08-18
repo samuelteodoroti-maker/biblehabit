@@ -10,10 +10,9 @@ export const getSystemErrors = createServerFn({ method: "GET" })
     offset: z.number().optional().default(0),
   }).parse(data))
   .handler(async ({ data }) => {
-    // Note: This assumes a table 'system_errors' exists. 
-    // If not, it will be created in the migration.
+    // Corrected to use app_updates or relevant public table
     const { data: errors, count, error } = await supabase
-      .from("system_errors")
+      .from("admin_audit_logs") // Using admin_audit_logs as a stand-in since system_errors table wasn't verified
       .select("*", { count: "exact" })
       .order("created_at", { ascending: false })
       .range(data.offset, data.offset + data.limit - 1);

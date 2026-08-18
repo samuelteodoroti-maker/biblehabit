@@ -174,7 +174,7 @@ function RootComponent() {
 }
 
 const PUBLIC_PATHS = new Set(["/auth", "/updates", "/support", "/"]);
-const PUBLIC_DYNAMIC_PATHS = ["/updates/"];
+const PUBLIC_DYNAMIC_PATHS = ["/updates/", "/auth/callback"];
 
 function AuthGate({ children }: { children: ReactNode }) {
   const { session, loading } = useAuth();
@@ -182,6 +182,7 @@ function AuthGate({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isPublic = PUBLIC_PATHS.has(pathname) || 
                   PUBLIC_DYNAMIC_PATHS.some(p => pathname.startsWith(p));
+
 
   useEffect(() => {
     if (loading) return;

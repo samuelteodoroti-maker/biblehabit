@@ -554,6 +554,18 @@ export type Database = {
       }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       join_group_by_code: { Args: { _code: string }; Returns: string }
+      log_reading_atomic: {
+        Args: {
+          p_chapters_count: number
+          p_duration_minutes: number
+          p_notes: string
+          p_passages: Json
+          p_plan_id: string
+          p_reading_date: string
+          p_user_id: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       app_role:

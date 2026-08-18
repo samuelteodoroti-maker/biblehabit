@@ -1,121 +1,94 @@
 import { jsPDF } from "jspdf";
-import "jspdf-autotable";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { SUPPORT_WHATSAPP_DISPLAY, getVersionWhatsAppUrl } from "./app-utils";
 
-export async function generateUpdatePDF(update: any) {
+export const generateUpdatePDF = async (update: any) => {
   const doc = new jsPDF();
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const margin = 20;
+  const primaryColor = [16, 185, 129]; // Emerald 500
   
   // Header
+  doc.setFillColor(20, 20, 20);
+  doc.rect(0, 0, 210, 40, "F");
+  
+  doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(22);
-  doc.setTextColor(59, 130, 246); // Primary Indigo color
-  doc.text("Bible Habit", margin, 25);
-  
-  doc.setFontSize(10);
-  doc.setTextColor(100, 100, 100);
-  doc.text("biblehabit.lovable.app", pageWidth - margin - 40, 25);
-  
-  doc.setDrawColor(230, 230, 230);
-  doc.line(margin, 32, pageWidth - margin, 32);
-  
-  // Update Title and Version
-  doc.setFontSize(18);
-  doc.setTextColor(0, 0, 0);
-  doc.text(update.title, margin, 45);
+  doc.setFontSize(24);
+  doc.text("Bible Habit", 20, 25);
   
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
+  doc.text(`NOTAS DE ATUALIZAÇÃO - V${update.version}`, 20, 32);
+  
   const dateStr = update.published_at 
     ? format(new Date(update.published_at), "dd 'de' MMMM, yyyy", { locale: ptBR })
-    : "Não publicado";
-  doc.text(`Versão: ${update.version}  |  Publicado em: ${dateStr}`, margin, 52);
-  
+    : "Não publicada";
+  doc.text(dateStr.toUpperCase(), 190, 32, { align: "right" });
+
+  // Title
+  let y = 55;
+  doc.setTextColor(20, 20, 20);
+  doc.setFontSize(18);
+  doc.setFont("helvetica", "bold");
+  const titleLines = doc.splitTextToSize(update.title, 170);
+  doc.text(titleLines, 20, y);
+  y += (titleLines.length * 8) + 5;
+
   // Summary
-  doc.setFont("helvetica", "italic");
   doc.setFontSize(11);
-  doc.setTextColor(80, 80, 80);
-  const splitSummary = doc.splitTextToSize(update.summary, pageWidth - (margin * 2));
-  doc.text(splitSummary, margin, 62);
-  
-  let currentY = 62 + (splitSummary.length * 7);
-  
+  doc.setFont("helvetica", "italic");
+  doc.setTextColor(100, 100, 100);
+  const summaryLines = doc.splitTextToSize(update.summary || "", 170);
+  doc.text(summaryLines, 20, y);
+  y += (summaryLines.length * 6) + 15;
+
   // Sections
-  const renderSection = (title: string, items: string[], color: [number, number, number]) => {
+  const renderSection = (title: string, items: string[], color: number[]) => {
     if (!items || items.length === 0) return;
     
-    currentY += 10;
-    if (currentY > 260) {
+    // Check page break
+    if (y > 250) {
       doc.addPage();
-      currentY = 25;
+      y = 20;
     }
-    
-    doc.setFont("helvetica", "bold");
+
     doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
     doc.setTextColor(color[0], color[1], color[2]);
-    doc.text(title.toUpperCase(), margin, currentY);
+    doc.text(title.toUpperCase(), 20, y);
     
-    currentY += 7;
-    doc.setFont("helvetica", "normal");
+    y += 8;
     doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
     doc.setTextColor(60, 60, 60);
     
     items.forEach(item => {
-      const splitItem = doc.splitTextToSize(`• ${item}`, pageWidth - (margin * 2) - 5);
-      if (currentY + (splitItem.length * 5) > 270) {
+      const lines = doc.splitTextToSize(`• ${item}`, 160);
+      doc.text(lines, 25, y);
+      y += (lines.length * 5) + 2;
+      
+      if (y > 275) {
         doc.addPage();
-        currentY = 25;
+        y = 20;
       }
-      doc.text(splitItem, margin + 2, currentY);
-      currentY += (splitItem.length * 6);
     });
+    
+    y += 10;
   };
-  
-  renderSection("Novidades", update.highlights, [34, 197, 94]);
-  renderSection("Melhorias", update.improvements, [59, 130, 246]);
-  renderSection("Correções", update.fixes, [249, 115, 22]);
-  renderSection("Acessibilidade", update.accessibility_changes, [168, 85, 247]);
-  
-  // Footer / Support
-  currentY += 15;
-  if (currentY > 240) {
-    doc.addPage();
-    currentY = 25;
-  }
-  
-  doc.setDrawColor(230, 230, 230);
-  doc.line(margin, currentY, pageWidth - margin, currentY);
-  currentY += 10;
-  
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(11);
-  doc.setTextColor(0, 0, 0);
-  doc.text("Suporte", margin, currentY);
-  
-  currentY += 7;
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
-  doc.setTextColor(100, 100, 100);
-  doc.text(`WhatsApp Oficial: ${SUPPORT_WHATSAPP_DISPLAY}`, margin, currentY);
-  
-  currentY += 5;
-  const waUrl = getVersionWhatsAppUrl(update.version);
-  doc.setTextColor(59, 130, 246);
-  doc.text("Clique aqui para falar com o suporte", margin, currentY);
-  // Add a link area
-  doc.link(margin, currentY - 4, 60, 6, { url: waUrl });
-  
-  // Page numbers
+
+  renderSection("Novidades", update.highlights || [], [16, 185, 129]);
+  renderSection("Melhorias", update.improvements || [], [59, 130, 246]);
+  renderSection("Correções", update.fixes || [], [245, 158, 11]);
+  renderSection("Acessibilidade", update.accessibility_changes || [], [139, 92, 246]);
+
+  // Footer
   const pageCount = (doc as any).internal.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     doc.setFontSize(8);
     doc.setTextColor(150, 150, 150);
-    doc.text(`Página ${i} de ${pageCount}`, pageWidth / 2, 285, { align: "center" });
+    doc.text(`Página ${i} de ${pageCount}`, 105, 285, { align: "center" });
+    doc.text("biblehabit.app", 190, 285, { align: "right" });
   }
-  
+
   return doc;
-}
+};

@@ -32,8 +32,10 @@ export type DetailedLog = {
     book_id: string;
     start_chapter: number;
     end_chapter: number;
+    is_full_chapter: boolean;
   }[];
 };
+
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -60,10 +62,10 @@ export function useReadingData() {
           .maybeSingle(),
         supabase
           .from("reading_logs")
-          .select("id, reading_date, chapters_count, notes, duration_minutes, reading_passages(book_id, start_chapter, end_chapter)")
+          .select("id, reading_date, chapters_count, notes, duration_minutes, plan_id, reading_passages(book_id, start_chapter, end_chapter, is_full_chapter)")
           .eq("user_id", user.id)
-          .order("reading_date", { ascending: false })
-          .limit(365),
+          .order("reading_date", { ascending: false }),
+
         supabase
           .from("reading_plans")
           .select("id, title, books_today, completed_days, total_days, description, updated_at")

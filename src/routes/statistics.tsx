@@ -35,9 +35,9 @@ function StatisticsPage() {
     const months = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
     
     const last6Months = [];
+    const now = new Date();
     for (let i = 5; i >= 0; i--) {
-      const d = new Date();
-      d.setMonth(d.getMonth() - i);
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const key = `${months[d.getMonth()]} ${d.getFullYear().toString().slice(-2)}`;
       groups[key] = 0;
       last6Months.push(key);
@@ -56,6 +56,27 @@ function StatisticsPage() {
       chapters: groups[month]
     }));
   }, [recentLogs]);
+
+  const divisionStats = useMemo(() => {
+    const divisions = [
+      { label: "Pentateuco", color: "bg-blue-500", books: ["GEN", "EXO", "LEV", "NUM", "DEU"] },
+      { label: "Históricos", color: "bg-emerald-500", books: ["JOS", "JDG", "RUT", "1SA", "2SA", "1KI", "2KI", "1CH", "2CH", "EZR", "NEH", "EST", "ACT"] },
+      { label: "Poéticos", color: "bg-amber-500", books: ["JOB", "PSA", "PRO", "ECC", "SNG"] },
+      { label: "Profetas", color: "bg-purple-500", books: ["ISA", "JER", "LAM", "EZK", "DAN", "HOS", "JOL", "AMO", "OBA", "JON", "MIC", "NAM", "HAB", "ZEP", "HAG", "ZEC", "MAL"] },
+      { label: "NT", color: "bg-rose-500", books: ["MAT", "MRK", "LUK", "JHN", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TS", "2TS", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD", "REV"] },
+    ];
+
+
+    const bookLogs = recentLogs.flatMap(l => l.reading_passages.map(p => p.book_id));
+    const totalLogs = bookLogs.length || 1;
+
+    return divisions.map(div => {
+      const count = bookLogs.filter(b => div.books.includes(b)).length;
+      const percent = Math.round((count / totalLogs) * 100);
+      return { ...div, percent };
+    });
+  }, [recentLogs]);
+
 
   return (
     <AppShell>
@@ -132,24 +153,8 @@ function StatisticsPage() {
               <Card className="border-border/60 bg-card/70 p-5 backdrop-blur-sm">
                 <h3 className="mb-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Distribuição por Divisão</h3>
                 <div className="space-y-4">
-                  {useMemo(() => {
-                    const divisions = [
-                      { label: "Pentateuco", color: "bg-blue-500", books: ["GEN", "EXO", "LEV", "NUM", "DEU"] },
-                      { label: "Históricos", color: "bg-emerald-500", books: ["JOS", "JDG", "RUT", "1SA", "2SA", "1KI", "2KI", "1CH", "2CH", "EZR", "NEH", "EST"] },
-                      { label: "Poéticos", color: "bg-amber-500", books: ["JOB", "PSA", "PRO", "ECC", "SNG"] },
-                      { label: "Profetas", color: "bg-purple-500", books: ["ISA", "JER", "LAM", "EZE", "DAN", "HOS", "JOE", "AMO", "OBA", "JON", "MIC", "NAH", "HAB", "ZEP", "HAG", "ZEC", "MAL"] },
-                      { label: "NT", color: "bg-rose-500", books: ["MAT", "MRK", "LUK", "JHN", "ACT", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TH", "2TH", "1TI", "2TI", "TIT", "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD", "REV"] },
-                    ];
+                  {divisionStats.map((div) => (
 
-                    const bookLogs = recentLogs.flatMap(l => l.reading_passages.map(p => p.book_id));
-                    const totalLogs = bookLogs.length || 1;
-
-                    return divisions.map(div => {
-                      const count = bookLogs.filter(b => div.books.includes(b)).length;
-                      const percent = Math.round((count / totalLogs) * 100);
-                      return { ...div, percent };
-                    });
-                  }, [recentLogs]).map((div) => (
                     <div key={div.label} className="space-y-1.5">
                       <div className="flex justify-between text-[11px] font-medium">
                         <span className="text-muted-foreground">{div.label}</span>
