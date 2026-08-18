@@ -273,11 +273,14 @@ function HomePage() {
             className="border-primary/10 bg-primary/5 backdrop-blur-md"
           >
             <div className="py-2">
-              <p className="font-serif-title text-xl md:text-2xl font-medium leading-relaxed italic text-foreground/90">
+              <blockquote className="font-serif-title text-xl md:text-2xl font-medium leading-relaxed italic text-foreground/90">
                 "{dailyVerse.text}"
-              </p>
+              </blockquote>
               <div className="mt-5 flex items-center justify-between">
-                <BibleReference book={dailyVerse.book} reference={`${dailyVerse.chapter}:${dailyVerse.verse}`} />
+                <cite className="not-italic">
+                  <BibleReference book={dailyVerse.book} reference={`${dailyVerse.chapter}:${dailyVerse.verse}`} />
+                  <span className="ml-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Almeida</span>
+                </cite>
                 <div className="flex gap-2">
                   <Button 
                     variant="ghost" 
@@ -313,6 +316,32 @@ function HomePage() {
                     <Share2 className="h-4 w-4" />
                   </Button>
                 </div>
+              </div>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="rounded-xl text-xs font-bold border-primary/20 hover:bg-primary/5"
+                  onClick={() => {
+                    const url = `https://www.bible.com/pt/bible/127/${dailyVerse.book.toUpperCase().substring(0,3)}.${dailyVerse.chapter}`;
+                    window.open(url, "_blank", "noopener,noreferrer");
+                  }}
+                  aria-label={`Ler o contexto de ${dailyVerse.reference} na YouVersion`}
+                >
+                  Ler o contexto
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="rounded-xl text-xs font-bold text-primary hover:bg-primary/5"
+                  onClick={() => {
+                    setInitialModalDate(today);
+                    // Pass specific passage info if modal supports it
+                    setModalOpen(true);
+                  }}
+                >
+                  Registrar como lido
+                </Button>
               </div>
             </div>
           </BibleCard>
