@@ -401,17 +401,17 @@ function HomePage() {
                     <Book className="h-6 w-6" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-serif-title text-sm font-bold uppercase tracking-widest text-biblical-gold">Leitura para hoje</h3>
+                    <h3 className="font-serif-title text-sm font-bold uppercase tracking-widest text-biblical-gold">Leitura sugerida</h3>
                     <div className="mt-1 flex flex-wrap items-baseline gap-2">
-                       <BibleReference book={activePlan.books_today?.split(' ')[0] || activePlan.title} reference={activePlan.books_today?.split(' ').slice(1).join(' ') || ""} />
+                       <span className="font-serif-title text-lg font-bold">Baseado no seu plano atual</span>
                     </div>
-                    <p className="mt-2 text-xs text-muted-foreground/80 line-clamp-1">Parte da sua jornada atual: <span className="font-semibold text-foreground">{activePlan.title}</span></p>
+                    <p className="mt-2 text-xs text-muted-foreground/80 line-clamp-1">Parte da sua jornada: <span className="font-semibold text-foreground">{activePlan.title}</span></p>
                     <div className="mt-4 flex items-center justify-between">
                        <div className="h-1.5 w-32 rounded-full bg-biblical-gold/10 overflow-hidden">
                           <div className="h-full bg-biblical-gold transition-all duration-1000" style={{ width: `${(activePlan.completed_days / activePlan.total_days) * 100}%` }} />
                        </div>
                        <Button variant="ghost" size="sm" onClick={() => openRegister(today)} className="h-8 text-xs font-bold text-biblical-gold hover:bg-biblical-gold/10 px-0">
-                          Continuar Jornada <ChevronRight className="h-4 w-4 ml-1" />
+                          Registrar Leitura <ChevronRight className="h-4 w-4 ml-1" />
                        </Button>
                     </div>
                   </div>
