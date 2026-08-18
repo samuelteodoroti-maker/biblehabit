@@ -9,6 +9,7 @@ export type Profile = {
   longest_streak: number;
   total_chapters_read: number;
   last_read_date: string | null;
+  status: 'active' | 'suspended';
 };
 
 export type ActivePlan = {
