@@ -202,7 +202,7 @@ function ProgressPage() {
       let totalRead = 0;
       const dayMap = new Map<string, number>();
       for (const l of logs) {
-        const d = new Date(l.reading_date + "T00:00:00");
+        const d = new Date(l.reading_date + "T12:00:00");
         dayCounts[d.getDay()]++;
         totalRead += l.chapters_count ?? 0;
         dayMap.set(l.reading_date, (dayMap.get(l.reading_date) ?? 0) + (l.chapters_count ?? 0));
