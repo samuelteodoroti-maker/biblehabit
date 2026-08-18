@@ -31,7 +31,7 @@ export function AppShell({
           <div className="flex flex-col">
             {title ? (
               <>
-                <h1 className="font-serif-title text-2xl font-bold tracking-tight md:text-3xl lg:text-4xl">{title}</h1>
+                <h1 className="font-serif-title text-clamp-xl font-bold tracking-tight">{title}</h1>
                 {subtitle && <p className="small-label mt-1 text-muted-foreground/60">{subtitle}</p>}
               </>
             ) : (

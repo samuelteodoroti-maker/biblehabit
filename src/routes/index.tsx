@@ -183,7 +183,7 @@ function HomePage() {
                   <p className="font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
                     {greeting()}, {displayName}
                   </p>
-                  <h1 className="mt-1 font-serif-title text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
+                  <h1 className="mt-1 font-serif-title text-clamp-2xl font-bold tracking-tight">
                     Sua jornada diária
                   </h1>
                 </>

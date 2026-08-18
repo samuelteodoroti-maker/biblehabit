@@ -157,7 +157,7 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[95vh] max-w-lg overflow-y-auto border-border/60 bg-card/95 p-0 backdrop-blur-xl rounded-t-[2.5rem] sm:rounded-[2rem]">
+      <DialogContent className="max-h-[95vh] max-w-lg overflow-y-auto border-border/60 bg-card/95 p-0 backdrop-blur-xl rounded-t-[2.5rem] sm:rounded-[2rem] focus-visible:outline-none">
         <div className="sticky top-0 z-10 bg-card/95 p-6 pb-2 backdrop-blur-xl">
           <DialogHeader>
             <DialogTitle className="font-display text-xl">Registrar Leitura</DialogTitle>
@@ -169,7 +169,7 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
 
         <div className="space-y-6 px-6 pb-8 pt-2">
           {/* Quick Settings: Date & Duration */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3" role="group" aria-label="Informações da sessão">
             <div className="space-y-1.5">
               <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Data</Label>
               <div className="relative">
