@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -64,9 +64,8 @@ type Message = {
 function weekStart() {
   const d = new Date();
   d.setHours(0, 0, 0, 0);
-  d.setDate(d.getDate() - d.getDay()); // Sunday, local time
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  d.setDate(d.getDate() - d.getDay()); 
+  return d.toISOString().split('T')[0];
 }
 
 function timeAgo(iso: string) {
@@ -320,7 +319,7 @@ function GroupDetail() {
     }
   };
 
-  const toggleReaction = async (logId: string, type: "fire" | "amen") => {
+  const toggleReaction = useCallback(async (logId: string, type: "fire" | "amen") => {
     if (!user) return;
     const cur = reactions.get(logId) ?? { fire: 0, amen: 0, myFire: false, myAmen: false };
     const mine = type === "fire" ? cur.myFire : cur.myAmen;
@@ -333,27 +332,27 @@ function GroupDetail() {
       else { next.myAmen = true; next.amen = cur.amen + 1; }
     }
     setReactions((prev) => new Map(prev).set(logId, next));
-    if (mine) {
-      const { error } = await supabase
-        .from("reactions")
-        .delete()
-        .eq("log_id", logId)
-        .eq("user_id", user.id)
-        .eq("type", type);
-      if (error) {
-        toast.error(error.message);
-        setReactions((prev) => new Map(prev).set(logId, cur));
+    
+    try {
+      if (mine) {
+        const { error } = await supabase
+          .from("reactions")
+          .delete()
+          .eq("log_id", logId)
+          .eq("user_id", user.id)
+          .eq("type", type);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from("reactions")
+          .insert({ log_id: logId, user_id: user.id, type });
+        if (error) throw error;
       }
-    } else {
-      const { error } = await supabase
-        .from("reactions")
-        .insert({ log_id: logId, user_id: user.id, type });
-      if (error) {
-        toast.error(error.message);
-        setReactions((prev) => new Map(prev).set(logId, cur));
-      }
+    } catch (error: any) {
+      toast.error(error.message);
+      setReactions((prev) => new Map(prev).set(logId, cur));
     }
-  };
+  }, [user, reactions]);
 
   if (notFound) {
     return (
