@@ -18,7 +18,7 @@ export async function checkIsAdmin(): Promise<boolean> {
   return roles.includes(data.role as UserRole);
 }
 
-export const APP_VERSION = "1.3.0";
+export const APP_VERSION = "1.5.0";
 export const SUPPORT_WHATSAPP = "5521959331138";
 export const SUPPORT_WHATSAPP_DISPLAY = "(21) 9 5933-1138";
 
