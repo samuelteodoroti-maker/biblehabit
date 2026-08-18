@@ -10,7 +10,9 @@ export type Profile = {
   total_chapters_read: number;
   last_read_date: string | null;
   status: 'active' | 'suspended';
+  youversion_link: string | null;
 };
+
 
 export type ActivePlan = {
   id: string;
@@ -62,7 +64,7 @@ export function useReadingData() {
       const [profileRes, logsRes, plansRes] = await Promise.all([
         supabase
           .from("profiles")
-          .select("name, avatar_url, current_streak, longest_streak, total_chapters_read, last_read_date, status")
+          .select("name, avatar_url, current_streak, longest_streak, total_chapters_read, last_read_date, status, youversion_link")
           .eq("id", user.id)
           .maybeSingle(),
         supabase
