@@ -391,8 +391,10 @@ function HomePage() {
           open={modalOpen}
           onOpenChange={setModalOpen}
           userId={user.id}
-          today={selectedDate}
+          today={today}
+          initialDate={initialModalDate}
           onSaved={refresh}
+
         />
       )}
     </AppShell>
