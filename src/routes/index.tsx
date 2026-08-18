@@ -79,6 +79,7 @@ function HomePage() {
   const { verse: dailyVerse } = useDailyVerse();
   const [modalOpen, setModalOpen] = useState(false);
   const [initialModalDate, setInitialModalDate] = useState(today);
+  const [initialPassage, setInitialPassage] = useState<any>(null);
 
   const [latestUpdate, setLatestUpdate] = useState<any>(null);
   const [showNotice, setShowNotice] = useState(false);
@@ -120,7 +121,7 @@ function HomePage() {
   const streak = profile?.current_streak ?? 0;
   const total = profile?.total_chapters_read ?? 0;
 
-  const openRegister = (date?: string) => {
+  const openRegister = (date?: string, passage?: any) => {
     if (!user) {
       toast.info("Entre para registrar sua leitura");
       navigate({ to: "/auth" });
@@ -138,6 +139,7 @@ function HomePage() {
     }
 
     setInitialModalDate(targetDateStr);
+    setInitialPassage(passage || null);
     setModalOpen(true);
   };
 
@@ -204,59 +206,6 @@ function HomePage() {
             </div>
           </div>
 
-          {/* Daily Verse Card */}
-          <BibleCard
-            variant="glass"
-            icon={Sparkles}
-            title="Versículo do Dia"
-            subtitle="Alimento Diário"
-            className="border-primary/10 bg-primary/5 backdrop-blur-md"
-          >
-            <div className="py-2">
-              <p className="font-serif-title text-xl md:text-2xl font-medium leading-relaxed italic text-foreground/90">
-                "{dailyVerse.text}"
-              </p>
-              <div className="mt-5 flex items-center justify-between">
-                <BibleReference book={dailyVerse.book} reference={`${dailyVerse.chapter}:${dailyVerse.verse}`} />
-                <div className="flex gap-2">
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-8 w-8 rounded-full text-primary hover:bg-primary/10"
-                    onClick={() => {
-                      navigator.clipboard.writeText(`"${dailyVerse.text}" - ${dailyVerse.reference}`);
-                      toast.success("Versículo copiado!");
-                    }}
-                    title="Copiar versículo"
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-8 w-8 rounded-full text-primary hover:bg-primary/10"
-                    onClick={() => {
-                      const shareText = `"${dailyVerse.text}" - ${dailyVerse.reference}\nLeia mais no Bible Habit!`;
-                      if (navigator.share) {
-                        navigator.share({
-                          title: 'Versículo do Dia - Bible Habit',
-                          text: shareText,
-                          url: window.location.origin
-                        }).catch(() => {});
-                      } else {
-                        navigator.clipboard.writeText(shareText);
-                        toast.success("Link para compartilhar copiado!");
-                      }
-                    }}
-                    title="Compartilhar"
-                  >
-                    <Share2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </BibleCard>
-
           {/* Main Streak Card */}
           <BibleCard 
             variant="editorial"
@@ -316,6 +265,120 @@ function HomePage() {
               </div>
             </div>
           </BibleCard>
+
+          {/* Daily Verse Card (Palavra para hoje) */}
+          <BibleCard
+            variant="glass"
+            icon={Sparkles}
+            title="Palavra para hoje"
+            subtitle="Versículo do dia"
+            className="border-primary/10 bg-primary/5 backdrop-blur-md"
+          >
+            <div className="py-2">
+              <blockquote className="font-serif-title text-xl md:text-2xl font-medium leading-relaxed italic text-foreground/90">
+                "{dailyVerse.text}"
+              </blockquote>
+              <div className="mt-5 flex items-center justify-between">
+                <cite className="not-italic">
+                  <BibleReference book={dailyVerse.book} reference={`${dailyVerse.chapter}:${dailyVerse.verse}`} />
+                  <span className="ml-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Almeida</span>
+                </cite>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-8 w-8 rounded-full text-primary hover:bg-primary/10"
+                    onClick={() => {
+                      navigator.clipboard.writeText(`"${dailyVerse.text}" - ${dailyVerse.reference}`);
+                      toast.success("Versículo copiado!");
+                    }}
+                    title="Copiar versículo"
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-8 w-8 rounded-full text-primary hover:bg-primary/10"
+                    onClick={() => {
+                      const shareText = `"${dailyVerse.text}" - ${dailyVerse.reference}\nLeia mais no Bible Habit!`;
+                      if (navigator.share) {
+                        navigator.share({
+                          title: 'Versículo do Dia - Bible Habit',
+                          text: shareText,
+                          url: window.location.origin
+                        }).catch(() => {});
+                      } else {
+                        navigator.clipboard.writeText(shareText);
+                        toast.success("Link para compartilhar copiado!");
+                      }
+                    }}
+                    title="Compartilhar"
+                  >
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="rounded-xl text-xs font-bold border-primary/20 hover:bg-primary/5"
+                  onClick={() => {
+                    const url = `https://www.bible.com/pt/bible/127/${dailyVerse.book.toUpperCase().substring(0,3)}.${dailyVerse.chapter}`;
+                    window.open(url, "_blank", "noopener,noreferrer");
+                  }}
+                  aria-label={`Ler o contexto de ${dailyVerse.reference} na YouVersion`}
+                >
+                  Ler o contexto
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="rounded-xl text-xs font-bold text-primary hover:bg-primary/5"
+                  onClick={() => {
+                    setInitialModalDate(today);
+                    setInitialPassage({
+                      bookId: dailyVerse.book.toUpperCase().substring(0,3), // Basic mapping, should ideally use stable bookId from dataset
+                      chapter: dailyVerse.chapter,
+                      startVerse: dailyVerse.verse,
+                      endVerse: dailyVerse.verse
+                    });
+                    setModalOpen(true);
+                  }}
+                >
+                  Registrar como lido
+                </Button>
+              </div>
+            </div>
+          </BibleCard>
+
+          {/* Bible YouVersion Button */}
+          <BibleCard
+            variant="default"
+            className="border-primary/20 bg-card/80 p-0 overflow-hidden"
+          >
+            <a 
+              href="https://www.bible.com/pt/bible" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              aria-label="Abrir a Bíblia no YouVersion"
+              className="flex items-center justify-between p-5 md:p-6 transition-colors hover:bg-primary/5 active:bg-primary/10"
+            >
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                  <Book className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="font-serif-title text-base font-bold text-foreground">Abrir Bíblia no YouVersion</h3>
+                  <p className="text-xs text-muted-foreground">Continue sua leitura oficial</p>
+                </div>
+              </div>
+              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+            </a>
+          </BibleCard>
+
+          {/* Main Streak Card */}
 
           {/* Reading Suggestion (Editorial Style) */}
           {!loading && activePlan && !registeredToday && (
@@ -446,12 +509,15 @@ function HomePage() {
       {user && (
         <LogReadingModal
           open={modalOpen}
-          onOpenChange={setModalOpen}
+          onOpenChange={(v) => {
+            setModalOpen(v);
+            if (!v) setInitialPassage(null);
+          }}
           userId={user.id}
           today={today}
           initialDate={initialModalDate}
+          initialPassage={initialPassage}
           onSaved={refresh}
-
         />
       )}
     </AppShell>
