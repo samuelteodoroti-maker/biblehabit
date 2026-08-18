@@ -77,9 +77,9 @@ function HomePage() {
   useEffect(() => {
     const checkUpdates = async () => {
       try {
-        const { updates } = await getUpdates({ data: { limit: 1 } });
-        if (updates && updates.length > 0) {
-          const update = updates[0];
+        const res = await getUpdates({ data: { limit: 1 } });
+        if (res?.updates && res.updates.length > 0) {
+          const update = res.updates[0];
           const lastSeen = localStorage.getItem("bh_last_update_seen");
           if (lastSeen !== update.version) {
             setLatestUpdate(update);
