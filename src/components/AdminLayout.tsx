@@ -27,10 +27,10 @@ interface AdminLayoutProps {
 const NAV_ITEMS = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/admin", roles: ["super_admin", "admin", "support", "analyst"] },
   { label: "Usuários", icon: Users, path: "/admin/users", roles: ["super_admin", "admin", "support"] },
-  { label: "Auditoria", icon: History, path: "/admin/audit", roles: ["super_admin", "admin"] },
-  { label: "Segurança", icon: ShieldAlert, path: "/admin/security", roles: ["super_admin"] },
-  { label: "Suporte", icon: LifeBuoy, path: "/admin/support", roles: ["super_admin", "support"] },
-  { label: "Configurações", icon: Settings, path: "/admin/settings", roles: ["super_admin"] },
+  { label: "Auditoria", icon: History, path: "/admin/audit", roles: ["super_admin", "admin", "analyst"] },
+  { label: "Segurança", icon: ShieldAlert, path: "/admin/security", roles: ["super_admin", "analyst"] },
+  { label: "Suporte", icon: LifeBuoy, path: "/admin/support", roles: ["super_admin", "support", "admin"] },
+  { label: "Configurações", icon: Settings, path: "/admin/settings", roles: ["super_admin", "admin"] },
 ];
 
 export function AdminLayout({ children, title, actions }: AdminLayoutProps) {
