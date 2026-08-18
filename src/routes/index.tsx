@@ -16,7 +16,9 @@ import {
   X, 
   Bookmark,
   ArrowRight,
-  TrendingUp
+  TrendingUp,
+  Copy,
+  Share2
 } from "lucide-react";
 
 
