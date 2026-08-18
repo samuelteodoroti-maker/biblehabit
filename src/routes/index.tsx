@@ -204,12 +204,72 @@ function HomePage() {
             </div>
           </div>
 
-          {/* Daily Verse Card */}
+          {/* Main Streak Card */}
+          <BibleCard 
+            variant="editorial"
+            icon={Flame}
+            title="Constância na Palavra"
+            subtitle="Ofensiva Diária"
+            action={
+              <Badge variant="secondary" className="bg-biblical-gold/10 text-biblical-gold font-bold text-[10px] tracking-widest px-3 py-1 border-biblical-gold/20 rounded-full">
+                Recorde: {profile?.longest_streak ?? 0}
+              </Badge>
+            }
+          >
+            <div className="flex flex-col items-center py-6 md:flex-row md:justify-around md:py-10 gap-8">
+              <div className="text-center md:text-left">
+                <div className="flex items-baseline justify-center gap-2.5 md:justify-start">
+                  <span className="stat-number font-display font-bold leading-none tracking-tighter text-foreground">
+                    {streak}
+                  </span>
+                  <span className="font-serif-title text-2xl font-bold italic text-muted-foreground/60">
+                    {streak === 1 ? "dia" : "dias"}
+                  </span>
+                </div>
+                <p className="mt-5 text-base leading-relaxed text-muted-foreground max-w-[320px]">
+                  {registeredToday
+                    ? "Você já alimentou seu espírito hoje. Continue firme na caminhada!"
+                    : streak === 0
+                      ? "Acenda sua chama hoje com a primeira leitura do dia."
+                      : "Mantenha sua jornada ativa com a leitura de hoje."}
+                </p>
+              </div>
+
+              <div className="mt-8 flex w-full flex-col gap-3 md:mt-0 md:w-auto">
+                <Button
+                  size="lg"
+                  className={`h-16 md:h-20 w-full gap-4 rounded-3xl text-lg font-bold transition-all duration-300 px-8 md:w-auto hover:scale-[1.02] active:scale-[0.98] ${
+                    registeredToday
+                      ? "bg-success/15 text-success hover:bg-success/20 border border-success/20 shadow-lg shadow-success/10"
+                      : "gradient-primary text-primary-foreground shadow-glow hover:brightness-110 shadow-xl"
+                  }`}
+                  disabled={loading}
+                  onClick={() => openRegister(today)}
+                >
+                  {registeredToday ? (
+                    <Check className="h-6 w-6" />
+                  ) : (
+                    <BookOpenCheck className="h-6 w-6" />
+                  )}
+                  {registeredToday
+                    ? "Leitura Concluída"
+                    : "Começar Leitura"}
+                </Button>
+                {!registeredToday && (
+                  <p className="text-center text-[10px] font-bold uppercase tracking-widest text-muted-foreground md:text-left">
+                    {streak > 0 ? "Faltam poucas horas para o fim do dia" : "Uma jornada de mil milhas começa agora"}
+                  </p>
+                )}
+              </div>
+            </div>
+          </BibleCard>
+
+          {/* Daily Verse Card (Palavra para hoje) */}
           <BibleCard
             variant="glass"
             icon={Sparkles}
-            title="Versículo do Dia"
-            subtitle="Alimento Diário"
+            title="Palavra para hoje"
+            subtitle="Versículo do dia"
             className="border-primary/10 bg-primary/5 backdrop-blur-md"
           >
             <div className="py-2">
