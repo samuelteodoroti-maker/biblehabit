@@ -211,22 +211,46 @@ function HomePage() {
             className="border-primary/10 bg-primary/5 backdrop-blur-md"
           >
             <div className="py-2">
-              <p className="font-serif text-lg md:text-xl font-medium leading-relaxed italic text-foreground/90">
+              <p className="font-serif-title text-xl md:text-2xl font-medium leading-relaxed italic text-foreground/90">
                 "{dailyVerse.text}"
               </p>
-              <div className="mt-4 flex items-center justify-between">
+              <div className="mt-5 flex items-center justify-between">
                 <BibleReference book={dailyVerse.book} reference={`${dailyVerse.chapter}:${dailyVerse.verse}`} />
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="h-8 rounded-lg text-[10px] font-bold uppercase tracking-wider text-primary hover:bg-primary/10"
-                  onClick={() => {
-                    navigator.clipboard.writeText(`"${dailyVerse.text}" - ${dailyVerse.reference}`);
-                    toast.success("Versículo copiado!");
-                  }}
-                >
-                  Compartilhar
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-8 w-8 rounded-full text-primary hover:bg-primary/10"
+                    onClick={() => {
+                      navigator.clipboard.writeText(`"${dailyVerse.text}" - ${dailyVerse.reference}`);
+                      toast.success("Versículo copiado!");
+                    }}
+                    title="Copiar versículo"
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-8 w-8 rounded-full text-primary hover:bg-primary/10"
+                    onClick={() => {
+                      const shareText = `"${dailyVerse.text}" - ${dailyVerse.reference}\nLeia mais no Bible Habit!`;
+                      if (navigator.share) {
+                        navigator.share({
+                          title: 'Versículo do Dia - Bible Habit',
+                          text: shareText,
+                          url: window.location.origin
+                        }).catch(() => {});
+                      } else {
+                        navigator.clipboard.writeText(shareText);
+                        toast.success("Link para compartilhar copiado!");
+                      }
+                    }}
+                    title="Compartilhar"
+                  >
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           </BibleCard>
