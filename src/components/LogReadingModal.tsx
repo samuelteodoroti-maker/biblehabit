@@ -60,6 +60,22 @@ export function LogReadingModal({ open, onOpenChange, userId, today, initialDate
     setNotes("");
     setDuration(15);
 
+    if (initialPassage) {
+      setPassages([{
+        id: crypto.randomUUID(),
+        bookId: initialPassage.bookId,
+        startChapter: initialPassage.chapter,
+        startVerse: initialPassage.startVerse || 1,
+        endChapter: initialPassage.chapter,
+        endVerse: initialPassage.endVerse || initialPassage.startVerse || 0,
+        isFullChapters: !initialPassage.startVerse
+      }]);
+    } else {
+      setPassages([
+        { id: crypto.randomUUID(), bookId: "GEN", startChapter: 1, startVerse: 1, endChapter: 1, endVerse: 1, isFullChapters: false }
+      ]);
+    }
+
     
     if (activePlan) {
       setPlanId(activePlan.id);
