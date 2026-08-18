@@ -25,6 +25,7 @@ import { LogReadingModal } from "@/components/LogReadingModal";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useReadingData } from "@/hooks/useReadingData";
+import { useDailyVerse } from "@/hooks/useDailyVerse";
 import { getUpdates } from "@/lib/updates.functions";
 import { APP_VERSION } from "@/lib/app-utils";
 import { BibleCard, BibleReference } from "@/components/BibleUI";
@@ -73,6 +74,7 @@ function HomePage() {
   const navigate = useNavigate();
   const { user, isAdmin, role } = useAuth();
   const { profile, activePlan, logDates, loading, today, refresh } = useReadingData();
+  const { verse: dailyVerse } = useDailyVerse();
   const [modalOpen, setModalOpen] = useState(false);
   const [initialModalDate, setInitialModalDate] = useState(today);
 
@@ -199,6 +201,35 @@ function HomePage() {
               )}
             </div>
           </div>
+
+          {/* Daily Verse Card */}
+          <BibleCard
+            variant="glass"
+            icon={Sparkles}
+            title="Versículo do Dia"
+            subtitle="Alimento Diário"
+            className="border-primary/10 bg-primary/5 backdrop-blur-md"
+          >
+            <div className="py-2">
+              <p className="font-serif text-lg md:text-xl font-medium leading-relaxed italic text-foreground/90">
+                "{dailyVerse.text}"
+              </p>
+              <div className="mt-4 flex items-center justify-between">
+                <BibleReference book={dailyVerse.book} reference={`${dailyVerse.chapter}:${dailyVerse.verse}`} />
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-8 rounded-lg text-[10px] font-bold uppercase tracking-wider text-primary hover:bg-primary/10"
+                  onClick={() => {
+                    navigator.clipboard.writeText(`"${dailyVerse.text}" - ${dailyVerse.reference}`);
+                    toast.success("Versículo copiado!");
+                  }}
+                >
+                  Compartilhar
+                </Button>
+              </div>
+            </div>
+          </BibleCard>
 
           {/* Main Streak Card */}
           <BibleCard 
