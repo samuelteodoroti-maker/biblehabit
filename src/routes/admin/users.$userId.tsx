@@ -53,7 +53,7 @@ function AdminUserDetailPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['admin-user-detail', userId],
     queryFn: () => fetchProfile({ data: { userId } }),
-    enabled: !!role && ['super_admin', 'admin', 'support'].includes(role)
+    enabled: !!role && ['super_admin', 'admin', 'support', 'analyst'].includes(role)
   });
 
   const statusMutation = useMutation({
@@ -125,7 +125,7 @@ function AdminUserDetailPage() {
              </div>
           </BibleCard>
 
-          {role === 'super_admin' && (
+          {(role === 'super_admin' || role === 'admin') && (
             <div className="space-y-3">
               <Button 
                 variant="destructive" 
