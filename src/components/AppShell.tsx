@@ -3,6 +3,9 @@ import { BottomNav } from "./BottomNav";
 import { DesktopSidebar } from "./DesktopSidebar";
 import { Bookmark, User } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { useReadingData } from "@/hooks/useReadingData";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+
 
 export function AppShell({
   title,
@@ -15,7 +18,14 @@ export function AppShell({
   children: ReactNode;
   hero?: ReactNode;
 }) {
+  const { profile, user } = useReadingData();
+  
+  const displayName = profile?.name || user?.email?.split('@')[0] || "Você";
+  const initial = (displayName || "?")[0].toUpperCase();
+  const effectiveAvatar = profile?.avatar_url || (user?.user_metadata?.avatar_url as string | undefined);
+
   return (
+
     <div className="relative min-h-screen bg-background text-foreground selection:bg-primary/20">
       {/* Editorial Decorative Background Elements */}
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
@@ -45,10 +55,16 @@ export function AppShell({
           </div>
           
           <div className="flex items-center gap-4">
-             <Link to="/settings" className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card shadow-sm transition-colors hover:bg-accent md:h-10 md:w-10">
-               <User className="h-4 w-4 text-muted-foreground md:h-5 md:w-5" />
+             <Link to="/settings" className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card shadow-sm transition-colors hover:bg-accent md:h-10 md:w-10 overflow-hidden">
+               <Avatar className="h-full w-full">
+                 <AvatarImage src={effectiveAvatar} alt={displayName} />
+                 <AvatarFallback className="text-[10px] font-bold">
+                   {initial}
+                 </AvatarFallback>
+               </Avatar>
              </Link>
           </div>
+
         </header>
 
         {hero && <div className="px-6 pt-6 lg:px-10 lg:pt-8">{hero}</div>}
