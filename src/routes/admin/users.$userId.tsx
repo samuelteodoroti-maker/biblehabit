@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { AdminLayout } from "@/components/AdminLayout";
 import { useServerFn } from "@tanstack/react-start";
@@ -41,6 +41,7 @@ export const Route = createFileRoute("/admin/users/$userId")({
 
 function AdminUserDetailPage() {
   const { userId } = Route.useParams();
+  const navigate = useNavigate();
   const { role, roleLoading } = useAuth();
   const fetchProfile = useServerFn(getAdminUserProfile);
   const updateStatus = useServerFn(manageUserStatus);
@@ -76,7 +77,20 @@ function AdminUserDetailPage() {
   const { profile, roles, stats, plans } = data || {};
 
   return (
-    <AdminLayout title="Detalhes do Usuário">
+    <AdminLayout 
+      title="Detalhes do Usuário"
+      actions={
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => navigate({ to: "/admin" })}
+          className="text-slate-400 hover:text-white"
+        >
+          <ChevronLeft className="h-4 w-4 mr-2" />
+          Voltar
+        </Button>
+      }
+    >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Profile Card */}
         <div className="lg:col-span-4 space-y-6">
