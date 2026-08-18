@@ -14,7 +14,7 @@ function AdminSecurityPage() {
   const navigate = useNavigate();
 
   if (roleLoading) return <div className="p-10 text-white">Carregando...</div>;
-  if (role !== "super_admin") {
+  if (role !== "super_admin" && role !== "analyst") {
     return (
       <AdminLayout title="Acesso Negado">
         <div className="flex flex-col items-center justify-center py-20 text-center">

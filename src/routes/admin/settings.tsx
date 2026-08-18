@@ -16,7 +16,7 @@ function AdminSettingsPage() {
   const navigate = useNavigate();
 
   if (roleLoading) return <div className="p-10 text-white">Carregando...</div>;
-  if (role !== "super_admin") {
+  if (role !== "super_admin" && role !== "admin") {
     return <div className="p-10 text-center text-white">Acesso negado.</div>;
   }
 
