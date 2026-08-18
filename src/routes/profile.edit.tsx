@@ -226,7 +226,7 @@ function EditProfilePage() {
                     size="sm" 
                     variant="ghost" 
                     className="h-9 gap-2 rounded-xl text-primary hover:bg-primary/10" 
-                    onClick={() => { setAvatar(originalGoogleGoogleAvatar); setIsDirty(true); }}
+                    onClick={() => { setAvatar(originalGoogleAvatar); setIsDirty(true); }}
                     disabled={saving}
                   >
                     <Sparkles className="h-4 w-4" /> Usar do Google
