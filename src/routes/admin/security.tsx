@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { AdminLayout } from "@/components/AdminLayout";
-import { Shield, Lock, ShieldCheck, AlertCircle } from "lucide-react";
+import { Shield, Lock, ShieldCheck, AlertCircle, ChevronLeft } from "lucide-react";
 import { BibleCard } from "@/components/BibleUI";
 import { Button } from "@/components/ui/button";
 
@@ -11,6 +11,7 @@ export const Route = createFileRoute("/admin/security")({
 
 function AdminSecurityPage() {
   const { role, roleLoading } = useAuth();
+  const navigate = useNavigate();
 
   if (roleLoading) return <div className="p-10 text-white">Carregando...</div>;
   if (role !== "super_admin") {
@@ -26,7 +27,20 @@ function AdminSecurityPage() {
   }
 
   return (
-    <AdminLayout title="Segurança do Sistema">
+    <AdminLayout 
+      title="Segurança do Sistema"
+      actions={
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => navigate({ to: "/admin" })}
+          className="text-slate-400 hover:text-white"
+        >
+          <ChevronLeft className="h-4 w-4 mr-2" />
+          Voltar
+        </Button>
+      }
+    >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <BibleCard title="Autenticação Multi-Fator (MFA)" icon={ShieldCheck}>
           <div className="space-y-4">
