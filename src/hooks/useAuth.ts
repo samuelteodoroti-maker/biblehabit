@@ -67,7 +67,7 @@ export function useAuth() {
     user, 
     loading, 
     role, 
-    isAdmin: role === "admin" || role === "super_admin",
+    isAdmin: ["admin", "super_admin", "support", "analyst"].includes(role),
     roleLoading 
   };
 }
