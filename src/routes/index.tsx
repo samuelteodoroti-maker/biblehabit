@@ -32,7 +32,7 @@ import { getUpdates } from "@/lib/updates.functions";
 import { APP_VERSION } from "@/lib/app-utils";
 import { BibleCard, BibleReference } from "@/components/BibleUI";
 import { buildYouVersionContextUrl, getCurrentAppLocale } from "@/lib/youversion-utils";
-import { BIBLE_CANON } from "@/lib/bible-canon";
+import { BIBLE_CANON, getBookById } from "@/lib/bible-canon";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -347,8 +347,9 @@ function HomePage() {
                   className="rounded-xl text-xs font-bold text-primary hover:bg-primary/5"
                   onClick={() => {
                     setInitialModalDate(today);
+                    const book = BIBLE_CANON.find(b => b.name === dailyVerse.book);
                     setInitialPassage({
-                      bookId: BIBLE_CANON.find(b => b.name === dailyVerse.book)?.id || "JHN",
+                      bookId: book?.id || "JHN",
                       chapter: dailyVerse.chapter,
                       startVerse: dailyVerse.verse,
                       endVerse: dailyVerse.verse
