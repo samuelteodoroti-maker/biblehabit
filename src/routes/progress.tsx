@@ -12,7 +12,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Plus, Share2, Pencil, Trash2, Loader2, BookOpen, CalendarHeart, TrendingUp } from "lucide-react";
+import { Plus, Share2, Pencil, Trash2, Loader2, BookOpen, CalendarHeart, TrendingUp, BookOpenCheck } from "lucide-react";
 import { bibleBooks, getChaptersBetween } from "@/lib/bibleBooks";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -45,50 +45,10 @@ type Plan = {
   share_code: string | null;
 };
 
+import { ProgressRing } from "@/components/BibleUI";
+
 function CircularProgress({ value }: { value: number }) {
-  const safe = Number.isFinite(value) ? Math.max(0, Math.min(100, value)) : 0;
-  const r = 32;
-  const c = 2 * Math.PI * r;
-  const offset = c - (safe / 100) * c;
-  return (
-    <svg
-      width="80"
-      height="80"
-      viewBox="0 0 80 80"
-      className="shrink-0"
-      aria-label={`Progresso ${Math.round(safe)}%`}
-    >
-      <defs>
-        <linearGradient id="progGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <linearGradient id="progGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="oklch(0.55 0.22 275)" />
-            <stop offset="100%" stopColor="oklch(0.75 0.19 275)" />
-          </linearGradient>
-        </linearGradient>
-      </defs>
-      <circle cx="40" cy="40" r={r} className="fill-none stroke-muted/60" strokeWidth="7" />
-      <circle
-        cx="40"
-        cy="40"
-        r={r}
-        stroke="url(#progGrad)"
-        className="fill-none transition-all"
-        strokeWidth="7"
-        strokeLinecap="round"
-        strokeDasharray={c}
-        strokeDashoffset={offset}
-        transform="rotate(-90 40 40)"
-      />
-      <text
-        x="40"
-        y="46"
-        textAnchor="middle"
-        className="fill-foreground font-display text-base font-bold"
-      >
-        {Math.round(safe)}%
-      </text>
-    </svg>
-  );
+  return <ProgressRing progress={value} size={80} strokeWidth={7} />;
 }
 
 const pad2 = (n: number) => String(n).padStart(2, "0");
@@ -202,7 +162,7 @@ function ProgressPage() {
       let totalRead = 0;
       const dayMap = new Map<string, number>();
       for (const l of logs) {
-        const d = new Date(l.reading_date + "T00:00:00");
+        const d = new Date(l.reading_date + "T12:00:00");
         dayCounts[d.getDay()]++;
         totalRead += l.chapters_count ?? 0;
         dayMap.set(l.reading_date, (dayMap.get(l.reading_date) ?? 0) + (l.chapters_count ?? 0));
@@ -380,6 +340,7 @@ function ProgressPage() {
         className="mb-10 h-16 w-full gap-3 rounded-[1.5rem] gradient-primary text-lg font-bold text-primary-foreground shadow-glow-lg hover:brightness-110 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300"
         disabled={!user || loading}
         aria-label="Criar novo plano de leitura"
+        aria-haspopup="dialog"
       >
         <Plus className="h-6 w-6" /> Novo plano
       </Button>

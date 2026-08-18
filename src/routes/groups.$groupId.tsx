@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -84,6 +84,7 @@ function timeAgo(iso: string) {
 
 function GroupDetail() {
   const { groupId } = Route.useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [group, setGroup] = useState<Group | null>(null);
   const [members, setMembers] = useState<MemberStat[]>([]);
@@ -368,13 +369,15 @@ function GroupDetail() {
   return (
     <AppShell>
       <div className="mb-6 flex items-center gap-3">
-        <Link
-          to="/groups"
-          className="grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-card/60 text-foreground transition-colors hover:bg-accent"
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 rounded-full border border-border/60 bg-card/60 text-foreground transition-colors hover:bg-accent"
+          onClick={() => navigate({ to: "/groups" })}
           aria-label="Voltar para grupos"
         >
           <ChevronLeft className="h-4 w-4" />
-        </Link>
+        </Button>
         {loading ? (
           <>
             <Skeleton className="h-12 w-12 rounded-2xl" />

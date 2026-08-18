@@ -9,6 +9,7 @@ export type Profile = {
   longest_streak: number;
   total_chapters_read: number;
   last_read_date: string | null;
+  status: 'active' | 'suspended';
 };
 
 export type ActivePlan = {
@@ -41,10 +42,12 @@ export function useReadingData() {
   const [logDates, setLogDates] = useState<Set<string>>(new Set());
   const [recentLogs, setRecentLogs] = useState<DetailedLog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   const pad = (n: number) => String(n).padStart(2, "0");
   const today = useMemo(() => {
     const d = new Date();
+    // Use local date for the key to match reading_logs table logic
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   }, []);
 
@@ -55,39 +58,50 @@ export function useReadingData() {
     }
     
     setLoading(true);
+    setError(null);
     
     try {
-      // Fetch profile
-      const { data: p } = await supabase
-        .from("profiles")
-        .select("name, avatar_url, current_streak, longest_streak, total_chapters_read, last_read_date")
-        .eq("id", user.id)
-        .maybeSingle();
+      // Parallelize fetches for better performance
+      const [profileRes, logsRes, plansRes] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("name, avatar_url, current_streak, longest_streak, total_chapters_read, last_read_date, status")
+          .eq("id", user.id)
+          .maybeSingle(),
+        supabase
+          .from("reading_logs")
+          .select("id, reading_date, chapters_count, notes, duration_minutes, reading_passages(book_id, start_chapter, end_chapter)")
+          .eq("user_id", user.id)
+          .order("reading_date", { ascending: false })
+          .limit(365),
+        supabase
+          .from("reading_plans")
+          .select("id, title, books_today, completed_days, total_days, description, updated_at")
+          .eq("user_id", user.id)
+          .order("updated_at", { ascending: false })
+      ]);
         
-      // Fetch logs
-      const { data: logs } = await supabase
-        .from("reading_logs")
-        .select("id, reading_date, chapters_count, notes, duration_minutes, reading_passages(book_id, start_chapter, end_chapter)")
-        .eq("user_id", user.id)
-        .order("reading_date", { ascending: false })
-        .limit(365);
-        
-      // Fetch plans to determine active one
-      const { data: allPlans } = await supabase
-        .from("reading_plans")
-        .select("id, title, books_today, completed_days, total_days, description, updated_at")
-        .eq("user_id", user.id)
-        .order("updated_at", { ascending: false });
+      if (profileRes.error) throw profileRes.error;
+      if (logsRes.error) throw logsRes.error;
+      if (plansRes.error) throw plansRes.error;
+
+      // Handle account suspension
+      if (profileRes.data?.status === 'suspended') {
+        console.warn("Account is suspended.");
+        // We might want to trigger a logout or show a specific UI here
+      }
 
       // Logic: Favor uncompleted plans updated most recently
-      const finalPlan = allPlans?.find(p => (p.completed_days ?? 0) < (p.total_days ?? 0)) || allPlans?.[0];
+      const allPlans = plansRes.data || [];
+      const finalPlan = allPlans.find(p => (p.completed_days ?? 0) < (p.total_days ?? 0)) || allPlans[0];
       
-      setProfile(p as Profile | null);
-      setRecentLogs((logs as any) ?? []);
-      setLogDates(new Set((logs ?? []).map(l => l.reading_date)));
+      setProfile(profileRes.data as Profile | null);
+      setRecentLogs((logsRes.data as any) ?? []);
+      setLogDates(new Set((logsRes.data ?? []).map(l => l.reading_date)));
       setActivePlan(finalPlan as ActivePlan | null);
-    } catch (error) {
-      console.error("Error fetching reading data:", error);
+    } catch (err: any) {
+      console.error("Error fetching reading data:", err);
+      setError(err);
     } finally {
       setLoading(false);
     }
@@ -106,6 +120,7 @@ export function useReadingData() {
     logDates,
     recentLogs,
     loading: authLoading || loading,
+    error,
     today,
     refresh: fetchData
   };

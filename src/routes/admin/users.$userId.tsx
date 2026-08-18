@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { AdminLayout } from "@/components/AdminLayout";
 import { useServerFn } from "@tanstack/react-start";
@@ -16,7 +16,8 @@ import {
   Globe,
   CheckCircle2,
   XCircle,
-  Ban
+  Ban,
+  ChevronLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -41,6 +42,7 @@ export const Route = createFileRoute("/admin/users/$userId")({
 
 function AdminUserDetailPage() {
   const { userId } = Route.useParams();
+  const navigate = useNavigate();
   const { role, roleLoading } = useAuth();
   const fetchProfile = useServerFn(getAdminUserProfile);
   const updateStatus = useServerFn(manageUserStatus);
@@ -51,7 +53,7 @@ function AdminUserDetailPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['admin-user-detail', userId],
     queryFn: () => fetchProfile({ data: { userId } }),
-    enabled: !!role && ['super_admin', 'admin', 'support'].includes(role)
+    enabled: !!role && ['super_admin', 'admin', 'support', 'analyst'].includes(role)
   });
 
   const statusMutation = useMutation({
@@ -69,14 +71,27 @@ function AdminUserDetailPage() {
   });
 
   if (roleLoading || isLoading) return <div className="p-10 text-white">Carregando...</div>;
-  if (!role || !['super_admin', 'admin', 'support'].includes(role)) {
+  if (!role || !['super_admin', 'admin', 'support', 'analyst'].includes(role)) {
     return <div className="p-10 text-center text-white">Acesso negado.</div>;
   }
 
   const { profile, roles, stats, plans } = data || {};
 
   return (
-    <AdminLayout title="Detalhes do Usuário">
+    <AdminLayout 
+      title="Detalhes do Usuário"
+      actions={
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => navigate({ to: "/admin" })}
+          className="text-slate-400 hover:text-white"
+        >
+          <ChevronLeft className="h-4 w-4 mr-2" />
+          Voltar
+        </Button>
+      }
+    >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Profile Card */}
         <div className="lg:col-span-4 space-y-6">
@@ -110,7 +125,7 @@ function AdminUserDetailPage() {
              </div>
           </BibleCard>
 
-          {role === 'super_admin' && (
+          {(role === 'super_admin' || role === 'admin') && (
             <div className="space-y-3">
               <Button 
                 variant="destructive" 

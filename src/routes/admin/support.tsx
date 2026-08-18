@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { AdminLayout } from "@/components/AdminLayout";
-import { LifeBuoy, MessageCircle, UserCheck, Clock, ShieldCheck } from "lucide-react";
+import { LifeBuoy, MessageCircle, UserCheck, Clock, ShieldCheck, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BibleCard } from "@/components/BibleUI";
 
@@ -11,6 +11,7 @@ export const Route = createFileRoute("/admin/support")({
 
 function AdminSupportPage() {
   const { role, roleLoading } = useAuth();
+  const navigate = useNavigate();
 
   if (roleLoading) return <div className="p-10 text-white">Carregando...</div>;
   if (!role || !['super_admin', 'support'].includes(role)) {
@@ -18,7 +19,20 @@ function AdminSupportPage() {
   }
 
   return (
-    <AdminLayout title="Centro de Suporte">
+    <AdminLayout 
+      title="Centro de Suporte"
+      actions={
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => navigate({ to: "/admin" })}
+          className="text-slate-400 hover:text-white"
+        >
+          <ChevronLeft className="h-4 w-4 mr-2" />
+          Voltar
+        </Button>
+      }
+    >
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8 space-y-6">
           <div className="p-8 rounded-3xl border border-white/5 bg-white/5 flex flex-col items-center justify-center text-center">

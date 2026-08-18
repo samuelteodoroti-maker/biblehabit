@@ -117,15 +117,18 @@ function HomePage() {
       navigate({ to: "/auth" });
       return;
     }
-    const targetDate = date || today;
+    const targetDateStr = date || today;
     
-    // Prevent future dates
-    if (new Date(targetDate + "T12:00:00") > new Date()) {
+    const targetDateObj = new Date(targetDateStr + "T12:00:00");
+    const todayDateObj = new Date();
+    todayDateObj.setHours(23, 59, 59, 999);
+
+    if (targetDateObj > todayDateObj) {
       toast.error("Não é possível registrar leituras em datas futuras.");
       return;
     }
 
-    setSelectedDate(targetDate);
+    setSelectedDate(targetDateStr);
     setModalOpen(true);
   };
 
@@ -183,7 +186,7 @@ function HomePage() {
                   <p className="font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
                     {greeting()}, {displayName}
                   </p>
-                  <h1 className="mt-1 font-serif-title text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
+                  <h1 className="mt-1 font-serif-title text-clamp-2xl font-bold tracking-tight">
                     Sua jornada diária
                   </h1>
                 </>

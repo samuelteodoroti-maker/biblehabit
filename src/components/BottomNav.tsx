@@ -17,6 +17,7 @@ export function BottomNav() {
           <li key={to} className="flex-1">
             <Link
               to={to}
+              aria-label={label}
               activeOptions={{ exact: to === "/" }}
               activeProps={{ "data-active": "true" } as unknown as { className?: string }}
               className="group relative flex flex-col items-center gap-1 py-1 text-[10px] font-medium text-muted-foreground transition-all data-[active=true]:text-primary"

@@ -38,6 +38,7 @@ export function DesktopSidebar() {
           <Link
             key={to}
             to={to}
+            aria-label={label}
             activeOptions={{ exact: to === "/" }}
             activeProps={{ "data-active": "true" } as unknown as { className?: string }}
             className={cn(

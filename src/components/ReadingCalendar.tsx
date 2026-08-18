@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
@@ -20,14 +21,16 @@ export function ReadingCalendar({
   className,
   onDateClick,
 }: ReadingCalendarProps) {
-  const monthLabel = new Date(Date.UTC(year, month, 1)).toLocaleDateString("pt-BR", {
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  });
+  const monthLabel = useMemo(() => {
+    return new Date(Date.UTC(year, month, 1)).toLocaleDateString("pt-BR", {
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC",
+    });
+  }, [year, month]);
 
-  const firstDayOfMonth = new Date(Date.UTC(year, month, 1)).getUTCDay();
-  const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+  const firstDayOfMonth = useMemo(() => new Date(Date.UTC(year, month, 1)).getUTCDay(), [year, month]);
+  const daysInMonth = useMemo(() => new Date(Date.UTC(year, month + 1, 0)).getUTCDate(), [year, month]);
 
   const leadingEmptyCells = firstDayOfMonth;
   const totalCells = leadingEmptyCells + daysInMonth;

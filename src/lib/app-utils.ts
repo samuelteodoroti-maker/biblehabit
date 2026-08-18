@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 
-export type UserRole = "admin" | "moderator" | "user";
+export type UserRole = "admin" | "moderator" | "user" | "super_admin" | "support" | "analyst";
 
 export async function checkIsAdmin(): Promise<boolean> {
   const { data: { user } } = await supabase.auth.getUser();
@@ -12,7 +12,10 @@ export async function checkIsAdmin(): Promise<boolean> {
     .eq("user_id", user.id)
     .single();
 
-  return data?.role === "admin";
+  if (!data) return false;
+  
+  const roles: UserRole[] = ["admin", "super_admin", "support", "analyst"];
+  return roles.includes(data.role as UserRole);
 }
 
 export const APP_VERSION = "1.3.0";

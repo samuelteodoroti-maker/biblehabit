@@ -1,8 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { AdminLayout } from "@/components/AdminLayout";
-import { Settings as SettingsIcon, Database, Bell, Layout, Cpu } from "lucide-react";
+import { Settings as SettingsIcon, Database, Bell, Layout, Cpu, ChevronLeft } from "lucide-react";
 import { BibleCard } from "@/components/BibleUI";
+import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
@@ -12,14 +13,28 @@ export const Route = createFileRoute("/admin/settings")({
 
 function AdminSettingsPage() {
   const { role, roleLoading } = useAuth();
+  const navigate = useNavigate();
 
   if (roleLoading) return <div className="p-10 text-white">Carregando...</div>;
-  if (role !== "super_admin") {
+  if (role !== "super_admin" && role !== "admin") {
     return <div className="p-10 text-center text-white">Acesso negado.</div>;
   }
 
   return (
-    <AdminLayout title="Configurações do Sistema">
+    <AdminLayout 
+      title="Configurações do Sistema"
+      actions={
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => navigate({ to: "/admin" })}
+          className="text-slate-400 hover:text-white"
+        >
+          <ChevronLeft className="h-4 w-4 mr-2" />
+          Voltar
+        </Button>
+      }
+    >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <BibleCard title="Geral" icon={Layout}>
           <div className="space-y-6">

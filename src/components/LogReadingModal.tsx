@@ -96,6 +96,16 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
   }, [passages]);
 
   const save = async () => {
+    // Prevent future dates
+    const targetDateObj = new Date(readingDate + "T12:00:00");
+    const todayDateObj = new Date();
+    todayDateObj.setHours(23, 59, 59, 999);
+
+    if (targetDateObj > todayDateObj) {
+      toast.error("Não é possível registrar leituras em datas futuras.");
+      return;
+    }
+
     setSaving(true);
     try {
       // 1. Insert Log
@@ -123,7 +133,7 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
         start_verse: p.startVerse || 1,
         end_chapter: p.endChapter,
         end_verse: p.endVerse || 0,
-        is_full_chapter: p.isFullChapters
+        is_full_chapter: p.isFullChapters || false
       }));
 
       const { error: passErr } = await supabase
@@ -157,7 +167,7 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[95vh] max-w-lg overflow-y-auto border-border/60 bg-card/95 p-0 backdrop-blur-xl rounded-t-[2.5rem] sm:rounded-[2rem]">
+      <DialogContent className="max-h-[95vh] max-w-lg overflow-y-auto border-border/60 bg-card/95 p-0 backdrop-blur-xl rounded-t-[2.5rem] sm:rounded-[2rem] focus-visible:outline-none">
         <div className="sticky top-0 z-10 bg-card/95 p-6 pb-2 backdrop-blur-xl">
           <DialogHeader>
             <DialogTitle className="font-display text-xl">Registrar Leitura</DialogTitle>
@@ -169,7 +179,7 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
 
         <div className="space-y-6 px-6 pb-8 pt-2">
           {/* Quick Settings: Date & Duration */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3" role="group" aria-label="Informações da sessão">
             <div className="space-y-1.5">
               <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Data</Label>
               <div className="relative">
@@ -277,7 +287,6 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
                       <div className="col-span-2 flex items-end justify-center pb-2">
                         <ChevronRight className="h-4 w-4 text-muted-foreground/40" />
                       </div>
-
                       <div className="col-span-5 flex items-center gap-2">
                         <div className="flex-1 space-y-1">
                           <Label className="text-[9px] text-muted-foreground">Cap. Final</Label>
@@ -290,6 +299,17 @@ export function LogReadingModal({ open, onOpenChange, userId, today, onSaved }: 
                             className="h-9 rounded-lg bg-background/60 text-center"
                           />
                         </div>
+                        {passages.length > 1 && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setPassages(prev => prev.filter(x => x.id !== p.id))}
+                            className="mt-4 h-8 w-8 rounded-lg text-destructive hover:bg-destructive/10"
+                            aria-label="Remover passagem"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>

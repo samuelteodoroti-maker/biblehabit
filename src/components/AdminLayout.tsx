@@ -21,18 +21,19 @@ import { useState } from "react";
 interface AdminLayoutProps {
   children: ReactNode;
   title: string;
+  actions?: ReactNode;
 }
 
 const NAV_ITEMS = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/admin", roles: ["super_admin", "admin", "support", "analyst"] },
   { label: "Usuários", icon: Users, path: "/admin/users", roles: ["super_admin", "admin", "support"] },
-  { label: "Auditoria", icon: History, path: "/admin/audit", roles: ["super_admin", "admin"] },
-  { label: "Segurança", icon: ShieldAlert, path: "/admin/security", roles: ["super_admin"] },
-  { label: "Suporte", icon: LifeBuoy, path: "/admin/support", roles: ["super_admin", "support"] },
-  { label: "Configurações", icon: Settings, path: "/admin/settings", roles: ["super_admin"] },
+  { label: "Auditoria", icon: History, path: "/admin/audit", roles: ["super_admin", "admin", "analyst"] },
+  { label: "Segurança", icon: ShieldAlert, path: "/admin/security", roles: ["super_admin", "analyst"] },
+  { label: "Suporte", icon: LifeBuoy, path: "/admin/support", roles: ["super_admin", "support", "admin"] },
+  { label: "Configurações", icon: Settings, path: "/admin/settings", roles: ["super_admin", "admin"] },
 ];
 
-export function AdminLayout({ children, title }: AdminLayoutProps) {
+export function AdminLayout({ children, title, actions }: AdminLayoutProps) {
   const { role, user } = useAuth();
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -117,11 +118,16 @@ export function AdminLayout({ children, title }: AdminLayoutProps) {
         <main className="flex-1 min-w-0 bg-slate-950 min-h-screen">
           <div className="p-6 md:p-8 lg:p-10 max-w-7xl mx-auto">
             <div className="mb-10">
-              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">
-                <ShieldAlert className="h-3 w-3 text-primary" />
-                <span>Acesso Seguro Restrito</span>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">
+                    <ShieldAlert className="h-3 w-3 text-primary" />
+                    <span>Acesso Seguro Restrito</span>
+                  </div>
+                  <h1 className="font-serif-title text-3xl font-bold tracking-tight md:text-4xl text-white">{title}</h1>
+                </div>
+                {actions && <div>{actions}</div>}
               </div>
-              <h1 className="font-serif-title text-3xl font-bold tracking-tight md:text-4xl text-white">{title}</h1>
             </div>
             {children}
           </div>

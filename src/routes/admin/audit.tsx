@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { AdminLayout } from "@/components/AdminLayout";
-import { History, Search, Filter, Download } from "lucide-react";
+import { History, Search, Filter, Download, ChevronLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -11,14 +11,28 @@ export const Route = createFileRoute("/admin/audit")({
 
 function AdminAuditPage() {
   const { role, roleLoading } = useAuth();
+  const navigate = useNavigate();
 
   if (roleLoading) return <div className="p-10 text-white">Carregando...</div>;
-  if (role !== 'super_admin') {
-    return <div className="p-10 text-center text-white">Acesso negado. Apenas o Super Administrador pode visualizar logs de auditoria.</div>;
+  if (role !== 'super_admin' && role !== 'analyst') {
+    return <div className="p-10 text-center text-white">Acesso negado. Apenas o Super Administrador ou Analista podem visualizar logs de auditoria.</div>;
   }
 
   return (
-    <AdminLayout title="Logs de Auditoria">
+    <AdminLayout 
+      title="Logs de Auditoria"
+      actions={
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => navigate({ to: "/admin" })}
+          className="text-slate-400 hover:text-white"
+        >
+          <ChevronLeft className="h-4 w-4 mr-2" />
+          Voltar
+        </Button>
+      }
+    >
       <div className="mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
         <div className="relative w-full md:w-96">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
