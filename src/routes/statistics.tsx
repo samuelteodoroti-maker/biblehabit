@@ -296,9 +296,11 @@ function StatisticsPage() {
                 ))
               )}
               
-              <Button variant="ghost" className="w-full gap-2 text-xs text-muted-foreground">
-                Ver histórico completo <ChevronRight className="h-3 w-3" />
-              </Button>
+              <Link to="/history" className="w-full">
+                <Button variant="ghost" className="w-full gap-2 text-xs text-muted-foreground">
+                  Ver histórico completo <ChevronRight className="h-3 w-3" />
+                </Button>
+              </Link>
             </TabsContent>
           </Tabs>
         </div>
