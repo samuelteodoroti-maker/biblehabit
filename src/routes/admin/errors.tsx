@@ -39,7 +39,7 @@ function AdminErrorsPage() {
 
   return (
     <AppShell title="Logs do Sistema" subtitle="Auditoria e erros">
-      <AdminLayout>
+      <AdminLayout title="Logs do Sistema">
         <div className="space-y-4">
           {loading ? (
             <div className="flex justify-center py-12">
