@@ -96,11 +96,11 @@
 }
 
 .dark {
-  /* Theme: Midnight Indigo (Night Sky) */
-  --background: oklch(0.12 0.03 275); /* Very dark midnight indigo */
+  /* Theme: Pure Black (Night Sky) */
+  --background: oklch(0 0 0); /* Pure Black */
   --foreground: oklch(0.96 0.01 275);
 
-  --card: oklch(0.17 0.04 275); /* Slightly lighter indigo for cards */
+  --card: oklch(0.12 0.03 275); /* Deep midnight indigo for cards */
   --card-foreground: oklch(0.96 0.01 275);
 
   --popover: oklch(0.17 0.04 275);
