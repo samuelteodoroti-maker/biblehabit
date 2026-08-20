@@ -22,10 +22,13 @@ export function calculateBibleCoverage(passages: Passage[]): DetailedCoverage {
   const uniqueVerses = new Set<string>();
   let totalActivity = 0;
 
+  // 1. Sort passages by date or just process them. Since we use a Set, the order doesn't matter for "unique".
+  // 2. Normalize and add each verse.
   passages.forEach(p => {
     const book = BIBLE_CANON.find(b => b.id === p.book_id);
     if (!book) return;
 
+    // Use full chapters if flag is set, otherwise use verse range
     const startChapter = p.start_chapter;
     const endChapter = p.end_chapter;
     
@@ -36,11 +39,13 @@ export function calculateBibleCoverage(passages: Passage[]): DetailedCoverage {
       let sv = 1;
       let ev = ch.verses;
       
-      if (p.is_full_chapter) {
-        // Already defaults to 1 and ch.verses
-      } else {
-        if (c === startChapter) sv = p.start_verse || 1;
-        if (c === endChapter) ev = p.end_verse === 0 ? ch.verses : Math.min(p.end_verse, ch.verses);
+      if (!p.is_full_chapter) {
+        // Special case: if we are in the boundary chapters (start/end), we might not be reading the whole thing
+        if (c === startChapter) sv = Math.max(1, p.start_verse || 1);
+        if (c === endChapter) ev = p.end_verse > 0 ? Math.min(p.end_verse, ch.verses) : ch.verses;
+        
+        // Safety check for inverted ranges
+        if (sv > ev && startChapter === endChapter) continue;
       }
       
       for (let v = sv; v <= ev; v++) {
@@ -49,6 +54,7 @@ export function calculateBibleCoverage(passages: Passage[]): DetailedCoverage {
       }
     }
   });
+
 
   const stats: DetailedCoverage = {
     totalUnique: uniqueVerses.size,
