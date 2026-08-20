@@ -2,6 +2,11 @@ import { jsPDF } from "jspdf";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+/**
+ * Generates a professional PDF for app updates.
+ * Optimized for mobile sharing and desktop viewing.
+ */
+
 export const generateUpdatePDF = async (update: any) => {
   const doc = new jsPDF();
   
