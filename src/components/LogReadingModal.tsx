@@ -9,7 +9,8 @@ import { Plus, Loader2, BookOpenCheck, Trash2, Calendar, Clock, ChevronRight } f
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useReadingData } from "@/hooks/useReadingData";
-import { bibleBooks, getBibleBook } from "@/lib/bibleBooks";
+import { bibleBooks } from "@/lib/bibleBooks";
+import { BIBLE_CANON } from "@/lib/bible-canon";
 import { cn } from "@/lib/utils";
 
 const FREE = "__free__";
@@ -249,7 +250,11 @@ export function LogReadingModal({ open, onOpenChange, userId, today, initialDate
 
             <div className="space-y-3">
               {passages.map((p, index) => {
-                const book = getBibleBook(p.bookId);
+                const book = bibleBooks.find(b => b.id === p.bookId);
+                const canonBook = BIBLE_CANON.find(b => b.id === p.bookId);
+                const currentChapter = canonBook?.chapters.find(c => c.chapter === p.startChapter);
+                const maxVerses = currentChapter?.verses || 176;
+
                 return (
                   <div key={p.id} className="relative space-y-3 rounded-2xl border border-border/40 bg-background/30 p-4 pt-5">
                     {passages.length > 1 && (
@@ -267,7 +272,16 @@ export function LogReadingModal({ open, onOpenChange, userId, today, initialDate
                       <div className="col-span-12">
                         <Select 
                           value={p.bookId} 
-                          onValueChange={(val) => updatePassage(p.id, { bookId: val })}
+                          onValueChange={(val) => {
+                            const newBook = BIBLE_CANON.find(b => b.id === val);
+                            updatePassage(p.id, { 
+                              bookId: val, 
+                              startChapter: 1, 
+                              endChapter: 1,
+                              startVerse: 1,
+                              endVerse: newBook?.chapters[0]?.verses || 0
+                            });
+                          }}
                         >
                           <SelectTrigger className="h-10 rounded-xl border-none bg-background/60 shadow-none focus:ring-1">
                             <SelectValue />
@@ -292,7 +306,16 @@ export function LogReadingModal({ open, onOpenChange, userId, today, initialDate
                             min={1} 
                             max={book?.chapters || 150}
                             value={p.startChapter}
-                            onChange={(e) => updatePassage(p.id, { startChapter: Number(e.target.value), endChapter: Number(e.target.value) })}
+                            onChange={(e) => {
+                              const ch = Number(e.target.value);
+                              const chapterData = canonBook?.chapters.find(c => c.chapter === ch);
+                              updatePassage(p.id, { 
+                                startChapter: ch, 
+                                endChapter: ch,
+                                startVerse: 1,
+                                endVerse: chapterData?.verses || 0
+                              });
+                            }}
                             className="h-9 flex-1 rounded-lg bg-background/60 text-center"
                             placeholder="Cap."
                           />
@@ -300,6 +323,7 @@ export function LogReadingModal({ open, onOpenChange, userId, today, initialDate
                             <Input 
                               type="number" 
                               min={1}
+                              max={maxVerses}
                               value={p.startVerse}
                               onChange={(e) => updatePassage(p.id, { startVerse: Number(e.target.value) })}
                               className="h-9 w-11 rounded-lg bg-background/60 text-center text-[10px]"
@@ -308,7 +332,8 @@ export function LogReadingModal({ open, onOpenChange, userId, today, initialDate
                             <span className="text-muted-foreground/40">-</span>
                             <Input 
                               type="number" 
-                              min={0}
+                              min={1}
+                              max={maxVerses}
                               value={p.endVerse}
                               onChange={(e) => updatePassage(p.id, { endVerse: Number(e.target.value) })}
                               className="h-9 w-11 rounded-lg bg-background/60 text-center text-[10px]"

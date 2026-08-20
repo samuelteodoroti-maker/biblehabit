@@ -15,7 +15,16 @@ function AdminAccessPage() {
 
   if (roleLoading) return <div className="p-10 text-white">Carregando...</div>;
   if (role !== 'super_admin') {
-    return <div className="p-10 text-center text-white">Acesso negado.</div>;
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center p-10 text-center">
+        <div className="space-y-4">
+          <ShieldAlert className="mx-auto h-12 w-12 text-destructive opacity-50" />
+          <h2 className="text-xl font-bold text-white">Acesso Negado</h2>
+          <p className="text-sm text-slate-400">Esta área requer privilégios de Super Administrador.</p>
+          <Button onClick={() => navigate({ to: "/" })} variant="outline">Voltar ao início</Button>
+        </div>
+      </div>
+    );
   }
 
   return (
