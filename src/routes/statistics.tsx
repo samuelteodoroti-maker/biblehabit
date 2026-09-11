@@ -11,7 +11,7 @@ import { useMemo } from "react";
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
 } from "recharts";
-import { formatLogPassages } from "@/lib/reading-format";
+import { formatLogLine } from "@/lib/reading-format";
 import { BIBLE_CANON } from "@/lib/bible-canon";
 import { cn } from "@/lib/utils";
 
