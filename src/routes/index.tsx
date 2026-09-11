@@ -550,6 +550,53 @@ function HomePage() {
           onSaved={refresh}
         />
       )}
+
+      <Dialog open={!!selectedDate} onOpenChange={(v) => !v && setSelectedDate(null)}>
+        <DialogContent className="max-w-md rounded-[2rem] border-border/60 bg-card/95 backdrop-blur-xl">
+          <DialogHeader>
+            <DialogTitle className="font-display text-lg">
+              Leituras de {formatDateBR(selectedDate)}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedDayLogs.length} {selectedDayLogs.length === 1 ? "registro" : "registros"} nesta data
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="max-h-[50vh] space-y-3 overflow-y-auto">
+            {selectedDayLogs.length === 0 ? (
+              <p className="py-4 text-center text-sm text-muted-foreground">
+                Nenhuma leitura registrada nesta data.
+              </p>
+            ) : (
+              selectedDayLogs.map((log) => (
+                <div key={log.id} className="rounded-2xl border border-border/50 bg-background/40 p-4">
+                  <p className="font-display text-sm font-bold">
+                    {formatLogPassages(log.reading_passages)}
+                  </p>
+                  <p className="mt-1 text-[11px] text-muted-foreground">
+                    {log.chapters_count} {log.chapters_count === 1 ? "capítulo" : "capítulos"}
+                  </p>
+                  {log.notes && (
+                    <p className="mt-2 text-[11px] italic text-muted-foreground">"{log.notes}"</p>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+
+          <Button
+            variant="outline"
+            className="h-11 w-full rounded-xl text-sm font-semibold"
+            onClick={() => {
+              const date = selectedDate;
+              setSelectedDate(null);
+              if (date) openRegister(date);
+            }}
+          >
+            Registrar outra leitura nesta data
+          </Button>
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
