@@ -107,6 +107,21 @@ function StatisticsPage() {
 
   const formatNumber = (val: number) => val.toLocaleString('pt-BR');
 
+  const totalChaptersLogged = useMemo(
+    () => recentLogs.reduce((acc, log) => acc + (log.chapters_count ?? 0), 0),
+    [recentLogs],
+  );
+
+  const distinctBooks = useMemo(() => {
+    const ids = new Set<string>();
+    recentLogs.forEach((log) => {
+      (log.reading_passages ?? []).forEach((p) => {
+        if (p?.book_id) ids.add(p.book_id);
+      });
+    });
+    return ids.size;
+  }, [recentLogs]);
+
 
 
   return (
