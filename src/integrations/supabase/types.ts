@@ -216,6 +216,7 @@ export type Database = {
           name: string | null
           status: string | null
           suspension_reason: string | null
+          timezone: string
           total_chapters_read: number
           updated_at: string
           youversion_link: string | null
@@ -231,6 +232,7 @@ export type Database = {
           name?: string | null
           status?: string | null
           suspension_reason?: string | null
+          timezone?: string
           total_chapters_read?: number
           updated_at?: string
           youversion_link?: string | null
@@ -246,6 +248,7 @@ export type Database = {
           name?: string | null
           status?: string | null
           suspension_reason?: string | null
+          timezone?: string
           total_chapters_read?: number
           updated_at?: string
           youversion_link?: string | null
@@ -538,6 +541,31 @@ export type Database = {
         Returns: {
           current_streak: number
           longest_streak: number
+        }[]
+      }
+      get_daily_reading_summary: {
+        Args: { _from: string; _to: string; _user_id: string }
+        Returns: {
+          chapters_count: number
+          last_logged_at: string
+          logs_count: number
+          reading_date: string
+        }[]
+      }
+      get_reading_stats: {
+        Args: { _user_id: string }
+        Returns: {
+          current_streak: number
+          first_read_date: string
+          last_read_date: string
+          longest_gap: number
+          longest_streak: number
+          monthly_average: number
+          timezone: string
+          today_local: string
+          total_chapters: number
+          total_read_days: number
+          weekly_average: number
         }[]
       }
       has_any_admin_role: { Args: { _user_id: string }; Returns: boolean }
