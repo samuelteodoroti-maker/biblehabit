@@ -33,6 +33,7 @@ import { APP_VERSION } from "@/lib/app-utils";
 import { BibleCard, BibleReference } from "@/components/BibleUI";
 import { buildYouVersionContextUrl, getCurrentAppLocale } from "@/lib/youversion-utils";
 import { BIBLE_CANON, getBookById } from "@/lib/bible-canon";
+import { toDayNumber } from "@/lib/reading-days";
 
 export const Route = createFileRoute("/")({
   head: () => ({

@@ -27,7 +27,7 @@ export const Route = createFileRoute("/statistics")({
 });
 
 function StatisticsPage() {
-  const { profile, recentLogs, coverage, loading } = useReadingData();
+  const { profile, recentLogs, coverage, loading, stats } = useReadingData();
 
   const chartData = useMemo(() => {
     if (!recentLogs.length) return [];
@@ -131,8 +131,8 @@ function StatisticsPage() {
                 <Flame className="h-3.5 w-3.5 text-orange-500" />
                 Ofensiva
               </div>
-              <p className="mt-2 font-display text-2xl font-bold">{profile?.current_streak ?? 0}</p>
-              <p className="text-[10px] text-muted-foreground">Recorde: {profile?.longest_streak ?? 0}</p>
+              <p className="mt-2 font-display text-2xl font-bold">{stats.current_streak}</p>
+              <p className="text-[10px] text-muted-foreground">Recorde: {stats.longest_streak}</p>
             </Card>
             <Card className="border-border/60 bg-card/60 p-4 backdrop-blur-sm">
               <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
