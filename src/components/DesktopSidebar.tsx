@@ -11,13 +11,14 @@ import {
   HandHeart
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useReleaseNotes } from "@/hooks/useReleaseNotes";
 
 const items = [
   { to: "/", label: "Início", icon: Home },
   { to: "/progress", label: "Planos", icon: Bookmark },
   { to: "/statistics", label: "Progresso", icon: ChartNoAxesColumnIncreasing },
   { to: "/groups", label: "Comunidade", icon: Users },
-  { to: "/updates", label: "Novidades", icon: Bell },
+  { to: "/novidades", label: "Novidades", icon: Bell },
   { to: "/support", label: "Suporte", icon: HelpCircle },
   { to: "/settings", label: "Ajustes", icon: Settings },
   { to: "/apoie", label: "Apoie este app", icon: HandHeart },

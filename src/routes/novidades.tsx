@@ -80,10 +80,7 @@ function ReleaseNotesPage() {
         <ol className="space-y-5" aria-label="Histórico de versões">
           {releases.map((release, index) => (
             <li key={release.version}>
-              <Card
-                as="article"
-                className="border-border/60 bg-card/70 p-5 backdrop-blur-sm sm:p-7"
-              >
+              <Card className="border-border/60 bg-card/70 p-5 backdrop-blur-sm sm:p-7">
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge variant="secondary" className="rounded-full font-bold">
                     v{release.version}
