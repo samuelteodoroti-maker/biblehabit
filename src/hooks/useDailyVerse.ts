@@ -102,11 +102,14 @@ export function resolveDailyVerse(currentDate: string): DailyVerse {
 
   try {
     localStorage.setItem(cacheKey, JSON.stringify(freshVerse));
-    Object.keys(localStorage).forEach((key) => {
-      if (key.startsWith(DAILY_VERSE_CACHE_PREFIX) && key !== cacheKey) {
-        localStorage.removeItem(key);
+    const staleKeys: string[] = [];
+    for (let i = 0; i < localStorage.length; i += 1) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith(DAILY_VERSE_CACHE_PREFIX) && key !== cacheKey) {
+        staleKeys.push(key);
       }
-    });
+    }
+    staleKeys.forEach((key) => localStorage.removeItem(key));
   } catch {
     /* storage unavailable: verse still works in memory */
   }
