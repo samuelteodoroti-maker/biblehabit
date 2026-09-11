@@ -435,15 +435,15 @@ function HomePage() {
         <div className="space-y-6 lg:col-span-5 xl:col-span-4">
           
           {/* Quick Stats Grid */}
-          <div className="grid grid-cols-1 xs:grid-cols-2 gap-4">
-            <BibleCard title="Capítulos" icon={BookOpenCheck} className="px-4 py-4 md:px-5 md:py-5 min-h-[140px]">
-               <div className="flex items-baseline gap-1">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            <BibleCard title="Capítulos" icon={BookOpenCheck} className="min-w-0 px-4 py-4 md:px-5 md:py-5 min-h-[130px]">
+               <div className="flex flex-wrap items-baseline gap-1">
                  <span className="font-display text-3xl font-bold">{total}</span>
                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Total</span>
                </div>
             </BibleCard>
-            <BibleCard title="Progresso" icon={TrendingUp} className="px-4 py-4 md:px-5 md:py-5 min-h-[140px]">
-               <div className="flex items-baseline gap-1">
+            <BibleCard title="Dias lidos" icon={TrendingUp} className="min-w-0 px-4 py-4 md:px-5 md:py-5 min-h-[130px]">
+               <div className="flex flex-wrap items-baseline gap-1">
                  <span className="font-display text-3xl font-bold">{stats.total_read_days}</span>
                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Dias</span>
                </div>
