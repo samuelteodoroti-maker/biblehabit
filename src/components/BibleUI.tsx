@@ -8,6 +8,8 @@ interface BibleCardProps {
   variant?: "default" | "editorial" | "gold" | "glass";
   icon?: LucideIcon;
   title?: string;
+  titleClassName?: string;
+  headerGapClassName?: string;
   subtitle?: string;
   action?: ReactNode;
 }
