@@ -7,7 +7,8 @@ import {
   ChartNoAxesColumnIncreasing, 
   Bell,
   HelpCircle,
-  History
+  History,
+  HandHeart
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
