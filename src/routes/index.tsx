@@ -28,6 +28,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useReadingData } from "@/hooks/useReadingData";
 import { useDailyVerse } from "@/hooks/useDailyVerse";
+import { VERSE_TRANSLATION_LABEL } from "@/lib/bible-verses";
 import { getUpdates } from "@/lib/updates.functions";
 import { APP_VERSION } from "@/lib/app-utils";
 import { BibleCard, BibleReference } from "@/components/BibleUI";
@@ -197,7 +198,7 @@ function HomePage() {
               ) : (
                 <>
                   <p className="font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                    {greeting()}, {displayName}
+                    {`${greeting()}, ${displayName}`}
                   </p>
                   <h1 className="mt-1 font-serif-title text-clamp-2xl font-bold tracking-tight">
                     Sua jornada diária
@@ -282,7 +283,7 @@ function HomePage() {
               <div className="mt-5 flex items-center justify-between">
                 <cite className="not-italic">
                   <BibleReference book={dailyVerse.book} reference={`${dailyVerse.chapter}:${dailyVerse.verse}`} />
-                  <span className="ml-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Almeida</span>
+                  <span className="ml-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{VERSE_TRANSLATION_LABEL}</span>
                 </cite>
                 <div className="flex gap-2">
                   <Button 
@@ -330,7 +331,7 @@ function HomePage() {
                   <a
                     href={buildYouVersionContextUrl({
                       appLocale: getCurrentAppLocale(profile?.name ? "pt-BR" : null), // Fallback to pt-BR if profile or local settings fail
-                      bookId: BIBLE_CANON.find(b => b.name === dailyVerse.book)?.id || "JHN",
+                      bookId: dailyVerse.bookId,
                       chapter: dailyVerse.chapter
                     })}
                     target="_blank" 
@@ -346,9 +347,8 @@ function HomePage() {
                   className="rounded-xl text-xs font-bold text-primary hover:bg-primary/5"
                   onClick={() => {
                     setInitialModalDate(today);
-                    const book = BIBLE_CANON.find(b => b.name === dailyVerse.book);
                     setInitialPassage({
-                      bookId: book?.id || "JHN",
+                      bookId: dailyVerse.bookId,
                       chapter: dailyVerse.chapter,
                       startVerse: dailyVerse.verse,
                       endVerse: dailyVerse.verse

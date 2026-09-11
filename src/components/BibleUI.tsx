@@ -47,7 +47,7 @@ export function BibleCard({
               </div>
             )}
             <div>
-              {title && <h3 className="font-serif-title text-lg font-bold tracking-tight text-foreground">{title}</h3>}
+              {title && <h3 className="font-serif-title text-lg font-bold tracking-tight text-foreground break-keep [text-wrap:balance]">{title}</h3>}
               {subtitle && <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{subtitle}</p>}
             </div>
           </div>

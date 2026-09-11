@@ -64,7 +64,7 @@ export function ReadingCalendar({
       <div className="mb-4 flex items-center justify-between gap-2">
         <div className="min-w-0">
           <h2 className="font-display text-base font-semibold">Calendário</h2>
-          <p className="mt-0.5 truncate text-xs capitalize text-muted-foreground">{monthLabel}</p>
+          <p className="mt-0.5 truncate text-xs text-muted-foreground first-letter:uppercase">{monthLabel}</p>
         </div>
         <div className="flex items-center gap-1">
           <Button
