@@ -2,6 +2,10 @@
 
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
+> A fonte **oficial** das notas exibidas no aplicativo é `src/data/releaseNotes.ts`,
+> publicada na página `/novidades`. Atualize esse arquivo antes de qualquer
+> publicação (ver `RELEASE_CHECKLIST.md`).
+
 ## [1.4.0] - 2026-08-17
 ### Melhorado
 - **Responsividade Global**: Overhaul completo para telas mobile (320px+), tablets e desktop.

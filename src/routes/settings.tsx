@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Sun, Moon, LogOut, ChevronRight, Loader2, Bell, HelpCircle, HandHeart } from "lucide-react";
+import { useReleaseNotes } from "@/hooks/useReleaseNotes";
+import { APP_VERSION_LABEL } from "@/data/releaseNotes";
 import { Switch } from "@/components/ui/switch";
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
@@ -125,6 +127,7 @@ function SettingsPage() {
   };
 
   const logs = recentLogs;
+  const { hasUnseen: hasUnseenRelease } = useReleaseNotes();
   const metaName =
     (user?.user_metadata?.full_name as string | undefined) ??
     (user?.user_metadata?.name as string | undefined) ??
@@ -266,14 +269,21 @@ function SettingsPage() {
       </Section>
 
       <Section title="Informações">
-        <Link to="/updates" className="flex items-center justify-between p-4 transition-colors hover:bg-accent/50">
+        <Link to="/novidades" className="flex items-center justify-between p-4 transition-colors hover:bg-accent/50">
           <div className="flex items-center gap-3">
             <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent/60">
               <Bell className="h-4 w-4" aria-hidden="true" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold">Novidades</p>
-              <p className="text-xs text-muted-foreground">Notas de atualização e mudanças</p>
+              <p className="flex items-center gap-2 text-sm font-semibold">
+                Novidades e atualizações
+                {hasUnseenRelease && (
+                  <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-foreground">
+                    Novo
+                  </span>
+                )}
+              </p>
+              <p className="text-xs text-muted-foreground">O que mudou em cada versão</p>
             </div>
           </div>
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -331,6 +341,7 @@ function SettingsPage() {
       >
         <LogOut className="h-4 w-4" /> Sair
       </Button>
+      <p className="mt-6 pb-2 text-center text-xs text-muted-foreground">{APP_VERSION_LABEL}</p>
     </AppShell>
   );
 }

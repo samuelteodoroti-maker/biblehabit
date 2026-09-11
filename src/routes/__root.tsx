@@ -12,6 +12,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { WhatsNewModal } from "@/components/WhatsNewModal";
 
 
 import appCss from "../styles.css?url";
@@ -193,13 +194,14 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthGate>
         <Outlet />
+        <WhatsNewModal />
       </AuthGate>
       <Toaster position="top-center" richColors closeButton />
     </QueryClientProvider>
   );
 }
 
-const PUBLIC_PATHS = new Set(["/auth", "/updates", "/support", "/apoie", "/"]);
+const PUBLIC_PATHS = new Set(["/auth", "/updates", "/novidades", "/support", "/apoie", "/"]);
 const PUBLIC_DYNAMIC_PATHS = ["/updates/", "/auth/callback"];
 
 function AuthGate({ children }: { children: ReactNode }) {
