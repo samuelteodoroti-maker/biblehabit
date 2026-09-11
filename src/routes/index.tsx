@@ -81,7 +81,8 @@ function greeting() {
 function HomePage() {
   const navigate = useNavigate();
   const { user, isAdmin, role } = useAuth();
-  const { profile, activePlan, logDates, loading, today, stats, refresh } = useReadingData();
+  const { profile, activePlan, logDates, recentLogs, loading, today, stats, refresh } = useReadingData();
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const { verse: rawDailyVerse, currentDate: verseDate } = useDailyVerse();
   const dailyVerse = isValidDailyVerse(rawDailyVerse)
     ? rawDailyVerse
@@ -149,6 +150,21 @@ function HomePage() {
     setInitialModalDate(targetDateStr);
     setInitialPassage(passage || null);
     setModalOpen(true);
+  };
+
+  const selectedDayLogs = useMemo(
+    () => (selectedDate ? recentLogs.filter((l) => l.reading_date === selectedDate) : []),
+    [selectedDate, recentLogs],
+  );
+
+  // Clique no calendário: se houver leituras no dia, mostra o detalhe; senão abre o registro.
+  const handleDateClick = (date: string) => {
+    const hasLogs = logDates.has(date);
+    if (hasLogs) {
+      setSelectedDate(date);
+      return;
+    }
+    openRegister(date);
   };
 
 
