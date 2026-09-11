@@ -20,6 +20,8 @@ export function BibleCard({
   variant = "default",
   icon: Icon,
   title,
+  titleClassName,
+  headerGapClassName,
   subtitle,
   action,
 }: BibleCardProps) {
