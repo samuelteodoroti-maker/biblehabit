@@ -348,6 +348,7 @@ function HomePage() {
                 <Button 
                   variant="ghost" 
                   size="sm" 
+                  disabled={!canUseVerseActions}
                   className="rounded-xl text-xs font-bold text-primary hover:bg-primary/5"
                   onClick={() => {
                     setInitialModalDate(today);
