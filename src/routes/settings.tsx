@@ -269,14 +269,21 @@ function SettingsPage() {
       </Section>
 
       <Section title="Informações">
-        <Link to="/updates" className="flex items-center justify-between p-4 transition-colors hover:bg-accent/50">
+        <Link to="/novidades" className="flex items-center justify-between p-4 transition-colors hover:bg-accent/50">
           <div className="flex items-center gap-3">
             <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent/60">
               <Bell className="h-4 w-4" aria-hidden="true" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold">Novidades</p>
-              <p className="text-xs text-muted-foreground">Notas de atualização e mudanças</p>
+              <p className="flex items-center gap-2 text-sm font-semibold">
+                Novidades e atualizações
+                {hasUnseenRelease && (
+                  <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-foreground">
+                    Novo
+                  </span>
+                )}
+              </p>
+              <p className="text-xs text-muted-foreground">O que mudou em cada versão</p>
             </div>
           </div>
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
