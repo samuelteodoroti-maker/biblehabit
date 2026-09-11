@@ -329,11 +329,10 @@ function HomePage() {
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  asChild={canUseVerseActions}
-                  disabled={!canUseVerseActions}
+                  asChild
                   className="rounded-xl text-xs font-bold border-primary/20 hover:bg-primary/5 cursor-pointer"
                 >
-                  <
+                  <a
                     href={buildYouVersionContextUrl({
                       appLocale: getCurrentAppLocale(profile?.name ? "pt-BR" : null), // Fallback to pt-BR if profile or local settings fail
                       bookId: dailyVerse.bookId,
