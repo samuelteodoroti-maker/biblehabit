@@ -20,6 +20,7 @@ const items = [
   { to: "/updates", label: "Novidades", icon: Bell },
   { to: "/support", label: "Suporte", icon: HelpCircle },
   { to: "/settings", label: "Ajustes", icon: Settings },
+  { to: "/apoie", label: "Apoie este app", icon: HandHeart },
 ] as const;
 
 export function DesktopSidebar() {

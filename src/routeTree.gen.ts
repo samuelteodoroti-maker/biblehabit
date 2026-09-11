@@ -18,6 +18,7 @@ import { Route as ProgressRouteImport } from './routes/progress'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as GroupsRouteImport } from './routes/groups'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ApoieRouteImport } from './routes/apoie'
 import { Route as AchievementsRouteImport } from './routes/achievements'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GroupsIndexRouteImport } from './routes/groups.index'
@@ -78,6 +79,11 @@ const GroupsRoute = GroupsRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApoieRoute = ApoieRouteImport.update({
+  id: '/apoie',
+  path: '/apoie',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AchievementsRoute = AchievementsRouteImport.update({
@@ -164,6 +170,7 @@ const AdminUsersUserIdRoute = AdminUsersUserIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/achievements': typeof AchievementsRoute
+  '/apoie': typeof ApoieRoute
   '/auth': typeof AuthRoute
   '/groups': typeof GroupsRouteWithChildren
   '/history': typeof HistoryRoute
@@ -191,6 +198,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/achievements': typeof AchievementsRoute
+  '/apoie': typeof ApoieRoute
   '/auth': typeof AuthRoute
   '/history': typeof HistoryRoute
   '/progress': typeof ProgressRoute
@@ -218,6 +226,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/achievements': typeof AchievementsRoute
+  '/apoie': typeof ApoieRoute
   '/auth': typeof AuthRoute
   '/groups': typeof GroupsRouteWithChildren
   '/history': typeof HistoryRoute
@@ -247,6 +256,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/achievements'
+    | '/apoie'
     | '/auth'
     | '/groups'
     | '/history'
@@ -274,6 +284,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/achievements'
+    | '/apoie'
     | '/auth'
     | '/history'
     | '/progress'
@@ -300,6 +311,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/achievements'
+    | '/apoie'
     | '/auth'
     | '/groups'
     | '/history'
@@ -328,6 +340,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AchievementsRoute: typeof AchievementsRoute
+  ApoieRoute: typeof ApoieRoute
   AuthRoute: typeof AuthRoute
   GroupsRoute: typeof GroupsRouteWithChildren
   HistoryRoute: typeof HistoryRoute
@@ -412,6 +425,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/apoie': {
+      id: '/apoie'
+      path: '/apoie'
+      fullPath: '/apoie'
+      preLoaderRoute: typeof ApoieRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/achievements': {
@@ -568,6 +588,7 @@ const AdminUsersRouteWithChildren = AdminUsersRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AchievementsRoute: AchievementsRoute,
+  ApoieRoute: ApoieRoute,
   AuthRoute: AuthRoute,
   GroupsRoute: GroupsRouteWithChildren,
   HistoryRoute: HistoryRoute,
