@@ -561,10 +561,10 @@ export type Database = {
           longest_gap: number
           longest_streak: number
           monthly_average: number
-          timezone: string
           today_local: string
           total_chapters: number
           total_read_days: number
+          tz_name: string
           weekly_average: number
         }[]
       }
