@@ -77,7 +77,7 @@ function greeting() {
 function HomePage() {
   const navigate = useNavigate();
   const { user, isAdmin, role } = useAuth();
-  const { profile, activePlan, logDates, loading, today, refresh } = useReadingData();
+  const { profile, activePlan, logDates, loading, today, stats, refresh } = useReadingData();
   const { verse: dailyVerse } = useDailyVerse();
   const [modalOpen, setModalOpen] = useState(false);
   const [initialModalDate, setInitialModalDate] = useState(today);
@@ -113,14 +113,15 @@ function HomePage() {
   };
 
   const registeredToday = logDates.has(today);
-  const now = useMemo(() => new Date(), []);
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth();
+  const [currentYear, currentMonth] = useMemo(() => {
+    const [y, m] = today.split("-").map(Number);
+    return [y, (m ?? 1) - 1];
+  }, [today]);
 
   const displayName =
     profile?.name?.split(" ")[0] ??
     (user?.email ? user.email.split("@")[0] : "amigo");
-  const streak = profile?.current_streak ?? 0;
+  const streak = stats.current_streak;
   const total = profile?.total_chapters_read ?? 0;
 
   const openRegister = (date?: string, passage?: any) => {
@@ -130,12 +131,9 @@ function HomePage() {
       return;
     }
     const targetDateStr = date || today;
-    
-    const targetDateObj = new Date(targetDateStr + "T12:00:00");
-    const todayDateObj = new Date();
-    todayDateObj.setHours(23, 59, 59, 999);
 
-    if (targetDateObj > todayDateObj) {
+    // Comparação de datas civis no fuso do usuário (nunca com o relógio do navegador).
+    if (toDayNumber(targetDateStr) > toDayNumber(today)) {
       toast.error("Não é possível registrar leituras em datas futuras.");
       return;
     }
@@ -216,7 +214,7 @@ function HomePage() {
             subtitle="Ofensiva Diária"
             action={
               <Badge variant="secondary" className="bg-biblical-gold/10 text-biblical-gold font-bold text-[10px] tracking-widest px-3 py-1 border-biblical-gold/20 rounded-full">
-                Recorde: {profile?.longest_streak ?? 0}
+                Recorde: {stats.longest_streak}
               </Badge>
             }
           >
@@ -423,10 +421,9 @@ function HomePage() {
           <div className="hidden lg:block">
             <BibleCard title="Diário de Leitura" icon={CalendarDays} subtitle="Histórico Mensal">
               <ReadingCalendar
-                year={currentYear}
-                month={currentMonth}
                 today={today}
                 readDates={logDates}
+                loading={loading}
                 onDateClick={openRegister}
               />
             </BibleCard>
@@ -446,7 +443,7 @@ function HomePage() {
             </BibleCard>
             <BibleCard title="Progresso" icon={TrendingUp} className="px-4 py-4 md:px-5 md:py-5 min-h-[140px]">
                <div className="flex items-baseline gap-1">
-                 <span className="font-display text-3xl font-bold">{logDates.size}</span>
+                 <span className="font-display text-3xl font-bold">{stats.total_read_days}</span>
                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Dias</span>
                </div>
             </BibleCard>
@@ -494,10 +491,9 @@ function HomePage() {
           <div className="lg:hidden">
             <BibleCard title="Diário de Leitura" icon={CalendarDays} subtitle="Histórico Mensal">
               <ReadingCalendar
-                year={currentYear}
-                month={currentMonth}
                 today={today}
                 readDates={logDates}
+                loading={loading}
                 onDateClick={openRegister}
               />
             </BibleCard>
