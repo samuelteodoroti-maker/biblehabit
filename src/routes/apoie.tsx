@@ -4,10 +4,23 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Check, Copy, HandHeart, Heart, ShieldAlert, Share2 } from "lucide-react";
+import {
+  Check,
+  Copy,
+  Download,
+  HandHeart,
+  Heart,
+  Share2,
+  ShieldAlert,
+  Smartphone,
+} from "lucide-react";
 import { toast } from "sonner";
+import { usePwaInstall } from "@/hooks/usePwaInstall";
 
 const PIX_KEY = "db6c4642-a7da-4a38-968c-8583cf07e05d";
+const APP_URL = "https://biblehabit.lovable.app";
+const APP_DESCRIPTION =
+  "Registre suas leituras bíblicas, acompanhe seu progresso e crie constância na Palavra.";
 
 export const Route = createFileRoute("/apoie")({
   head: () => ({
