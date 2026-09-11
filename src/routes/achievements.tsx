@@ -26,8 +26,7 @@ import {
   Megaphone,
   type LucideIcon,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+import { useReadingData } from "@/hooks/useReadingData";
 
 export const Route = createFileRoute("/achievements")({
   head: () => ({
