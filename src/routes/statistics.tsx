@@ -5,13 +5,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { BarChart3, TrendingUp, BookOpen, Clock, Calendar, Flame, ChevronRight, CheckCircle2 } from "lucide-react";
+import { TrendingUp, BookOpen, Library, CalendarCheck, Flame, ChevronRight, CheckCircle2 } from "lucide-react";
 import { useReadingData } from "@/hooks/useReadingData";
 import { useMemo } from "react";
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
 } from "recharts";
-import { getBibleBook } from "@/lib/bibleBooks";
+import { formatLogPassages } from "@/lib/reading-format";
 import { BIBLE_CANON } from "@/lib/bible-canon";
 import { cn } from "@/lib/utils";
 
