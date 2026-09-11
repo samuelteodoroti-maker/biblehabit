@@ -12,6 +12,7 @@ import { useReadingData } from "@/hooks/useReadingData";
 import { bibleBooks } from "@/lib/bibleBooks";
 import { BIBLE_CANON } from "@/lib/bible-canon";
 import { cn } from "@/lib/utils";
+import { toDayNumber } from "@/lib/reading-days";
 
 const FREE = "__free__";
 
