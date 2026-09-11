@@ -459,13 +459,25 @@ function HomePage() {
           
           {/* Quick Stats Grid */}
           <div className="grid grid-cols-2 gap-3 sm:gap-4">
-            <BibleCard title="Capítulos" icon={BookOpenCheck} className="min-w-0 px-4 py-4 md:px-5 md:py-5 min-h-[130px]">
+            <BibleCard
+              title="Capítulos"
+              icon={BookOpenCheck}
+              titleClassName="text-[20px] leading-[1.15] whitespace-nowrap break-normal [overflow-wrap:normal] [text-wrap:nowrap] md:text-lg md:leading-tight"
+              headerGapClassName="gap-2.5 md:gap-3.5"
+              className="min-w-0 px-4 py-4 md:px-5 md:py-5 min-h-[130px]"
+            >
                <div className="flex flex-wrap items-baseline gap-1">
                  <span className="font-display text-3xl font-bold">{total}</span>
                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Total</span>
                </div>
             </BibleCard>
-            <BibleCard title="Dias lidos" icon={TrendingUp} className="min-w-0 px-4 py-4 md:px-5 md:py-5 min-h-[130px]">
+            <BibleCard
+              title="Dias lidos"
+              icon={TrendingUp}
+              titleClassName="text-[20px] leading-[1.15] whitespace-nowrap break-normal [overflow-wrap:normal] [text-wrap:nowrap] md:text-lg md:leading-tight"
+              headerGapClassName="gap-2.5 md:gap-3.5"
+              className="min-w-0 px-4 py-4 md:px-5 md:py-5 min-h-[130px]"
+            >
                <div className="flex flex-wrap items-baseline gap-1">
                  <span className="font-display text-3xl font-bold">{stats.total_read_days}</span>
                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Dias</span>

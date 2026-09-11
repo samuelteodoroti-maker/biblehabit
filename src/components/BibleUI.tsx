@@ -8,6 +8,8 @@ interface BibleCardProps {
   variant?: "default" | "editorial" | "gold" | "glass";
   icon?: LucideIcon;
   title?: string;
+  titleClassName?: string;
+  headerGapClassName?: string;
   subtitle?: string;
   action?: ReactNode;
 }
@@ -18,6 +20,8 @@ export function BibleCard({
   variant = "default",
   icon: Icon,
   title,
+  titleClassName,
+  headerGapClassName,
   subtitle,
   action,
 }: BibleCardProps) {
@@ -37,17 +41,17 @@ export function BibleCard({
       
       {(title || Icon) && (
         <div className="flex items-center justify-between px-5 pt-5 pb-2 md:px-7 md:pt-7 md:pb-3">
-          <div className="flex items-center gap-3.5">
+          <div className={cn("flex min-w-0 items-center gap-3.5", headerGapClassName)}>
             {Icon && (
               <div className={cn(
-                "flex h-10 w-10 items-center justify-center rounded-xl transition-colors",
+                "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors",
                 variant === "gold" ? "bg-biblical-gold/10 text-biblical-gold" : "bg-primary-soft text-primary"
               )}>
                 <Icon className="h-5.5 w-5.5" strokeWidth={2.2} />
               </div>
             )}
-            <div>
-              {title && <h3 className="font-serif-title text-lg font-bold tracking-tight text-foreground break-keep [text-wrap:balance]">{title}</h3>}
+            <div className="min-w-0">
+              {title && <h3 className={cn("font-serif-title text-lg font-bold tracking-tight text-foreground break-keep [text-wrap:balance]", titleClassName)}>{title}</h3>}
               {subtitle && <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{subtitle}</p>}
             </div>
           </div>
