@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Plus, Loader2, BookOpenCheck, Trash2, Calendar, Clock, ChevronRight } from "lucide-react";
+import { Plus, Loader2, BookOpenCheck, Trash2, Calendar } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useReadingData } from "@/hooks/useReadingData";
@@ -48,7 +48,7 @@ export function LogReadingModal({ open, onOpenChange, userId, today, initialDate
   const [plans, setPlans] = useState<Plan[]>([]);
   const [planId, setPlanId] = useState<string>(FREE);
   const [readingDate, setReadingDate] = useState(initialDate || today);
-  const [duration, setDuration] = useState(15);
+  
   const [passages, setPassages] = useState<PassageEntry[]>([
     { id: crypto.randomUUID(), bookId: "GEN", startChapter: 1, startVerse: 1, endChapter: 1, endVerse: 1, isFullChapters: false }
   ]);
@@ -60,7 +60,7 @@ export function LogReadingModal({ open, onOpenChange, userId, today, initialDate
     if (!open) return;
     setReadingDate(initialDate || today);
     setNotes("");
-    setDuration(15);
+
 
     if (initialPassage) {
       setPassages([{
