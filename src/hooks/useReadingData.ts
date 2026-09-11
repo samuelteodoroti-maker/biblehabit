@@ -29,7 +29,7 @@ export type DetailedLog = {
   reading_date: string;
   chapters_count: number;
   notes: string | null;
-  duration_minutes: number | null;
+  
   created_at?: string | null;
   plan_id?: string | null;
   reading_passages: {
@@ -73,7 +73,7 @@ export function useReadingData() {
           .maybeSingle(),
         supabase
           .from("reading_logs")
-          .select("id, reading_date, chapters_count, notes, duration_minutes, plan_id, created_at, reading_passages(book_id, start_chapter, start_verse, end_chapter, end_verse, is_full_chapter)")
+          .select("id, reading_date, chapters_count, notes, plan_id, created_at, reading_passages(book_id, start_chapter, start_verse, end_chapter, end_verse, is_full_chapter)")
           .eq("user_id", user.id)
           .order("reading_date", { ascending: false }),
 
