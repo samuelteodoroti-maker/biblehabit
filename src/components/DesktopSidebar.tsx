@@ -25,6 +25,7 @@ const items = [
 ] as const;
 
 export function DesktopSidebar() {
+  const { hasUnseen } = useReleaseNotes();
   return (
     <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 border-r border-border bg-card/30 backdrop-blur-xl md:flex md:flex-col lg:w-72">
       <div className="flex h-20 items-center px-8">
@@ -52,6 +53,11 @@ export function DesktopSidebar() {
           >
             <Icon className="h-5 w-5 shrink-0 transition-transform group-hover:scale-110" strokeWidth={2.2} />
             <span className="font-sans tracking-tight">{label}</span>
+            {to === "/novidades" && hasUnseen && (
+              <span className="ml-auto rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-foreground">
+                Novo
+              </span>
+            )}
           </Link>
         ))}
       </nav>
