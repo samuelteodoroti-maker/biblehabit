@@ -15,6 +15,7 @@ import { Route as StatisticsRouteImport } from './routes/statistics'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ProgressRouteImport } from './routes/progress'
+import { Route as NovidadesRouteImport } from './routes/novidades'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as GroupsRouteImport } from './routes/groups'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -64,6 +65,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const ProgressRoute = ProgressRouteImport.update({
   id: '/progress',
   path: '/progress',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NovidadesRoute = NovidadesRouteImport.update({
+  id: '/novidades',
+  path: '/novidades',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HistoryRoute = HistoryRouteImport.update({
@@ -174,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/groups': typeof GroupsRouteWithChildren
   '/history': typeof HistoryRoute
+  '/novidades': typeof NovidadesRoute
   '/progress': typeof ProgressRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -201,6 +208,7 @@ export interface FileRoutesByTo {
   '/apoie': typeof ApoieRoute
   '/auth': typeof AuthRoute
   '/history': typeof HistoryRoute
+  '/novidades': typeof NovidadesRoute
   '/progress': typeof ProgressRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -230,6 +238,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/groups': typeof GroupsRouteWithChildren
   '/history': typeof HistoryRoute
+  '/novidades': typeof NovidadesRoute
   '/progress': typeof ProgressRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -260,6 +269,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/groups'
     | '/history'
+    | '/novidades'
     | '/progress'
     | '/settings'
     | '/sitemap.xml'
@@ -287,6 +297,7 @@ export interface FileRouteTypes {
     | '/apoie'
     | '/auth'
     | '/history'
+    | '/novidades'
     | '/progress'
     | '/settings'
     | '/sitemap.xml'
@@ -315,6 +326,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/groups'
     | '/history'
+    | '/novidades'
     | '/progress'
     | '/settings'
     | '/sitemap.xml'
@@ -344,6 +356,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   GroupsRoute: typeof GroupsRouteWithChildren
   HistoryRoute: typeof HistoryRoute
+  NovidadesRoute: typeof NovidadesRoute
   ProgressRoute: typeof ProgressRoute
   SettingsRoute: typeof SettingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -404,6 +417,13 @@ declare module '@tanstack/react-router' {
       path: '/progress'
       fullPath: '/progress'
       preLoaderRoute: typeof ProgressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/novidades': {
+      id: '/novidades'
+      path: '/novidades'
+      fullPath: '/novidades'
+      preLoaderRoute: typeof NovidadesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/history': {
@@ -592,6 +612,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   GroupsRoute: GroupsRouteWithChildren,
   HistoryRoute: HistoryRoute,
+  NovidadesRoute: NovidadesRoute,
   ProgressRoute: ProgressRoute,
   SettingsRoute: SettingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
