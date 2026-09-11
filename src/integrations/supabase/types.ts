@@ -113,6 +113,62 @@ export type Database = {
         }
         Relationships: []
       }
+      bible_books: {
+        Row: {
+          canonical_order: number
+          chapter_count: number
+          created_at: string
+          division: string
+          name_pt: string
+          testament: string
+          usfm: string
+        }
+        Insert: {
+          canonical_order: number
+          chapter_count: number
+          created_at?: string
+          division: string
+          name_pt: string
+          testament: string
+          usfm: string
+        }
+        Update: {
+          canonical_order?: number
+          chapter_count?: number
+          created_at?: string
+          division?: string
+          name_pt?: string
+          testament?: string
+          usfm?: string
+        }
+        Relationships: []
+      }
+      bible_chapters: {
+        Row: {
+          book_usfm: string
+          chapter_number: number
+          verse_count: number
+        }
+        Insert: {
+          book_usfm: string
+          chapter_number: number
+          verse_count: number
+        }
+        Update: {
+          book_usfm?: string
+          chapter_number?: number
+          verse_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bible_chapters_book_usfm_fkey"
+            columns: ["book_usfm"]
+            isOneToOne: false
+            referencedRelation: "bible_books"
+            referencedColumns: ["usfm"]
+          },
+        ]
+      }
       group_members: {
         Row: {
           group_id: string
