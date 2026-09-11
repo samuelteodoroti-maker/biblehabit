@@ -159,6 +159,38 @@ function StatisticsPage() {
             </Card>
           </div>
 
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <Card className="border-border/60 bg-card/60 p-4 backdrop-blur-sm">
+              <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                <CalendarCheck className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                Dias com leitura
+              </div>
+              <p className="mt-2 font-display text-2xl font-bold">{formatNumber(stats.total_read_days)}</p>
+            </Card>
+            <Card className="border-border/60 bg-card/60 p-4 backdrop-blur-sm">
+              <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                <Flame className="h-3.5 w-3.5 text-orange-500" aria-hidden="true" />
+                Maior sequência
+              </div>
+              <p className="mt-2 font-display text-2xl font-bold">{formatNumber(stats.longest_streak)}</p>
+            </Card>
+            <Card className="border-border/60 bg-card/60 p-4 backdrop-blur-sm">
+              <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                <BookOpen className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                Capítulos registrados
+              </div>
+              <p className="mt-2 font-display text-2xl font-bold">{formatNumber(totalChaptersLogged)}</p>
+            </Card>
+            <Card className="border-border/60 bg-card/60 p-4 backdrop-blur-sm">
+              <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                <Library className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                Livros diferentes
+              </div>
+              <p className="mt-2 font-display text-2xl font-bold">{formatNumber(distinctBooks)}</p>
+              <p className="text-[10px] text-muted-foreground">de 66 livros</p>
+            </Card>
+          </div>
+
           <div className="grid grid-cols-1 xs:grid-cols-2 gap-3">
             <Card className="border-border/60 bg-card/60 p-4 backdrop-blur-sm">
               <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
