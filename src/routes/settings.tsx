@@ -341,6 +341,7 @@ function SettingsPage() {
       >
         <LogOut className="h-4 w-4" /> Sair
       </Button>
+      <p className="mt-6 pb-2 text-center text-xs text-muted-foreground">{APP_VERSION_LABEL}</p>
     </AppShell>
   );
 }

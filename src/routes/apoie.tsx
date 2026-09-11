@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { APP_VERSION_LABEL } from "@/data/releaseNotes";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -284,6 +285,22 @@ function SupportProjectPage() {
           <p aria-live="polite" role="status" className="mt-3 min-h-[1rem] text-xs font-medium text-primary">
             {installMessage}
           </p>
+        </Card>
+
+        <Card className="border-border/60 bg-card/70 p-6 backdrop-blur-sm sm:p-8">
+          <h2 className="font-serif-title text-lg font-bold tracking-tight">
+            Veja o que já foi entregue
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            Seu apoio se transforma em novos recursos e melhorias. Acompanhe o histórico completo de
+            atualizações do aplicativo.
+          </p>
+          <Button asChild variant="outline" className="mt-5 h-12 w-full gap-2 rounded-xl">
+            <Link to="/novidades">
+              <Sparkles className="h-4 w-4" aria-hidden="true" /> Novidades e atualizações
+            </Link>
+          </Button>
+          <p className="mt-3 text-center text-xs text-muted-foreground">{APP_VERSION_LABEL}</p>
         </Card>
 
         <Card className="border-border/60 bg-card/70 p-6 text-center backdrop-blur-sm sm:p-8">
