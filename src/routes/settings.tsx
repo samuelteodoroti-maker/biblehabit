@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { Sun, Moon, LogOut, ChevronRight, Loader2, Bell, HelpCircle } from "lucide-react";
+import { Sun, Moon, LogOut, ChevronRight, Loader2, Bell, HelpCircle, HandHeart } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
@@ -286,6 +286,18 @@ function SettingsPage() {
             <div className="flex-1">
               <p className="text-sm font-semibold">Suporte</p>
               <p className="text-xs text-muted-foreground">Precisa de ajuda com o app?</p>
+            </div>
+          </div>
+          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        </Link>
+        <Link to="/apoie" className="flex items-center justify-between p-4 transition-colors hover:bg-accent/50">
+          <div className="flex items-center gap-3">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent/60">
+              <HandHeart className="h-4 w-4" aria-hidden="true" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold">Apoie este app</p>
+              <p className="text-xs text-muted-foreground">Contribuição voluntária via Pix</p>
             </div>
           </div>
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
