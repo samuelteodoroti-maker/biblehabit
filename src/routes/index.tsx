@@ -448,7 +448,7 @@ function HomePage() {
                 today={today}
                 readDates={logDates}
                 loading={loading}
-                onDateClick={openRegister}
+                onDateClick={handleDateClick}
               />
             </BibleCard>
           </div>
@@ -518,7 +518,7 @@ function HomePage() {
                 today={today}
                 readDates={logDates}
                 loading={loading}
-                onDateClick={openRegister}
+                onDateClick={handleDateClick}
               />
             </BibleCard>
           </div>
