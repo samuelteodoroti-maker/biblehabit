@@ -171,8 +171,8 @@ function SupportProjectPage() {
             </p>
           </div>
 
-          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-            <Button className="h-12 flex-1 gap-2 rounded-xl" onClick={handleCopyPix}>
+          <div className="mt-5">
+            <Button className="h-12 w-full gap-2 rounded-xl" onClick={handleCopyPix}>
               {copied ? (
                 <>
                   <Check className="h-4 w-4" aria-hidden="true" /> Chave Pix copiada
@@ -182,13 +182,6 @@ function SupportProjectPage() {
                   <Copy className="h-4 w-4" aria-hidden="true" /> Copiar chave Pix
                 </>
               )}
-            </Button>
-            <Button
-              variant="outline"
-              className="h-12 flex-1 gap-2 rounded-xl"
-              onClick={handleShare}
-            >
-              <Share2 className="h-4 w-4" aria-hidden="true" /> Compartilhar página
             </Button>
           </div>
           <p aria-live="polite" className="mt-3 min-h-[1rem] text-xs font-medium text-primary">
