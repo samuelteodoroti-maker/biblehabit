@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -27,8 +26,7 @@ import {
   Megaphone,
   type LucideIcon,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+import { useReadingData } from "@/hooks/useReadingData";
 
 export const Route = createFileRoute("/achievements")({
   head: () => ({
@@ -80,27 +78,14 @@ const ACHIEVEMENTS: Achievement[] = [
 ];
 
 function AchievementsPage() {
-  const { user } = useAuth();
-  const [stats, setStats] = useState<Stats>({ current_streak: 0, longest_streak: 0, total_chapters_read: 0 });
-  const [loading, setLoading] = useState(true);
+  const { profile, stats: readingStats, loading } = useReadingData();
 
-  useEffect(() => {
-    if (!user) return;
-    let cancelled = false;
-    setLoading(true);
-    (async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("current_streak, longest_streak, total_chapters_read")
-        .eq("id", user.id)
-        .maybeSingle();
-      if (!cancelled && data) setStats(data as Stats);
-      if (!cancelled) setLoading(false);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [user]);
+  // Mesma fonte de verdade da Home e das Estatísticas.
+  const stats: Stats = {
+    current_streak: readingStats.current_streak,
+    longest_streak: readingStats.longest_streak,
+    total_chapters_read: profile?.total_chapters_read ?? 0,
+  };
 
   const unlockedCount = ACHIEVEMENTS.filter((a) => a.unlocked(stats)).length;
 

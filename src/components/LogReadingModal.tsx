@@ -12,6 +12,7 @@ import { useReadingData } from "@/hooks/useReadingData";
 import { bibleBooks } from "@/lib/bibleBooks";
 import { BIBLE_CANON } from "@/lib/bible-canon";
 import { cn } from "@/lib/utils";
+import { toDayNumber } from "@/lib/reading-days";
 
 const FREE = "__free__";
 
@@ -122,12 +123,10 @@ export function LogReadingModal({ open, onOpenChange, userId, today, initialDate
   }, [passages]);
 
   const save = async () => {
-    // Prevent future dates
-    const targetDateObj = new Date(readingDate + "T12:00:00");
-    const todayDateObj = new Date();
-    todayDateObj.setHours(23, 59, 59, 999);
+    if (saving) return; // evita duplicidade em cliques rápidos
 
-    if (targetDateObj > todayDateObj) {
+    // Datas futuras: comparação de dias civis no fuso do usuário
+    if (toDayNumber(readingDate) > toDayNumber(today)) {
       toast.error("Não é possível registrar leituras em datas futuras.");
       return;
     }

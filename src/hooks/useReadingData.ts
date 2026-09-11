@@ -30,6 +30,8 @@ export type DetailedLog = {
   chapters_count: number;
   notes: string | null;
   duration_minutes: number | null;
+  created_at?: string | null;
+  plan_id?: string | null;
   reading_passages: {
     book_id: string;
     start_chapter: number;
@@ -44,32 +46,34 @@ export type DetailedLog = {
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { calculateBibleCoverage } from "@/lib/bible-calculations";
+import {
+  DEFAULT_TIMEZONE,
+  computeReadingStats,
+  getLocalDateKey,
+  type ReadingStats,
+} from "@/lib/reading-days";
+
+export type { ReadingStats };
 
 export function useReadingData() {
 
   const { user, loading: authLoading } = useAuth();
   const queryClient = useQueryClient();
 
-  const pad = (n: number) => String(n).padStart(2, "0");
-  const today = useMemo(() => {
-    const d = new Date();
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-  }, []);
-
   const readingQuery = useQuery({
     queryKey: ["reading-data", user?.id || null],
     queryFn: async () => {
       if (!user) return null;
-      
-      const [profileRes, logsRes, plansRes] = await Promise.all([
+
+      const [profileRes, logsRes, plansRes, statsRes] = await Promise.all([
         supabase
           .from("profiles")
-          .select("name, avatar_url, current_streak, longest_streak, total_chapters_read, last_read_date, status, youversion_link")
+          .select("name, avatar_url, current_streak, longest_streak, total_chapters_read, last_read_date, status, youversion_link, timezone")
           .eq("id", user.id)
           .maybeSingle(),
         supabase
           .from("reading_logs")
-          .select("id, reading_date, chapters_count, notes, duration_minutes, plan_id, reading_passages(book_id, start_chapter, start_verse, end_chapter, end_verse, is_full_chapter)")
+          .select("id, reading_date, chapters_count, notes, duration_minutes, plan_id, created_at, reading_passages(book_id, start_chapter, start_verse, end_chapter, end_verse, is_full_chapter)")
           .eq("user_id", user.id)
           .order("reading_date", { ascending: false }),
 
@@ -78,26 +82,51 @@ export function useReadingData() {
           .from("reading_plans")
           .select("id, title, books_today, completed_days, total_days, description, updated_at")
           .eq("user_id", user.id)
-          .order("updated_at", { ascending: false })
+          .order("updated_at", { ascending: false }),
+
+        (supabase as any).rpc("get_reading_stats", { _user_id: user.id }),
       ]);
-        
+
       if (profileRes.error) throw profileRes.error;
       if (logsRes.error) throw logsRes.error;
       if (plansRes.error) throw plansRes.error;
 
       const allPlans = plansRes.data || [];
       const activePlan = allPlans.find(p => (p.completed_days ?? 0) < (p.total_days ?? 0)) || allPlans[0];
-      
+
       const recentLogs = (logsRes.data as any) as DetailedLog[];
-      const passages = recentLogs.flatMap(l => l.reading_passages);
+      const passages = recentLogs.flatMap(l => l.reading_passages ?? []);
       const coverage = calculateBibleCoverage(passages);
 
+      const profile = profileRes.data as (Profile & { timezone?: string | null }) | null;
+      const timezone = profile?.timezone || DEFAULT_TIMEZONE;
+      const logDates = new Set((logsRes.data ?? []).map(l => l.reading_date));
+
+      // Fonte de verdade: função do banco. Fallback local com a mesma fórmula.
+      const row = Array.isArray(statsRes?.data) ? statsRes.data[0] : statsRes?.data;
+      const today = row?.today_local || getLocalDateKey(timezone);
+      const stats: ReadingStats = row
+        ? {
+            current_streak: row.current_streak ?? 0,
+            longest_streak: row.longest_streak ?? 0,
+            total_read_days: row.total_read_days ?? 0,
+            first_read_date: row.first_read_date ?? null,
+            last_read_date: row.last_read_date ?? null,
+            longest_gap: row.longest_gap ?? 0,
+            weekly_average: Number(row.weekly_average ?? 0),
+            monthly_average: Number(row.monthly_average ?? 0),
+          }
+        : computeReadingStats(logDates, today);
+
       return {
-        profile: profileRes.data as Profile,
+        profile: profile as Profile,
         recentLogs,
-        logDates: new Set((logsRes.data ?? []).map(l => l.reading_date)),
+        logDates,
         activePlan: activePlan as ActivePlan,
-        coverage
+        coverage,
+        stats,
+        timezone,
+        today,
       };
 
     },
@@ -106,6 +135,22 @@ export function useReadingData() {
     gcTime: 1000 * 60 * 30, // 30 minutes
   });
 
+  const fallbackToday = useMemo(() => getLocalDateKey(DEFAULT_TIMEZONE), []);
+
+  const emptyStats: ReadingStats = useMemo(
+    () => ({
+      current_streak: 0,
+      longest_streak: 0,
+      total_read_days: 0,
+      first_read_date: null,
+      last_read_date: null,
+      longest_gap: 0,
+      weekly_average: 0,
+      monthly_average: 0,
+    }),
+    [],
+  );
+
   return {
     user,
     profile: readingQuery.data?.profile ?? null,
@@ -113,10 +158,12 @@ export function useReadingData() {
     coverage: readingQuery.data?.coverage ?? null,
     logDates: readingQuery.data?.logDates ?? new Set<string>(),
     recentLogs: readingQuery.data?.recentLogs ?? [],
+    stats: readingQuery.data?.stats ?? emptyStats,
+    timezone: readingQuery.data?.timezone ?? DEFAULT_TIMEZONE,
     loading: authLoading || readingQuery.isLoading,
 
     error: readingQuery.error,
-    today,
+    today: readingQuery.data?.today ?? fallbackToday,
     refresh: () => queryClient.invalidateQueries({ queryKey: ["reading-data", user?.id || null] })
   };
 }

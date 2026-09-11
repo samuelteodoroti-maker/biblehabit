@@ -20,7 +20,8 @@ export function useAuth() {
           .from("user_roles")
           .select("role")
           .eq("user_id", userId)
-          .single();
+          .limit(1)
+          .maybeSingle();
 
         if (mounted) {
           if (data) setRole(data.role as UserRole);
