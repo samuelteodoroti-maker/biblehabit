@@ -26,6 +26,12 @@ export function BottomNav() {
             >
               <span className="relative grid h-8 w-12 place-items-center rounded-full transition-all group-data-[active=true]:bg-primary-soft">
                 <Icon className="h-5 w-5" strokeWidth={2} />
+                {to === "/settings" && hasUnseen && (
+                  <span
+                    className="absolute right-2.5 top-0.5 h-2 w-2 rounded-full bg-primary ring-2 ring-background"
+                    aria-label="Nova atualização disponível"
+                  />
+                )}
               </span>
               <span className="font-sans leading-none">{label}</span>
             </Link>
