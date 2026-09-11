@@ -122,12 +122,10 @@ export function LogReadingModal({ open, onOpenChange, userId, today, initialDate
   }, [passages]);
 
   const save = async () => {
-    // Prevent future dates
-    const targetDateObj = new Date(readingDate + "T12:00:00");
-    const todayDateObj = new Date();
-    todayDateObj.setHours(23, 59, 59, 999);
+    if (saving) return; // evita duplicidade em cliques rápidos
 
-    if (targetDateObj > todayDateObj) {
+    // Datas futuras: comparação de dias civis no fuso do usuário
+    if (toDayNumber(readingDate) > toDayNumber(today)) {
       toast.error("Não é possível registrar leituras em datas futuras.");
       return;
     }
