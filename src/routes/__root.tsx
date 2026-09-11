@@ -137,6 +137,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       { rel: "icon", type: "image/png", href: "/favicon.png" },
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
     ],
   }),
 
@@ -163,6 +164,31 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  // Registra o service worker (PWA) somente no navegador, após a hidratação.
+  useEffect(() => {
+    if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
+    let cancelled = false;
+    navigator.serviceWorker
+      .register("/sw.js", { scope: "/" })
+      .then((registration) => {
+        if (cancelled) return;
+        // Aplica atualizações imediatamente para não manter versões quebradas em cache.
+        registration.addEventListener("updatefound", () => {
+          const next = registration.installing;
+          next?.addEventListener("statechange", () => {
+            if (next.state === "installed" && navigator.serviceWorker.controller) {
+              next.postMessage("SKIP_WAITING");
+            }
+          });
+        });
+        registration.update?.().catch(() => undefined);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthGate>
@@ -173,7 +199,7 @@ function RootComponent() {
   );
 }
 
-const PUBLIC_PATHS = new Set(["/auth", "/updates", "/support", "/"]);
+const PUBLIC_PATHS = new Set(["/auth", "/updates", "/support", "/apoie", "/"]);
 const PUBLIC_DYNAMIC_PATHS = ["/updates/", "/auth/callback"];
 
 function AuthGate({ children }: { children: ReactNode }) {
