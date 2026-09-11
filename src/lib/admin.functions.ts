@@ -152,7 +152,7 @@ export const manageUserStatus = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     // Get admin role for logging
-    const { data: roleData } = await supabase.from("user_roles").select("role").eq("user_id", admin.id).single();
+    const { data: roleData } = await supabase.from("user_roles").select("role").eq("user_id", admin.id).limit(1).maybeSingle();
 
     await logAdminAction({
       adminId: admin.id,
@@ -195,7 +195,7 @@ export const performControlledCorrection = createServerFn({ method: "POST" })
 
     if (result?.error) throw new Error(result.error.message);
 
-    const { data: roleData } = await supabase.from("user_roles").select("role").eq("user_id", admin.id).single();
+    const { data: roleData } = await supabase.from("user_roles").select("role").eq("user_id", admin.id).limit(1).maybeSingle();
 
     await logAdminAction({
       adminId: admin.id,
@@ -245,7 +245,7 @@ export const manageSupportSession = createServerFn({ method: "POST" })
       if (error) throw new Error(error.message);
     }
 
-    const { data: roleData } = await supabase.from("user_roles").select("role").eq("user_id", admin.id).single();
+    const { data: roleData } = await supabase.from("user_roles").select("role").eq("user_id", admin.id).limit(1).maybeSingle();
 
     await logAdminAction({
       adminId: admin.id,
