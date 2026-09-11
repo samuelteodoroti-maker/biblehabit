@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Home, Bookmark, Users, Settings, ChartNoAxesColumnIncreasing, Bell } from "lucide-react";
+import { useReleaseNotes } from "@/hooks/useReleaseNotes";
 
 const tabs = [
   { to: "/", label: "Início", icon: Home },
@@ -10,6 +11,7 @@ const tabs = [
 ] as const;
 
 export function BottomNav() {
+  const { hasUnseen } = useReleaseNotes();
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/90 backdrop-blur-xl md:hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom)', minHeight: 'calc(72px + env(safe-area-inset-bottom))' }}>
       <ul className="mx-auto flex max-w-md items-stretch justify-around px-2 pt-2">

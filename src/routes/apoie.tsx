@@ -14,6 +14,7 @@ import {
   Share2,
   ShieldAlert,
   Smartphone,
+  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import { usePwaInstall } from "@/hooks/usePwaInstall";
