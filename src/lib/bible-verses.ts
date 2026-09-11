@@ -66,7 +66,7 @@ const SEEDS: Seed[] = [
   ["ISA", "Isaías", 41, 10, "Presença", "Não temas, porque eu sou contigo; não te assombres, porque eu sou o teu Deus."],
   ["ISA", "Isaías", 43, 19, "Novidade", "Eis que faço coisa nova, que agora mesmo vai aparecer."],
   ["LAM", "Lamentações", 3, 22, "Misericórdia", "As misericórdias do Senhor são a causa de não sermos consumidos; renovam-se cada manhã."],
-  ["MIC", "Miqueias", 6, 8, "Justiça", "Que é que o Senhor pede de ti, senão que pratiques a justiça, e ames a misericórdia, e andes humildemente com o teu Deus?"],
+  ["MIC", "Miquéias", 6, 8, "Justiça", "Que é que o Senhor pede de ti, senão que pratiques a justiça, e ames a misericórdia, e andes humildemente com o teu Deus?"],
   ["HAB", "Habacuque", 3, 19, "Firmeza", "O Senhor Deus é a minha fortaleza; ele faz os meus pés como os da corça."],
   ["ZEP", "Sofonias", 3, 17, "Alegria", "O Senhor, teu Deus, está no meio de ti, poderoso para salvar."],
   ["DEU", "Deuteronômio", 31, 6, "Coragem", "Sede fortes e corajosos; o Senhor, vosso Deus, é quem vai convosco."],
