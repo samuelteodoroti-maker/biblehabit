@@ -10,7 +10,8 @@ export async function checkIsAdmin(): Promise<boolean> {
     .from("user_roles")
     .select("role")
     .eq("user_id", user.id)
-    .single();
+    .limit(1)
+    .maybeSingle();
 
   if (!data) return false;
   
