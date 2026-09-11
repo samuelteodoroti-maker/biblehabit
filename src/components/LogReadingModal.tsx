@@ -286,9 +286,22 @@ export function LogReadingModal({ open, onOpenChange, userId, today, initialDate
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="max-h-[300px]">
-                            {bibleBooks.map((b) => (
-                              <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
-                            ))}
+                            <SelectGroup>
+                              <SelectLabel className="text-[10px] uppercase tracking-widest">Antigo Testamento</SelectLabel>
+                              {bibleBooks
+                                .filter(b => b.testament === "Antigo Testamento")
+                                .map((b) => (
+                                  <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
+                                ))}
+                            </SelectGroup>
+                            <SelectGroup>
+                              <SelectLabel className="text-[10px] uppercase tracking-widest">Novo Testamento</SelectLabel>
+                              {bibleBooks
+                                .filter(b => b.testament === "Novo Testamento")
+                                .map((b) => (
+                                  <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
+                                ))}
+                            </SelectGroup>
                           </SelectContent>
                         </Select>
                       </div>
