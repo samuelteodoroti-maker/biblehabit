@@ -35,6 +35,8 @@ import { BibleCard, BibleReference } from "@/components/BibleUI";
 import { buildYouVersionContextUrl, getCurrentAppLocale } from "@/lib/youversion-utils";
 import { BIBLE_CANON, getBookById } from "@/lib/bible-canon";
 import { toDayNumber } from "@/lib/reading-days";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { formatDateBR, formatLogPassages } from "@/lib/reading-format";
 
 export const Route = createFileRoute("/")({
   head: () => ({
