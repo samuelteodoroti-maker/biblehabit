@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Plus, Loader2, BookOpenCheck, Trash2, Calendar, Clock, ChevronRight } from "lucide-react";
+import { Plus, Loader2, BookOpenCheck, Trash2, Calendar } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useReadingData } from "@/hooks/useReadingData";
@@ -48,7 +48,7 @@ export function LogReadingModal({ open, onOpenChange, userId, today, initialDate
   const [plans, setPlans] = useState<Plan[]>([]);
   const [planId, setPlanId] = useState<string>(FREE);
   const [readingDate, setReadingDate] = useState(initialDate || today);
-  const [duration, setDuration] = useState(15);
+  
   const [passages, setPassages] = useState<PassageEntry[]>([
     { id: crypto.randomUUID(), bookId: "GEN", startChapter: 1, startVerse: 1, endChapter: 1, endVerse: 1, isFullChapters: false }
   ]);
@@ -60,7 +60,7 @@ export function LogReadingModal({ open, onOpenChange, userId, today, initialDate
     if (!open) return;
     setReadingDate(initialDate || today);
     setNotes("");
-    setDuration(15);
+
 
     if (initialPassage) {
       setPassages([{
@@ -141,7 +141,7 @@ export function LogReadingModal({ open, onOpenChange, userId, today, initialDate
         p_chapters_count: totalChapters,
         p_plan_id: (planId === FREE ? null : planId) as any,
         p_notes: (notes.trim() || null) as any,
-        p_duration_minutes: duration,
+        p_duration_minutes: null as any,
 
         p_passages: passages.map(p => ({
           book_id: p.bookId,
@@ -188,32 +188,19 @@ export function LogReadingModal({ open, onOpenChange, userId, today, initialDate
         </div>
 
         <div className="space-y-6 px-6 pb-8 pt-2">
-          {/* Quick Settings: Date & Duration */}
-          <div className="grid grid-cols-2 gap-3" role="group" aria-label="Informações da sessão">
-            <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Data</Label>
-              <div className="relative">
-                <Input 
-                  type="date" 
-                  value={readingDate}
-                  max={today}
-                  onChange={(e) => setReadingDate(e.target.value)}
-                  className="h-10 rounded-xl bg-background/40 pl-9 pr-3 text-xs"
-                />
-                <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              </div>
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Duração (min)</Label>
-              <div className="relative">
-                <Input 
-                  type="number" 
-                  value={duration}
-                  onChange={(e) => setDuration(Number(e.target.value))}
-                  className="h-10 rounded-xl bg-background/40 pl-9 pr-3 text-xs"
-                />
-                <Clock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              </div>
+          {/* Data da leitura */}
+          <div className="space-y-1.5" role="group" aria-label="Informações da sessão">
+            <Label htmlFor="reading-date" className="text-[10px] uppercase tracking-wider text-muted-foreground">Data</Label>
+            <div className="relative">
+              <Input
+                id="reading-date"
+                type="date"
+                value={readingDate}
+                max={today}
+                onChange={(e) => setReadingDate(e.target.value)}
+                className="h-10 rounded-xl bg-background/40 pl-9 pr-3 text-xs"
+              />
+              <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             </div>
           </div>
 

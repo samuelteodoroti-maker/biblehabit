@@ -5,13 +5,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { BarChart3, TrendingUp, BookOpen, Clock, Calendar, Flame, ChevronRight, CheckCircle2 } from "lucide-react";
+import { TrendingUp, BookOpen, Library, CalendarCheck, Flame, ChevronRight, CheckCircle2 } from "lucide-react";
 import { useReadingData } from "@/hooks/useReadingData";
 import { useMemo } from "react";
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
 } from "recharts";
-import { getBibleBook } from "@/lib/bibleBooks";
+import { formatLogLine } from "@/lib/reading-format";
 import { BIBLE_CANON } from "@/lib/bible-canon";
 import { cn } from "@/lib/utils";
 
@@ -107,6 +107,21 @@ function StatisticsPage() {
 
   const formatNumber = (val: number) => val.toLocaleString('pt-BR');
 
+  const totalChaptersLogged = useMemo(
+    () => recentLogs.reduce((acc, log) => acc + (log.chapters_count ?? 0), 0),
+    [recentLogs],
+  );
+
+  const distinctBooks = useMemo(() => {
+    const ids = new Set<string>();
+    recentLogs.forEach((log) => {
+      (log.reading_passages ?? []).forEach((p) => {
+        if (p?.book_id) ids.add(p.book_id);
+      });
+    });
+    return ids.size;
+  }, [recentLogs]);
+
 
 
   return (
@@ -141,6 +156,38 @@ function StatisticsPage() {
               </div>
               <p className="mt-2 font-display text-2xl font-bold">{formatPercent(coverage?.percentage || 0)}</p>
               <p className="text-[10px] text-muted-foreground">{formatNumber(coverage?.totalUnique || 0)} de {formatNumber(31102)} versículos</p>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <Card className="border-border/60 bg-card/60 p-4 backdrop-blur-sm">
+              <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                <CalendarCheck className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                Dias com leitura
+              </div>
+              <p className="mt-2 font-display text-2xl font-bold">{formatNumber(stats.total_read_days)}</p>
+            </Card>
+            <Card className="border-border/60 bg-card/60 p-4 backdrop-blur-sm">
+              <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                <Flame className="h-3.5 w-3.5 text-orange-500" aria-hidden="true" />
+                Maior sequência
+              </div>
+              <p className="mt-2 font-display text-2xl font-bold">{formatNumber(stats.longest_streak)}</p>
+            </Card>
+            <Card className="border-border/60 bg-card/60 p-4 backdrop-blur-sm">
+              <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                <BookOpen className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                Capítulos registrados
+              </div>
+              <p className="mt-2 font-display text-2xl font-bold">{formatNumber(totalChaptersLogged)}</p>
+            </Card>
+            <Card className="border-border/60 bg-card/60 p-4 backdrop-blur-sm">
+              <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                <Library className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                Livros diferentes
+              </div>
+              <p className="mt-2 font-display text-2xl font-bold">{formatNumber(distinctBooks)}</p>
+              <p className="text-[10px] text-muted-foreground">de 66 livros</p>
             </Card>
           </div>
 
@@ -257,30 +304,13 @@ function StatisticsPage() {
                 recentLogs.map((log) => (
                   <Card key={log.id} className="border-border/40 bg-card/40 p-4 backdrop-blur-sm">
                     <div className="flex items-start justify-between">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-3 w-3 text-muted-foreground" />
-                          <span className="text-[11px] font-medium text-muted-foreground">
-                            {new Date(log.reading_date + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}
-                          </span>
-                        </div>
-                        <h4 className="font-display text-sm font-bold">
-                          {log.reading_passages.map((p, i) => {
-                            const book = getBibleBook(p.book_id);
-                            return `${book?.name} ${p.start_chapter}${p.start_chapter !== p.end_chapter ? '-' + p.end_chapter : ''}${i < log.reading_passages.length - 1 ? ', ' : ''}`;
-                          })}
+                      <div className="min-w-0 space-y-1">
+                        <h4 className="font-display text-sm font-bold leading-snug">
+                          {formatLogLine(log)}
                         </h4>
-                        <div className="flex items-center gap-3">
-                           <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                            <BookOpen className="h-3 w-3" />
-                            {log.chapters_count} {log.chapters_count === 1 ? 'capítulo' : 'capítulos'}
-                          </div>
-                          {log.duration_minutes && (
-                            <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                              <Clock className="h-3 w-3" />
-                              {log.duration_minutes} min
-                            </div>
-                          )}
+                        <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                          <BookOpen className="h-3 w-3" aria-hidden="true" />
+                          {log.chapters_count} {log.chapters_count === 1 ? 'capítulo' : 'capítulos'}
                         </div>
                       </div>
                       <div className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
