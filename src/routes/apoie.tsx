@@ -71,6 +71,10 @@ async function copyText(text: string) {
 
 function SupportProjectPage() {
   const [copied, setCopied] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+  const [installMessage, setInstallMessage] = useState("");
+  const { mode: installMode, install } = usePwaInstall();
+
 
   const handleCopyPix = async () => {
     const ok = await copyText(PIX_KEY);
@@ -83,25 +87,43 @@ function SupportProjectPage() {
     window.setTimeout(() => setCopied(false), 4000);
   };
 
+  const handleCopyLink = async () => {
+    const ok = await copyText(APP_URL);
+    if (!ok) {
+      toast.error("Não foi possível copiar o link agora.");
+      return;
+    }
+    setLinkCopied(true);
+    toast.success("Link copiado com sucesso");
+    window.setTimeout(() => setLinkCopied(false), 4000);
+  };
+
   const handleShare = async () => {
-    const url = typeof window !== "undefined" ? window.location.href : "";
-    const shareData = {
-      title: "Apoie o Bible Habit",
-      text: "Ajude a manter o Bible Habit e incentivar a leitura bíblica diária.",
-      url,
-    };
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
-        await navigator.share(shareData);
+        await navigator.share({
+          title: "Bible Habit",
+          text: APP_DESCRIPTION,
+          url: APP_URL,
+        });
         return;
       } catch {
         return;
       }
     }
-    const ok = await copyText(url);
-    if (ok) toast.success("Link copiado");
-    else toast.error("Não foi possível compartilhar agora");
+    await handleCopyLink();
   };
+
+  const handleInstall = async () => {
+    const outcome = await install();
+    if (outcome === "accepted") {
+      setInstallMessage("Aplicativo instalado com sucesso");
+      toast.success("Bible Habit instalado com sucesso");
+    } else {
+      setInstallMessage("");
+    }
+  };
+
 
   return (
     <AppShell title="Apoie este app" subtitle="Contribuição voluntária para o projeto">
