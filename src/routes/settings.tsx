@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Sun, Moon, LogOut, ChevronRight, Loader2, Bell, HelpCircle, HandHeart } from "lucide-react";
+import { useReleaseNotes } from "@/hooks/useReleaseNotes";
+import { APP_VERSION_LABEL } from "@/data/releaseNotes";
 import { Switch } from "@/components/ui/switch";
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
@@ -125,6 +127,7 @@ function SettingsPage() {
   };
 
   const logs = recentLogs;
+  const { hasUnseen: hasUnseenRelease } = useReleaseNotes();
   const metaName =
     (user?.user_metadata?.full_name as string | undefined) ??
     (user?.user_metadata?.name as string | undefined) ??
