@@ -27,7 +27,7 @@ import { LogReadingModal } from "@/components/LogReadingModal";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useReadingData } from "@/hooks/useReadingData";
-import { useDailyVerse } from "@/hooks/useDailyVerse";
+import { useDailyVerse, isValidDailyVerse, getVerseForDate } from "@/hooks/useDailyVerse";
 import { VERSE_TRANSLATION_LABEL } from "@/lib/bible-verses";
 import { getUpdates } from "@/lib/updates.functions";
 import { APP_VERSION } from "@/lib/app-utils";
@@ -80,7 +80,11 @@ function HomePage() {
   const navigate = useNavigate();
   const { user, isAdmin, role } = useAuth();
   const { profile, activePlan, logDates, loading, today, stats, refresh } = useReadingData();
-  const { verse: dailyVerse } = useDailyVerse();
+  const { verse: rawDailyVerse, currentDate: verseDate } = useDailyVerse();
+  const dailyVerse = isValidDailyVerse(rawDailyVerse)
+    ? rawDailyVerse
+    : getVerseForDate(verseDate);
+  const canUseVerseActions = isValidDailyVerse(dailyVerse);
   const [modalOpen, setModalOpen] = useState(false);
   const [initialModalDate, setInitialModalDate] = useState(today);
   const [initialPassage, setInitialPassage] = useState<any>(null);
@@ -344,6 +348,7 @@ function HomePage() {
                 <Button 
                   variant="ghost" 
                   size="sm" 
+                  disabled={!canUseVerseActions}
                   className="rounded-xl text-xs font-bold text-primary hover:bg-primary/5"
                   onClick={() => {
                     setInitialModalDate(today);

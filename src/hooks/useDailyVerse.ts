@@ -50,35 +50,80 @@ function getVerseForDatePure(dateStr: string): DailyVerse {
   return FULL_DATASET[index];
 }
 
-export function useDailyVerse() {
-  const [currentDate, setCurrentDate] = useState(getBrasiliaDate());
-  
-  const cacheKey = useMemo(() => `daily-verse:${currentDate}`, [currentDate]);
-  
-  const verse = useMemo(() => {
-    // Check localStorage first
+const isNonEmptyString = (v: unknown): v is string =>
+  typeof v === "string" && v.trim().length > 0;
+
+const isPositiveInt = (v: unknown): v is number =>
+  typeof v === "number" && Number.isInteger(v) && v > 0;
+
+/**
+ * Validates a verse object recovered from cache (old formats are rejected).
+ */
+export function isValidDailyVerse(value: unknown): value is DailyVerse {
+  if (!value || typeof value !== "object") return false;
+  const v = value as Record<string, unknown>;
+  return (
+    isNonEmptyString(v["bookId"]) &&
+    isNonEmptyString(v["book"]) &&
+    isPositiveInt(v["chapter"]) &&
+    isPositiveInt(v["verse"]) &&
+    isNonEmptyString(v["text"]) &&
+    isNonEmptyString(v["reference"])
+  );
+}
+
+export const DAILY_VERSE_CACHE_PREFIX = "daily-verse:";
+export const dailyVerseCacheKey = (date: string) => `daily-verse:v2:${date}`;
+
+/**
+ * Reads the cached verse for a date, regenerating it whenever the stored value
+ * is missing, corrupted or in an older format. Never throws.
+ */
+export function resolveDailyVerse(currentDate: string): DailyVerse {
+  const cacheKey = dailyVerseCacheKey(currentDate);
+
+  try {
     const cached = localStorage.getItem(cacheKey);
     if (cached) {
-      try {
-        return JSON.parse(cached) as DailyVerse;
-      } catch (e) {
-        console.error("Failed to parse cached verse", e);
+      const parsed = JSON.parse(cached) as unknown;
+      if (isValidDailyVerse(parsed)) return parsed;
+    }
+  } catch {
+    // corrupted JSON -> fall through and regenerate
+  }
+
+  try {
+    localStorage.removeItem(cacheKey);
+  } catch {
+    /* ignore */
+  }
+
+  const freshVerse = getVerseForDate(currentDate);
+
+  try {
+    localStorage.setItem(cacheKey, JSON.stringify(freshVerse));
+    const staleKeys: string[] = [];
+    for (let i = 0; i < localStorage.length; i += 1) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith(DAILY_VERSE_CACHE_PREFIX) && key !== cacheKey) {
+        staleKeys.push(key);
       }
     }
-    
-    // Calculate and cache
-    const freshVerse = getVerseForDate(currentDate);
-    localStorage.setItem(cacheKey, JSON.stringify(freshVerse));
-    
-    // Clean up old daily-verse keys
-    Object.keys(localStorage).forEach(key => {
-      if (key.startsWith("daily-verse:") && key !== cacheKey) {
-        localStorage.removeItem(key);
-      }
-    });
-    
-    return freshVerse;
-  }, [currentDate, cacheKey]);
+    staleKeys.forEach((key) => localStorage.removeItem(key));
+  } catch {
+    /* storage unavailable: verse still works in memory */
+  }
+
+  return freshVerse;
+}
+
+export function useDailyVerse() {
+  const [currentDate, setCurrentDate] = useState(getBrasiliaDate());
+
+  const verse = useMemo(() => {
+    if (typeof window === "undefined") return getVerseForDate(currentDate);
+    return resolveDailyVerse(currentDate);
+  }, [currentDate]);
 
   const updateDate = useCallback(() => {
     const newDate = getBrasiliaDate();

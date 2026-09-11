@@ -107,9 +107,12 @@ export function buildYouVersionContextUrl({
   const config = BIBLE_VERSIONS_BY_LOCALE[locale] || BIBLE_VERSIONS_BY_LOCALE[DEFAULT_LOCALE];
   const yvLocale = youVersionLocaleMap[locale] || youVersionLocaleMap[DEFAULT_LOCALE] || "pt";
 
-  // 2. Validate Book and Chapter
-  const book = getBookById(bookId.toUpperCase());
-  const isValidChapter = book && chapter > 0 && chapter <= book.chapters.length;
+  // 2. Validate Book and Chapter (never call string methods on missing values)
+  const safeBookId = typeof bookId === "string" ? bookId.trim() : "";
+  const isValidChapterNumber =
+    typeof chapter === "number" && Number.isInteger(chapter) && chapter > 0;
+  const book = safeBookId ? getBookById(safeBookId.toUpperCase()) : undefined;
+  const isValidChapter = !!book && isValidChapterNumber && chapter <= book.chapters.length;
 
   if (!book || !isValidChapter) {
     // Fallback 1: Localized generic Bible link
